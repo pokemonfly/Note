@@ -29,7 +29,7 @@ ap.Feature = [
 	},
 	{
 		name : "复仇",
-		description : "怪兽死亡后会使首领怪兽获得强大力量"
+		description : "怪兽死亡后会使首领怪兽获得 强大力量"
 		effect : function (field) {
 			field.monsters.each(function (monster) {
 					monster.onDead = function () {
