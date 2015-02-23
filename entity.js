@@ -38,6 +38,11 @@ ap.Entity = {
 	anims: {},
     animSheet: null,
 
+    // 碰撞体积 半径
+    radius : 10,
+    // 位置
+    pos : {},
+
 	// 准备阶段 检查状态效果
 	onReady : function () {
 		this.skills.map(function (s) {

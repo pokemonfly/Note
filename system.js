@@ -1,5 +1,5 @@
 "use strict";
-ap.System = {
+ap.system = {
 	width: 1024,
     height: 768,	
 	canvas: null,
