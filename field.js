@@ -2,7 +2,8 @@
 ap.Field = {
 	monsters : [],
 	boss : [],
-
+	// 判断是否是新的场景，用于检测场景是否刚初始化完毕
+    isNewField : true,
 	monstersAmount : 0,
 	bossAmount : 0,
 	// 创建怪兽   类型，数量，位置

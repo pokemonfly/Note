@@ -1,5 +1,5 @@
 // 场景特性 数量受难度决定
-ap.Feature = [
+ap.feature = [
 	{
 		name : "冲锋",
 		description : "怪兽获得冲锋技能"

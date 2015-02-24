@@ -3,4 +3,16 @@ ap.Config = {
 	
 	monsters : [],
 	boss : [],
+
+	difficulty : {
+		"EASY" : {
+			
+		},
+		"NORMAL" : {
+
+		},
+		"HARD" : {
+
+		}
+	}
 };

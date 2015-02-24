@@ -1,6 +1,6 @@
 // 实体 所有的物体
 "use strict";
-ap.Entity = {
+ap.Entity = ap.Class.extend({
 	// 生命
 	life : 100,
 	// 生命上限
@@ -44,7 +44,7 @@ ap.Entity = {
     pos : {},
 
 	// 准备阶段 检查状态效果
-	onReady : function () {
+	onKeep : function () {
 		this.skills.map(function (s) {
 			s.effect(this);
 		});
@@ -101,4 +101,4 @@ ap.Entity = {
 	update : function () {},
 	draw : function () {},
 
-};
+});

@@ -3,7 +3,11 @@ ap.utils = {
 	// 深度拷贝
 	deepCopy : function (obj) {
 		return obj;
-	}
+	},
+    // 播放剧情
+    playScenario : function () {
+
+    }
 }； 
 
 // 以防万一
