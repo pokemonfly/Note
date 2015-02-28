@@ -1,18 +1,20 @@
 // 怪兽的配置
-ap.Config = {
-	
-	monsters : [],
-	boss : [],
+ap.module("achievement").defines(function() {
+	ap.config = {
+		
+		monsters : [],
+		boss : [],
 
-	difficulty : {
-		"EASY" : {
-			
-		},
-		"NORMAL" : {
+		difficulty : {
+			"EASY" : {
+				
+			},
+			"NORMAL" : {
 
-		},
-		"HARD" : {
+			},
+			"HARD" : {
 
+			}
 		}
-	}
-};
+	};
+});

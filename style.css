@@ -1,0 +1,102 @@
+html, body, .full, #canvas {
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+.hidden {
+	display: none;
+}
+.border, div {
+	outline:1px solid black;
+}
+.panel {
+	display: none;
+}
+.ui {
+	position: absolute;
+}
+canvas {
+	z-index: -10;
+}	
+/*角色名 血条 经验条 护盾 面板*/
+#summary {
+    left: 30%;
+    top: 92%;
+    width: 15%;
+    height: 7%;
+}
+/*护盾*/
+#shield {
+	height: 45%;
+	width: 80%;
+	padding-top: 20%;
+}
+/*血条 包含在护盾中*/
+#life {
+	height: 80%;
+	width: 90%;
+	vertical-align: bottom;
+}
+/*技能条*/
+#skill {
+    left: 48%;
+    top: 92%;
+    width: 20%;
+    height: 7%;
+}
+.skill {
+	float: left;
+	width: 17%;
+	height: 90%;
+	margin: 1%;
+	outline:1px solid black;
+}
+/*战斗信息*/
+#message {
+	left: 1%;
+    top: 83%;
+    width: 20%;
+    height: 15%;
+}
+/*状态栏*/
+#status {
+	left: 80%;
+    top: 3%;
+    width: 15%;
+    height: 5%;
+}
+/*快捷方式*/
+#shortcut {
+	left: 90%;
+    top: 93%;
+    width: 8%;
+    height: 5%;
+}
+/*场地特性表示*/
+#feature {
+	left: 3%;
+    top: 3%;
+    width: 10%;
+    height: 15%;
+}
+/*角色属性*/
+#playerInfo {
+	left: 35%;
+    top: 90%;
+    width: 30%;
+    height: 8%;
+}
+/*统计*/
+#achievement {
+	left: 35%;
+    top: 90%;
+    width: 30%;
+    height: 8%;
+}
+/*系统菜单*/
+#system {
+	left: 35%;
+    top: 90%;
+    width: 30%;
+    height: 8%;
+}

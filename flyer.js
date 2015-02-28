@@ -1,4 +1,5 @@
 // 附带伤害性质的飞行物
+ap.module("flyer").defines(function() {
 ap.Flyer = {
 	// 威力
 	power : 0,
@@ -42,3 +43,4 @@ ap.Flyer = {
 		
 	} 
 };
+});

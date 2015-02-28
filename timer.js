@@ -1,5 +1,7 @@
 // 计时器
-"use strict";
-ap.Timer = {
-	create : function (){}
-};
+ap.module("timer").defines(function() {
+	"use strict";
+	ap.Timer = {
+		create: function() {}
+	};
+});
