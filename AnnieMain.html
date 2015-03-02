@@ -12,20 +12,31 @@
 		<!--主画面-->
 		<canvas id="canvas" class="ui"></canvas>
 		<!-- 角色名 血条 经验条 护盾-->
-		<div id="summary" class="ui">
-			<span id="name" class="name">安妮</span>
-			<span id="level">18</span>
-			<span id="name" class="name">经验</span>
-			<div id="shield" class="border"></div>
-			<div id="life" class="border"></div>
+		<div id="player" class="ui">
+			<div class="playerInfo">
+				<span id="level" class="">18</span>
+				<div id="shield" class="border">
+					<div id="shieldInner" class="innerBar"></div>
+					<span id="shieldNum" class="num">30/60</span>
+					<div id="life" class="border hasShield">
+					<div id="lifeInner" class="innerBar"></div>
+					<span id="lifeNum" class="num">350/500</span>
+				</div> 
+				</div>
+				<div id="exp" class="noborder">
+					<div id="expInner" class="noborder"></div>
+				</div>
+			</div>
 		</div>
 		<!-- 技能条 -->
 		<div id="skill" class="ui border">
-			<div id="skill0" class="skill"></div>
-			<div id="skill1" class="skill"></div>
-			<div id="skill2" class="skill"></div>
-			<div id="skill3" class="skill"></div>
-			<div id="skill4" class="skill"></div>
+			<div class="skillList">
+				<div id="skill0" class="skill"></div>
+				<div id="skill1" class="skill"></div>
+				<div id="skill2" class="skill"></div>
+				<div id="skill3" class="skill"></div>
+				<div id="skill4" class="skill"></div>
+			</div>
 		</div>
 		<!-- 战斗信息 -->
 		<div id="message" class="ui"></div>

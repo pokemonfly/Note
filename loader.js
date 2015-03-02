@@ -1,6 +1,21 @@
 // 入口 所有的js都通过loader去加载
 (function() {
 	"use strict";
+	// bind方法，以防万一。代码来自网络
+	Function.prototype.bind = Function.prototype.bind || function(oThis) {
+		if (typeof this !== "function") {
+			throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+		}
+		var aArgs = Array.prototype.slice.call(arguments, 1),
+			fToBind = this,
+			fNOP = function() {},
+			fBound = function() {
+				return fToBind.apply((this instanceof fNOP && oThis ? this : oThis), aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+		return fBound;
+	};
 	// ap为本程序使用的名空间
 	window.ap = {
 		// 脚本的默认路径
@@ -57,12 +72,12 @@
 		},
 		// 等待DOM加载完成后加载模块
 		_initDOMReady: function() {
-			if (this.modules['domReady'] && this.modules['domReady'].loaded) {
+			if (this.modules['dom.ready'] && this.modules['dom.ready'].loaded) {
 				this._execModules();
 				return;
 			}
 			// Dom加载完成
-			this.modules['domReady'] = {
+			this.modules['dom.ready'] = {
 				requires: [],
 				loaded: false,
 				body: null
@@ -77,11 +92,11 @@
 		},
 		// 检查dom是否加载完成
 		_DOMReady: function() {
-			if (!this.modules['domReady'] || !this.modules['domReady'].loaded) {
+			if (!this.modules['dom.ready'] || !this.modules['dom.ready'].loaded) {
 				if (!document.body) {
 					return setTimeout(this._DOMReady, 15);
 				}
-				this.modules['domReady'].loaded = true;
+				this.modules['dom.ready'].loaded = true;
 				this._waitForOnload--;
 				this._execModules();
 			}
@@ -113,7 +128,7 @@
 			}
 			if (modulesLoaded) {
 				this._execModules();
-			} else if (this._waitForOnload == 0 && this._loadQueue.length != 0) {
+			} else if (this._waitForOnload === 0 && this._loadQueue.length !== 0) {
 				var unresolved = [];
 				for (var i = 0; i < this._loadQueue.length; i++) {
 					var unloaded = [];
@@ -143,8 +158,8 @@
 			script.type = 'text/javascript';
 			script.src = path;
 			script.onload = function() {
-				ap._waitForOnload--;
 				ap._execModules();
+				ap._waitForOnload--;
 			};
 			script.onerror = function() {
 				throw ('模块： ' + name + ' at ' + path + ' ' + 'required from ' + requiredFrom + '执行错误');
@@ -153,7 +168,11 @@
 		}
 	};
 	// 开始顺序加载基础模块
-	ap.module('loader').requires("skill","field").defines(function() {
-		ap.log("lalala~~");
+	ap.module('loader').requires("cheat").defines(function() {
+		ap.log("《安妮与提伯斯》是使用LOL安妮人设的同人作品。");
+		ap.log(" 素材来自饥荒，部分设定取自激战2。");
+		ap.log(" 游戏代码仅使用了原生javascript，为展示代码故未压缩。");
+		ap.log(" 请勿随意分享。有疑问请联系pokemonfly@outlook.com");
+		ap.log(" 												--2015年3月 杨");
 	});
 })();
