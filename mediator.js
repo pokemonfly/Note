@@ -1,8 +1,21 @@
-// 中介 
-ap.module("mediator").defines(function() {
+// 中介 负责对象之间的通信 
+ap.module("mediator").requires("scenario", "game", "ui").defines(function() {
 	"use strict";
-	ap.Mediator = {
+	ap.mediator = {
+		events: {},
+		scenario: ap.scenario,
 		achieve: ap.Achievement,
+		init: function() {
+			for (var i = 0, l = this.scenario.length; i < l; i++) {
+				// 剧本中的事件初始化
+				var s = this.scenario[i];
+				s.disabled = false;
+				if (!s.trigger) {
+					// 如果没有触发函数，就需要通过name手动触发
+					this.events[s.name] = s.run.bind(s);
+				}
+			}
+		},
 		// 攻击  攻击者，目标，伤害值，技能id，附加异常, 附加概率, 是否是反射伤害
 		attack: function(attacker, target, damage, skillId, status, probability, isReflection) {
 			var isDead = false;
@@ -15,7 +28,7 @@ ap.module("mediator").defines(function() {
 				// 反射攻击没有吸血 并且不会再次反射
 				isDead = target.onHurt(damage, attacker, false);
 			}
-			if (status != null) {
+			if (status !== null) {
 				// 判断是否附加异常
 				if (Math.random() < probability) {
 					target.status.push(status);
@@ -25,6 +38,14 @@ ap.module("mediator").defines(function() {
 				// 如果是玩家杀死怪物，则更新成就 并通知玩家
 				achieve.killCount += 1;
 				achieve.skillKillCount[skillId] += 1;
+			}
+		},
+		// 触发自定义事件
+		fire: function(event) {
+			if (this.events[event]) {
+				return this.events[event]();
+			} else {
+				console.log("事件未触发：" + event);
 			}
 		}
 	};

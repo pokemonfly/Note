@@ -1,7 +1,7 @@
 // 玩家
-ap.module("player").defines(function() {
+ap.module("player").requires("entity", "image").defines(function() {
 	"use strict";
-	ap.Player = {
+	ap.Player = ap.Entity.extend({
 		// 等级
 		level: 1,
 		// 经验
@@ -53,8 +53,10 @@ ap.module("player").defines(function() {
 		shieldDuration: 0,
 
 		// 是否无敌
-		isInvincible: false;
+		isInvincible: false,
 
+		// 表示图像
+		animSheet: new ap.Image("./media/frames/a.jpg"),
 		ready: function() {
 			// 护盾状态
 			if (this.hasShield) {
@@ -84,5 +86,5 @@ ap.module("player").defines(function() {
 				this.life -= damage;
 			}
 		}
-	};
+	});
 });

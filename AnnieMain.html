@@ -1,82 +1,89 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="UTF-8">
-	<title>安妮与提伯斯</title>
-	<link rel="stylesheet" href="style.css">
-	<script src="loader.js"></script>
+    <meta charset="UTF-8">
+    <title>安妮与提伯斯</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="loader.js"></script>
 </head>
+
 <body>
-	<!-- UI -->
-	<div id="ui" class="full">	
-		<!--主画面-->
-		<canvas id="canvas" class="ui"></canvas>
-		<!-- 角色名 血条 经验条 护盾-->
-		<div id="player" class="ui">
-			<div class="playerInfo">
-				<span id="level" class="">18</span>
-				<div id="shield" class="border">
-					<div id="shieldInner" class="innerBar"></div>
-					<span id="shieldNum" class="num">30/60</span>
-					<div id="life" class="border hasShield">
-					<div id="lifeInner" class="innerBar"></div>
-					<span id="lifeNum" class="num">350/500</span>
-				</div> 
-				</div>
-				<div id="exp" class="noborder">
-					<div id="expInner" class="noborder"></div>
-				</div>
-			</div>
-		</div>
-		<!-- 技能条 -->
-		<div id="skill" class="ui border">
-			<div class="skillList">
-				<div id="skill0" class="skill"></div>
-				<div id="skill1" class="skill"></div>
-				<div id="skill2" class="skill"></div>
-				<div id="skill3" class="skill"></div>
-				<div id="skill4" class="skill"></div>
-			</div>
-		</div>
-		<!-- 战斗信息 -->
-		<div id="message" class="ui"></div>
-		<!-- 状态栏 -->
-		<div id="status" class="ui"></div>
-		<!-- 快捷方式 点击打开各种面板-->
-		<div id="shortcut" class="ui"></div>
-		<!-- 场地特性表示 -->
-		<div id="feature" class="ui"></div>
-		<!-- 角色属性 -->
-		<div id="playerInfo" class="ui panel"></div>
-		<!-- 统计 成就 -->
-		<div id="achievement" class="ui panel"></div>
-		<!-- 系统菜单 -->
-		<div id="system" class="ui panel"></div>
-	</div>
-	<!-- 剧情用 -->
-	<div id="scenario" class="full hidden">
-		<!-- 头像 -->
-		<div id="head" class="scenario"></div>
-		<!-- 对话框 -->
-		<div id="dialog" class="scenario">
-			<span id="lines"></span>
-		</div>
-		<!-- 选择难度用 -->
-		<div id="selecter"></div>
-	</div>
-	<!-- 开始画面 -->
-	<div id="main" class="full hidden">
-		<div id="title">安妮与提伯斯</div>
-		<div id="intro">按任意键开始</div>
-		<div id="mainMenu hidden">
-			<a href="#" id="newGame">新的开始</a>
-			<a href="#" id="newGame">继续</a>
-		</div>
-	</div>
-	<!-- loading画面 -->
-	<div id="loading" class="full hidden">
-		Loading...
-	</div>
+    <!-- UI -->
+    <div id="ui" class="fullscreen ">
+        <!--主画面-->
+        <canvas id="canvas" class="ui"></canvas>
+        <!-- 角色名 血条 经验条 护盾-->
+        <div id="player" class="ui noborder">
+            <div class="middle">
+                <span id="level" class="">18</span>
+                <div id="shield" class="border">
+                    <div id="shieldInner" class="innerBar"></div>
+                    <span id="shieldNum" class="num">30/60</span>
+                    <div id="life" class="border">
+                        <div id="lifeInner" class="innerBar"></div>
+                        <span id="lifeNum" class="num">350/500</span>
+                    </div>
+                </div>
+                <div id="exp" class="noborder">
+                    <div id="expInner" class="noborder"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 技能条 -->
+        <div id="skill" class="ui noborder">
+            <div class="skillList noborder">
+                <div id="skill0" class="skill"></div>
+                <div id="skill1" class="skill"></div>
+                <div id="skill2" class="skill"></div>
+                <div id="skill3" class="skill"></div>
+                <div id="skill4" class="skill"></div>
+            </div>
+        </div>
+        <!-- 战斗信息 -->
+        <div id="message" class="ui"></div>
+        <!-- 状态栏 -->
+        <div id="status" class="ui"></div>
+        <!-- 快捷方式 点击打开各种面板-->
+        <div id="shortcut" class="ui"></div>
+        <!-- 场地特性表示 -->
+        <div id="feature" class="ui"></div>
+        <!-- 角色属性 -->
+        <div id="playerInfo" class="ui panel"></div>
+        <!-- 统计 成就 -->
+        <div id="achievement" class="ui panel"></div>
+        <!-- 系统菜单 -->
+        <div id="system" class="ui panel"></div>
+    </div>
+    <!-- 剧情用 -->
+    <div id="scenario" class="fullscreen">
+        <div class="dialog">
+            <div class="middle">
+                <!-- 头像 -->
+                <div id="head" class=""></div>
+                <!-- 对话框 -->
+                <div id="dialog" class="">
+                    <span id="lines"></span>
+                </div>
+            </div>
+        </div>
+        <!-- 画面选项 -->
+        <div id="selecter" class="hidden"></div>
+    </div>
+    <!-- 开始画面 -->
+    <div id="main" class="fullscreen hidden">
+        <div id="title">安妮与提伯斯</div>
+        <div id="intro">按任意键开始</div>
+        <div id="mainMenu hidden">
+            <a href="#" id="newGame">新的开始</a>
+            <a href="#" id="newGame">继续</a>
+        </div>
+    </div>
+    <!-- loading画面 -->
+    <div id="loading" class="fullscreen hidden">
+        Loading...
+    </div>
 
 </body>
+
 </html>

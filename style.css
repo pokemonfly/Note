@@ -1,45 +1,50 @@
-html, body, .full, #canvas {
-	margin: 0;
-	width: 100%;
-	height: 100%;
+html, body, .fullscreen, #canvas {
+    margin: 0;
+    width: 100%;
+    height: 100%;
 }
 .hidden {
-	display: none;
+    display: none;
 }
 .border, div {
-	/*outline:1px dotted  gray;*/
+    outline: 1px dotted gray;
 }
 .noborder {
     outline: none;
 }
 .panel {
-	display: none;
+    /*TODO*/
+    display: none;
 }
 .ui {
-	position: absolute;
-}
-canvas {
-	z-index: -10;
-}	
-/*角色名 血条 经验条 护盾 面板*/
-#player {
     position: fixed;
-    bottom: 80px;
-    width: 100%;
-    height: 70px;
 }
-.playerInfo {
+/*居中用*/
+.middle {
     width: 300px;
     position: relative;
     left: 50%;
     outline: none;
 }
-.playerInfo > * {
+.middle > * {
     position: relative;
     left: -50%;
 }
+canvas {
+    z-index: -10;
+}
+/*角色名 血条 经验条 护盾 面板*/
+#player {
+    bottom: 80px;
+    width: 100%;
+    height: 70px;
+}
 #level {
     float: left;
+}
+/* 初期无护盾*/
+#shieldNum {
+    display: none;
 }
 /*护盾*/
 #shield {
@@ -47,7 +52,7 @@ canvas {
     height: 40px;
     float: right;
     transform: skew(-20deg);
-    outline:1px solid lightblue;
+    outline: 1px solid lightblue;
     box-shadow: 1px 1px 3px #888888;
 }
 /*护盾条*/
@@ -75,12 +80,12 @@ canvas {
 }
 /*血条 包含在护盾中*/
 #life {
-	height: 100%;
+    height: 100%;
     width: 100%;
     left: 0;
     top: 0;
     background-color: white;
-    outline:1px solid lightblue;
+    outline: 1px solid lightblue;
 }
 #life.hasShield {
     left: 0;
@@ -138,50 +143,56 @@ canvas {
 }
 /*战斗信息*/
 #message {
-	left: 1%;
+    left: 1%;
     top: 83%;
     width: 20%;
     height: 15%;
 }
 /*状态栏*/
 #status {
-	left: 80%;
+    left: 80%;
     top: 3%;
     width: 15%;
     height: 5%;
 }
 /*快捷方式*/
 #shortcut {
-	left: 90%;
+    left: 90%;
     top: 93%;
     width: 8%;
     height: 5%;
 }
 /*场地特性表示*/
 #feature {
-	left: 3%;
+    left: 3%;
     top: 3%;
     width: 10%;
     height: 15%;
 }
 /*角色属性*/
 #playerInfo {
-	left: 35%;
+    left: 35%;
     top: 90%;
     width: 30%;
     height: 8%;
 }
 /*统计*/
 #achievement {
-	left: 35%;
+    left: 35%;
     top: 90%;
     width: 30%;
     height: 8%;
 }
 /*系统菜单*/
 #system {
-	left: 35%;
+    left: 35%;
     top: 90%;
     width: 30%;
     height: 8%;
+}
+/*=============剧情用=======================*/
+.dialog {
+    height: 200px;
+    width: 600px;
+    bottom: 10px
 }

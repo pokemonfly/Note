@@ -168,11 +168,13 @@
 		}
 	};
 	// 开始顺序加载基础模块
-	ap.module('loader').requires("cheat").defines(function() {
+	ap.module('loader').requires("cheat", "system").defines(function() {
 		ap.log("《安妮与提伯斯》是使用LOL安妮人设的同人作品。");
 		ap.log(" 素材来自饥荒，部分设定取自激战2。");
 		ap.log(" 游戏代码仅使用了原生javascript，为展示代码故未压缩。");
 		ap.log(" 请勿随意分享。有疑问请联系pokemonfly@outlook.com");
 		ap.log(" 												--2015年3月 杨");
+		// 开始初始化
+		ap.system.init();
 	});
 })();
