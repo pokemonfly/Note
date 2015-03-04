@@ -6,12 +6,14 @@ html, body, .fullscreen, #canvas {
 .hidden {
     display: none;
 }
+/*=========TEST==========*/
 .border, div {
     outline: 1px dotted gray;
 }
 .noborder {
     outline: none;
 }
+/*========================*/
 .panel {
     /*TODO*/
     display: none;
@@ -21,7 +23,6 @@ html, body, .fullscreen, #canvas {
 }
 /*居中用*/
 .middle {
-    width: 300px;
     position: relative;
     left: 50%;
     outline: none;
@@ -109,8 +110,15 @@ canvas {
 #level {
     font-family: cursive;
     line-height: 40px;
+    background-color: #FFF;
+    border-radius: 50%;
+    width: 40px;
+    text-align: center;
     font-size: 180%;
-    text-shadow: 0 1 2px #000;
+    /*text-shadow: 1 1 2px #FFF;*/
+}
+.playerPanel {
+    width: 310px;
 }
 /*生命值，护盾值*/
 .num {

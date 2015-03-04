@@ -2,11 +2,7 @@
 // 以防万一
 window.requestAnimationFrame = window.requestAnimationFrame ||
 	function(callback) {
-		window.setInterval(callback, 1000 / 60);
-	};
-window.cancelAnimationFrame = window.cancelAnimationFrame ||
-	function(id) {
-		window.clearInterval(id);
+		window.setTimeout(callback, 1000 / 60);
 	};
 ap.module("ui").requires("utils").defines(function() {
 	"use strict";
@@ -28,10 +24,17 @@ ap.module("ui").requires("utils").defines(function() {
 		returnValue: null,
 		// 剧情播放完的回调
 		callback: null,
+		// 当前动画循环调用用
+		_anims : {},
+		_next : 1,
 		init: function() {
 			this.canvas = ap.$("canvas")[0];
 			this.shield = ap.$("#shield");
 			this.life = ap.$("#life");
+
+			this.canvas.height = document.body.clientHeight;
+			this.canvas.width = document.body.clientWidth;
+
 
 		},
 		setLife: function(per) {
@@ -56,11 +59,21 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 		// 动画循环播放
 		setAnimation: function(callback) {
-			return window.requestAnimationFrame(callback);
+			var current = this._next++;
+			this._anims[current] = true;
+			var animate = function() {
+				if (!ap.ui._anims[current]) {
+					return;
+				}
+				window.requestAnimationFrame(animate);
+				callback();
+			};
+			window.requestAnimationFrame(animate);
+			return current;
 		},
 		// 清空当前播放的动画
 		clearAnimation: function(id) {
-			window.cancelAnimationFrame(id);
+			delete this._anims[id];
 		},
 		// 播放剧情
 		playScenario: function(scenario) {

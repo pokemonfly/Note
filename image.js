@@ -19,24 +19,18 @@ ap.module('image').requires().defines(function() {
                     loadCallback(this.path, true);
                 }
                 return;
-            } else if (!this.loaded && ap.ready) {
+            } else if (!this.loaded) {
                 this.loadCallback = loadCallback || null;
                 this.data = new Image();
                 this.data.onload = this.onload.bind(this);
                 this.data.onerror = this.onerror.bind(this);
-                this.data.src = ap.prefix + this.path;
-            } else {
-                ap.addResource(this);
-            }
-            ap.Image.cache[this.path] = this;
+                this.data.src = this.path;
+            } 
         },
         onload: function(event) {
             this.width = this.data.width;
             this.height = this.data.height;
             this.loaded = true;
-            if (ig.system.scale != 1) {
-                this.resize(ig.system.scale);
-            }
             if (this.loadCallback) {
                 this.loadCallback(this.path, true);
             }
@@ -56,9 +50,7 @@ ap.module('image').requires().defines(function() {
             width = width ? width : this.width;
             height = height ? height : this.height;
             ap.system.context.drawImage(this.data, sourceX, sourceY, width, height, 
-            							ap.system.getDrawPos(targetX), ap.system.getDrawPos(targetY), width, height);
+            							targetX, targetY, width, height);
         }
     });
-    // 缓冲已经加载过的图片
-    ap.Image.cache = {};
 });

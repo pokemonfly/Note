@@ -56,7 +56,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		isInvincible: false,
 
 		// 表示图像
-		animSheet: new ap.Image("./media/frames/a.jpg"),
+		animSheet: new ap.Image("media/frames/a.jpg"),
 		ready: function() {
 			// 护盾状态
 			if (this.hasShield) {

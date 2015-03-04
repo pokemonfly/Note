@@ -1,16 +1,13 @@
-// 系统 唯一的
-ap.module("system").requires("ui", "mediator").defines(function() {
+// 系统 唯一
+ap.module("system").requires("ui", "mediator", "config").defines(function() {
 	"use strict";
 	ap.system = {
-		width: 1024,
-		height: 768,
-		canvas: null,
-		context: null,
 		running: false,
 		// 当前活动的game对象
 		delegate: null,
 		// 系统刷新用定时器的id
 		loopId: null,
+		context: null,
 		init: function() {
 			ap.ui.init();
 			ap.mediator.init();
@@ -19,7 +16,7 @@ ap.module("system").requires("ui", "mediator").defines(function() {
 		resize: function() {},
 		// 新开游戏
 		newGame: function(val) {
-			console.log(val);
+			// console.log(val);
 			this.delegate = new ap.Game();
 			this.startLoop();
 		},
@@ -28,6 +25,7 @@ ap.module("system").requires("ui", "mediator").defines(function() {
 			this.running = true;
 			this.loopId = ap.ui.setAnimation(this.run.bind(this));
 		},
+		// 暂停
 		pause : function () {
 			ap.ui.clearAnimation(this.loopId);
 			this.running = false;
@@ -45,7 +43,5 @@ ap.module("system").requires("ui", "mediator").defines(function() {
 		saveGame : function() {
 
 		}
-
-
 	};
 });

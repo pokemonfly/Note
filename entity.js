@@ -12,7 +12,7 @@ ap.module("entity").defines(function() {
 		// 因状态而改变的
 		powerBonus : 0,
 		// 攻速 每秒攻击次数 
-		attackSpeed : 1，
+		attackSpeed : 1,
 		// 暴击
 		critical : 0,
 		// 生命吸取
@@ -100,7 +100,11 @@ ap.module("entity").defines(function() {
 		},
 
 		update : function () {},
-		draw : function () {},
+		i : 0,
+		draw : function () {
+			if (this.animSheet)
+			 this.animSheet.draw(50+ this.i++, 50 + this.i++);
+		},
 
 	});
 });
