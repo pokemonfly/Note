@@ -1,52 +1,57 @@
 // 实体 所有的物体
-ap.module("entity").defines(function() {
+ap.module("entity").requires("timer", "class").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
 		// 生命
-		life : 100,
+		life: 100,
 		// 生命上限
-		lifeLimit : 100,
-		
-		// 攻击力
-		power : 10,
-		// 因状态而改变的
-		powerBonus : 0,
-		// 攻速 每秒攻击次数 
-		attackSpeed : 1,
-		// 暴击
-		critical : 0,
-		// 生命吸取
-		drainLife : 0,
+		lifeLimit: 100,
 
-		// 移动速度
-		moveSpeed : 100,
+		// 攻击力
+		power: 10,
+		// 因状态而改变的
+		powerBonus: 0,
+		// 攻速 每秒攻击次数 
+		attackSpeed: 1,
+		// 暴击
+		critical: 0,
+		// 生命吸取
+		drainLife: 0,
+
+		// 移动速度 每秒移动像素
+		moveSpeed: 100,
 		// 移动速度奖励
-		moveSpeedBonus : 0,
+		moveSpeedBonus: 0,
+		// 移动用计时器
+		moveTimer: new ap.Timer(),
 		// 是否定身
-		isImmobilize : false,
+		isImmobilize: false,
 
 		// 是否有反射Buff
-		isReflection : false,
+		isReflection: false,
 
 		// 是否死亡
-		isKilled : false,
+		isKilled: false,
 
 		// 状态 buff & debuff
-		status : [],
+		status: [],
 		// 持有技能
-		skills : [],
+		skills: [],
 
 		anims: {},
-	    animSheet: null,
+		animSheet: null,
 
-	    // 碰撞体积 半径
-	    radius : 10,
-	    // 位置
-	    pos : {},
+		// 碰撞体积 半径
+		radius: 10,
+		// 位置
+		pos: {
+			x: 50,
+			y: 50
+		},
 
 		// 准备阶段 检查状态效果
-		onKeep : function () {
-			this.skills.map(function (s) {
+		onKeep: function() {
+			this.skills.map(function(s) {
 				s.effect(this);
 			});
 			// 如果有自定义的事件，一并执行
@@ -56,7 +61,7 @@ ap.module("entity").defines(function() {
 		},
 
 		// 受到治疗
-		onHeal : function (heal) {
+		onHeal: function(heal) {
 			this.life += heal;
 			if (this.life > this.lifeLimit) {
 				this.life = this.lifeLimit;
@@ -64,7 +69,7 @@ ap.module("entity").defines(function() {
 		},
 
 		// 造成伤害
-		onDamage : function (damage) {
+		onDamage: function(damage) {
 			// 吸血判定
 			if (this.drainLife > 0) {
 				this.onHeal(damage * this.drainLife);
@@ -72,15 +77,15 @@ ap.module("entity").defines(function() {
 		},
 
 		// 受到伤害  canReflection: 伤害能否反射
-		onHurt : function (damage, attacker, canReflection) {
+		onHurt: function(damage, attacker, canReflection) {
 			if (this.hurt) {
 				this.hurt(damage);
 			} else {
 				this.life -= damage;
 			}
-			
+
 			// 检查反射Buff
-			if (this.isReflection && ! canReflection) {
+			if (this.isReflection && !canReflection) {
 				// 反射的伤害不会再次触发反射
 				ap.Mediator.attack(this, attacker, damage * 0.5, "reflection", null, null, true);
 			}
@@ -95,15 +100,15 @@ ap.module("entity").defines(function() {
 		},
 
 		// 死亡事件
-		onKill : function () {
+		onKill: function() {
 			this.isKilled = true;
 		},
 
-		update : function () {},
-		i : 0,
-		draw : function () {
-			if (this.animSheet)
-			 this.animSheet.draw(50+ this.i++, 50 + this.i++);
+		update: function() {},
+		draw: function() {
+			if (this.animSheet) {
+				this.animSheet.draw(~~(this.pos.x + 0.5), ~~(this.pos.y + 0.5));
+			}
 		},
 
 	});

@@ -1,5 +1,5 @@
 // 系统 唯一
-ap.module("system").requires("ui", "mediator", "config").defines(function() {
+ap.module("system").requires("ui", "mediator", "config", "input", "timer").defines(function() {
 	"use strict";
 	ap.system = {
 		running: false,
@@ -9,8 +9,12 @@ ap.module("system").requires("ui", "mediator", "config").defines(function() {
 		loopId: null,
 		context: null,
 		init: function() {
+			// DOM绑定 初始
 			ap.ui.init();
+			// 中介初始化
 			ap.mediator.init();
+			// 输入组件 初始化
+			ap.input.init();
 			this.context = ap.ui.canvas.getContext('2d');
 		},
 		resize: function() {},
@@ -32,8 +36,24 @@ ap.module("system").requires("ui", "mediator", "config").defines(function() {
 		},
 		// 运行中
 		run: function() {
+			ap.Timer.tick();
 			// 执行当前游戏的run
 			this.delegate.run();
+			// 清空当前释放过的按钮
+			ap.input.clearReleased();
+			this.fps();
+		},
+		_fps: 0,
+		_fpsCount : 0,
+		_fpsTimer: new ap.Timer(),
+		fps : function() {
+			if (this._fpsTimer.delta() > 1) {
+				this._fps = this._fpsCount;
+				this._fpsCount = 0;
+				this._fpsTimer.reset();
+			} else {
+				this._fpsCount ++;
+			}
 		},
 		// 读取中断的游戏
 		loadGame: function() {

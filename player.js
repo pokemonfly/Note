@@ -33,11 +33,23 @@ ap.module("player").requires("entity", "image").defines(function() {
 		range: 0,
 		// 生命吸取
 		drainLife: 0.05,
+		// 技能方向
+		aim: 0,
 
 		// 位置
-		pos: {},
-		// 移动速度
-		moveSpeed: 100,
+		pos: {
+			x: 0,
+			y: 0
+		},
+		// 角色移动方向 弧度
+		moveAim: 0,
+		// 移动的目标地点
+		moveTo: {
+			x: 0,
+			y: 0
+		},
+		// 移动速度 
+		moveSpeed: 200,
 
 		// 是否有护盾
 		hasShield: false,
@@ -84,6 +96,87 @@ ap.module("player").requires("entity", "image").defines(function() {
 				}
 			} else {
 				this.life -= damage;
+			}
+		},
+
+		update: function() {
+			// 角色移动
+			// 是否使用键盘来移动
+			var useKey = false;
+			var keyAim = {
+				x: this.pos.x,
+				y: this.pos.y
+			};
+			// 鼠标点击 移动位置
+			if (ap.input.pressed("Go")) {
+				// 设定目标地点
+				this.moveTo.x = ap.input.mouse.x;
+				this.moveTo.y = ap.input.mouse.y;
+			}
+			if (ap.input.pressed("Up")) {
+				useKey = true;
+				keyAim.y--;
+			}
+			if (ap.input.pressed("Left")) {
+				useKey = true;
+				keyAim.x--;
+			}
+			if (ap.input.pressed("Down")) {
+				useKey = true;
+				keyAim.y++;
+			}
+			if (ap.input.pressed("Right")) {
+				useKey = true;
+				keyAim.x++;
+			}
+
+			// 设置移动方向
+			if (useKey) {
+				this.moveAim = Math.atan2(keyAim.y - this.pos.y, keyAim.x - this.pos.x);
+			} else {
+				this.moveAim = Math.atan2(this.moveTo.y - this.pos.y, this.moveTo.x - this.pos.x);
+			}
+
+			// 角色未定身的话开始移动
+			if (!this.isImmobilize) {
+				// 当前时间段可以移动的距离 像素
+				// if (Math.abs(this.moveTo.x - this.pos.x) >= 1 || Math.abs(this.moveTo.y - this.pos.y) >= 1) {
+				if (useKey) {
+					// 当前可以移动的长度
+					var distance = this.moveTimer.delta() * this.moveSpeed;
+					this.pos.x += distance * Math.cos(this.moveAim);
+					this.pos.y += distance * Math.sin(this.moveAim);
+					this.moveTo.x = this.pos.x;
+					this.moveTo.y = this.pos.y;
+				} else {
+					if (this.moveTo.x !== this.pos.x || this.moveTo.y !== this.pos.y) {
+						// 当前可以移动的长度
+						var distance = this.moveTimer.delta() * this.moveSpeed;
+
+						// 距离目标的长度
+						var current = Math.sqrt(Math.pow(Math.abs(this.moveTo.x - this.pos.x), 2) + Math.pow(Math.abs(this.moveTo.y - this.pos.y), 2), 0.5);
+						if (distance < current) {
+							this.pos.x += distance * Math.cos(this.moveAim);
+							this.pos.y += distance * Math.sin(this.moveAim);
+						} else {
+							this.pos.x = this.moveTo.x;
+							this.pos.y = this.moveTo.y;
+
+						}
+
+					}
+				}
+				this.moveTimer.reset();
+			}
+
+			// 普通攻击
+			if (ap.input.pressed("Attack1")) {
+				// 鼠标攻击
+				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
+			}
+			if (ap.input.pressed("Attack2")) {
+				// 键盘攻击
+				this.aim = this.moveAim;
 			}
 		}
 	});
