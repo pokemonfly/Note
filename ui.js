@@ -7,7 +7,6 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
 ap.module("ui").requires("utils").defines(function() {
 	"use strict";
 	ap.ui = {
-		_: ap.utils,
 		canvas: null,
 		life: null,
 
@@ -21,13 +20,39 @@ ap.module("ui").requires("utils").defines(function() {
 		// 当前播放到的位置
 		cur: 0,
 		// 剧情的返回值
-		returnValue: null,
+		returnValue: 0,
 		// 剧情播放完的回调
 		callback: null,
-		// 当前动画循环调用用
-		_anims : {},
-		_next : 1,
+		// 当前游戏动画循环调用用
+		_anims: {},
+		_next: 1,
+		// =============DOM关联==================
+		// loading界面
+		loading: null,
+		// 主界面
+		main: null,
+		startGame: null,
+		loadGame: null,
+		// 游戏界面
+		gameUI: null,
+		// 剧情界面
+		scenario: null,
+		scenarioHasEvent: false,
+		// 界面的头像		
+		head: null,
+		// 界面的文本
+		lines: null,
+
 		init: function() {
+			this.loading = ap.$("#loading");
+			this.main = ap.$("#main");
+			this.startGame = ap.$("#newGame");
+			this.loadGame = ap.$("#loadGame");
+			this.gameUI = ap.$("#ui");
+			this.scenario = ap.$("#scenario");
+			this.head = ap.$("#head");
+			this.lines = ap.$("#lines");
+
 			this.canvas = ap.$("canvas")[0];
 			this.shield = ap.$("#shield");
 			this.life = ap.$("#life");
@@ -35,7 +60,22 @@ ap.module("ui").requires("utils").defines(function() {
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
 
-
+			ap.$("#close").addEventListener("click", this.skipScenario.bind(this), false);
+		},
+		// CSS 操作
+		hasClass: function(obj, cls) {
+			return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
+		},
+		addClass: function(obj, cls) {
+			if (!this.hasClass(obj, cls)) {
+				obj.className += " " + cls;
+			}
+		},
+		removeClass: function(obj, cls) {
+			if (this.hasClass(obj, cls)) {
+				var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
+				obj.className = obj.className.replace(reg, '');
+			}
 		},
 		setLife: function(per) {
 
@@ -43,10 +83,10 @@ ap.module("ui").requires("utils").defines(function() {
 		setShield: function(per) {
 			if (per > 0) {
 				this.shield.style.display = "";
-				_.addClass(life, "hasShield");
+				this.addClass(life, "hasShield");
 			} else {
 				this.shield.style.display = "none";
-				_.removeClass(life, "hasShield");
+				this.removeClass(life, "hasShield");
 			}
 		},
 		setMessage: function(message) {
@@ -81,20 +121,31 @@ ap.module("ui").requires("utils").defines(function() {
 			if (scenario.needPause) {
 				ap.system.pause();
 			}
+			// 显示剧情界面
+			this.removeClass(this.scenario, "hidden");
+			this.addClass(this.main, "hidden");
+			this.addClass(this.gameUI, "hidden");
+
 			this.callback = scenario.callback || {};
 			this.cur = 0;
 			this.playNext();
 		},
 		// 播放下一句
 		playNext: function() {
-			this.cur++;
 			if (this.cur == this.script.length) {
 				// 剧情播放完毕执行回调
 				if (this.callback) {
 					this.callback(this.returnValue);
 				}
+				if (this.scenarioHasEvent) {
+					window.removeEventListener("keyup", this.playNextHandler, false);
+					window.removeEventListener("mouseup", this.playNextHandler, false);
+					this.scenarioHasEvent = false;
+				}
+				return;
 			}
 			var section = this.script[this.cur];
+			this.cur++;
 			// 判断当前条件是否要播放 针对选择枝
 			if (section.which && !section.which(this.returnValue)) {
 				this.playNext();
@@ -102,27 +153,42 @@ ap.module("ui").requires("utils").defines(function() {
 			}
 			// 设置头像
 			if (section.icon) {
-
+				this.head.className = section.icon.toLowerCase();
 			} else {
-
+				this.head.className = "none";
 			}
 			// 设置台词
 			if (section.words) {
-
+				this.lines.innerHTML = section.words;
 			} else {
-
+				this.lines.innerHTML = "";
 			}
-			// 设置背景 
-			if (section.background) {
-
-			} else {
-
-			}
+			// 设置背景  设计保留
+			// if (section.background) {
+			// } else {
+			// }
 			// 创建一个选择菜单 并关联监听器
 			if (section.select) {
 
 			} else {
+				// 添加动作
+				if (!this.scenarioHasEvent) {
+					window.addEventListener("keyup", this.playNextHandler, false);
+					window.addEventListener("mouseup", this.playNextHandler, false);
+					this.scenarioHasEvent = true;
+				}
+			}
 
+		},
+		// 跳过剧情
+		skipScenario: function() {
+			this.cur = this.script.length;
+			ap.ui.playNext();
+		},
+		playNextHandler: function(e) {
+			// 点击画面或者按下空格或Enter时
+			if (e.type !== 'keyup' || e.keyCode === 32 || e.keyCode === 13) {
+				ap.ui.playNext();
 			}
 		},
 		// 接收画面点击的选项
@@ -133,6 +199,23 @@ ap.module("ui").requires("utils").defines(function() {
 		// 画面点击新游戏
 		newGame: function() {
 			ap.mediator.fire("NEWGAME");
+		},
+		showMain: function() {
+			this.addClass(this.loading, "hidden");
+			this.removeClass(this.main, "hidden");
+			this.startGame.addEventListener("click", (function() {
+				this.addClass(this.main, "hidden");
+				this.removeClass(this.gameUI, "hidden");
+				this.newGame();
+				event.stopPropagation();
+				event.preventDefault();
+			}).bind(this));
+		},
+		showGame: function() {
+			this.addClass(this.loading, "hidden");
+			this.addClass(this.main, "hidden");
+			this.addClass(this.scenario, "hidden");
+			this.removeClass(this.gameUI, "hidden");
 		}
 	};
 });

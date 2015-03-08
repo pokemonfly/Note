@@ -68,17 +68,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		isInvincible: false,
 
 		// 表示图像
-		animSheet: new ap.Image("media/frames/a.jpg"),
-		ready: function() {
-			// 护盾状态
-			if (this.hasShield) {
-				if (+new Date() > this.shieldCreateTime + this.shieldDuration) {
-					this.hasShield = false;
-				}
-			}
-		},
-
-		// 造成伤害
+		animSheet: null,
 
 		// 受到伤害
 		hurt: function(damage) {
@@ -173,11 +163,15 @@ ap.module("player").requires("entity", "image").defines(function() {
 			if (ap.input.pressed("Attack1")) {
 				// 鼠标攻击
 				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
+				this.attack("Pyromania");
 			}
 			if (ap.input.pressed("Attack2")) {
 				// 键盘攻击
 				this.aim = this.moveAim;
+				this.attack("Pyromania");	
 			}
+
+
 		}
 	});
 });

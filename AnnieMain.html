@@ -10,21 +10,19 @@
 
 <body>
     <!-- UI -->
-    <div id="ui" class="fullscreen ">
-        <button style="position:fixed" onclick="ap.system.newGame();">START</button>
-        <button style="position:fixed; left:5%" onclick="ap.system.pause();">pause</button>
+    <div id="ui" class="fullscreen hidden">
         <!--主画面-->
         <canvas id="canvas" class="ui"></canvas>
         <!-- 角色名 血条 经验条 护盾-->
         <div id="player" class="ui noborder">
             <div class="middle playerPanel">
-                <span id="level" class="">18</span>
+                <span id="level" class="">1</span>
                 <div id="shield" class="border">
                     <div id="shieldInner" class="innerBar"></div>
-                    <span id="shieldNum" class="num">30/60</span>
+                    <span id="shieldNum" class="num">0/0</span>
                     <div id="life" class="border">
                         <div id="lifeInner" class="innerBar"></div>
-                        <span id="lifeNum" class="num">350/500</span>
+                        <span id="lifeNum" class="num">512/512</span>
                     </div>
                 </div>
                 <div id="exp" class="noborder">
@@ -59,13 +57,15 @@
     </div>
     <!-- 剧情用 -->
     <div id="scenario" class="fullscreen hidden">
+        <img id="close" src="media/ui/close.png" title="跳过剧情"></img>
         <div class="dialog">
             <div class="middle">
                 <!-- 头像 -->
-                <div id="head" class=""></div>
+                <div id="head" class="none"></div>
                 <!-- 对话框 -->
                 <div id="dialog" class="">
                     <span id="lines"></span>
+                    <img id="next" src="media/ui/next.png"></img>
                 </div>
             </div>
         </div>
@@ -74,18 +74,19 @@
     </div>
     <!-- 开始画面 -->
     <div id="main" class="fullscreen hidden">
-        <div id="title">安妮与提伯斯</div>
-        <div id="intro">按任意键开始</div>
-        <div id="mainMenu hidden">
-            <a href="#" id="newGame">新的开始</a>
-            <a href="#" id="newGame">继续</a>
+        <div id="title"></div>
+        <div id="mainMenu">
+            <div class="middle">
+                <a href="#" id="newGame"></a>
+                <a href="#" id="loadGame" class="disable" title="你必须要有一个可用的存档"></a>
+            </div>
         </div>
     </div>
     <!-- loading画面 -->
-    <div id="loading" class="fullscreen hidden">
-        Loading...
+    <div id="loading" class="fullscreen">
+        <span class="loadStr">Loading...</span>
     </div>
-    
+
 </body>
 
 </html>

@@ -2,9 +2,11 @@
 ap.module("mediator").requires("scenario", "game", "ui").defines(function() {
 	"use strict";
 	ap.mediator = {
+		game : null,
 		events: {},
 		scenario: ap.scenario,
 		achieve: ap.Achievement,
+		// 初始化
 		init: function() {
 			for (var i = 0, l = this.scenario.length; i < l; i++) {
 				// 剧本中的事件初始化
@@ -47,6 +49,11 @@ ap.module("mediator").requires("scenario", "game", "ui").defines(function() {
 			} else {
 				console.log("事件未触发：" + event);
 			}
+		},
+		// 调用game对象，创建投射物
+		createFlyer : function(property) {
+			this.game.createFlyer(property);
 		}
+
 	};
 });

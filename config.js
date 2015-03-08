@@ -1,5 +1,5 @@
 // 全局配置
-ap.module("config").defines(function() {
+ap.module("config").requires("image").defines(function() {
 	ap.config = {
 		
 		monsters : [{
@@ -18,6 +18,15 @@ ap.module("config").defines(function() {
 			"HARD" : {
 
 			}
+		},
+		// 玩家初始属性
+		player : {
+			// 安妮的初始属性大多已经在player中预设
+			"Annie" : {
+				animSheet : new ap.Image("media/sprites/annie.png", ap.Image.OFFSET.BELOW),
+				skill : ["Pyromania"]
+			}
 		}
+
 	};
 });

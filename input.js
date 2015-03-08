@@ -1,4 +1,4 @@
-// 输入监听
+// 游戏用输入监听（基于ap.system.run)  DOM元素监听在ap.ui中定义
 ap.module("input").defines(function() {
 	"use strict";
 	ap.KEY = {

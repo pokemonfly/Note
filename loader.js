@@ -175,6 +175,7 @@
 		ap.log(" 请勿随意分享。有疑问请联系pokemonfly@outlook.com");
 		ap.log(" 												--2015年3月 杨");
 		// 开始初始化
+		// setTimeout(ap.system.init, 1000);
 		ap.system.init();
 	});
 })();

@@ -16,11 +16,14 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			// 输入组件 初始化
 			ap.input.init();
 			this.context = ap.ui.canvas.getContext('2d');
+			// 初始化完毕后 显示主界面
+			ap.ui.showMain();
 		},
 		resize: function() {},
 		// 新开游戏
 		newGame: function(val) {
 			// console.log(val);
+			ap.ui.showGame();
 			this.delegate = new ap.Game();
 			this.startLoop();
 		},
@@ -31,8 +34,10 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 		},
 		// 暂停
 		pause : function () {
-			ap.ui.clearAnimation(this.loopId);
-			this.running = false;
+			if (this.running) {
+				ap.ui.clearAnimation(this.loopId);
+				this.running = false;
+			}
 		},
 		// 运行中
 		run: function() {

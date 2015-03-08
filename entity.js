@@ -1,5 +1,5 @@
-// 实体 所有的物体
-ap.module("entity").requires("timer", "class").defines(function() {
+// 实体 所有的参与碰撞物体
+ap.module("entity").requires("timer", "class", "skill").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
 		// 生命
@@ -24,20 +24,20 @@ ap.module("entity").requires("timer", "class").defines(function() {
 		moveSpeedBonus: 0,
 		// 移动用计时器
 		moveTimer: new ap.Timer(),
+
 		// 是否定身
 		isImmobilize: false,
-
 		// 是否有反射Buff
 		isReflection: false,
-
 		// 是否死亡
 		isKilled: false,
 
 		// 状态 buff & debuff
 		status: [],
 		// 持有技能
-		skills: [],
-
+		skills: {},
+		// 瞄准方向
+		aim: 0,
 		anims: {},
 		animSheet: null,
 
@@ -45,10 +45,27 @@ ap.module("entity").requires("timer", "class").defines(function() {
 		radius: 10,
 		// 位置
 		pos: {
-			x: 50,
-			y: 50
+			x: 0,
+			y: 0
 		},
-
+		// 初始化
+		init: function(property) {
+			for (var i in property) {
+				this[i] = property[i];
+			}
+			// 如果当前配置指定了技能
+			if (property["skill"]) {
+				for (var i = 0; i < property["skill"].length; i++) {
+					var sk = ap.skill.createSkill(property["skill"][i], this);
+					this.skills[property["skill"][i]] = sk;
+				}
+			}
+		},
+		// 攻击动作 技能
+		attack: function(skill) {
+			var s = this.skills[skill];
+			s.cast();
+		},
 		// 准备阶段 检查状态效果
 		onKeep: function() {
 			this.skills.map(function(s) {

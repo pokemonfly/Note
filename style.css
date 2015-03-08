@@ -8,7 +8,7 @@ html, body, .fullscreen, #canvas {
 }
 /*=========TEST==========*/
 .border, div {
-    outline: 1px dotted gray;
+    /*outline: 1px dotted gray;*/
 }
 .noborder {
     outline: none;
@@ -199,8 +199,149 @@ canvas {
     height: 8%;
 }
 /*=============剧情用=======================*/
+#scenario {
+    /*background-image: url("media/ui/scenario.jpg");*/
+    /*background-size: cover;*/
+    background-color: black;
+}
 .dialog {
+    width: 100%;
+    position: fixed;
+    bottom: 1%;
+    height: 150px;
+}
+.dialog > .middle {
+    width: 800px;
+    height: 100%
+}
+#head {
+    float: left;
+    display: inline-block;
+    height: 150px;
+    width: 150px
+}
+/*安妮头像*/
+.annie {
+    background-image: url("media/ui/head.jpg");
+    background-size: cover;
+}
+.none {
+    background-image: url("media/ui/nohead.jpg");
+    background-size: cover;
+}
+.bear {
+    background-image: url("media/ui/bear.png");
+    background-size: cover;
+}
+#dialog {
+    float: left;
+    display: inline-block;
+    height: 100%;
+    width: 650px;
+    background: url("media/ui/dialog.png") repeat-x;
+    background-size: 100% 100%;
+}
+#lines {
+    color: AntiqueWhite;
+    font-size: x-large;
+    font-family: cursive;
+    padding: 25px 30px;
+    display: block;
+}
+#close {
+    position: absolute;
+    right: 30px;
+    top:20px;
+    cursor: pointer;
+}
+#next {
+    position: absolute;
+    bottom: 25px;
+    right: 40px;
+    animation: twinkling 1s infinite ease-in-out;
+    -webkit-animation: twinkling 1s infinite ease-in-out;
+}
+/*闪烁动画*/
+@keyframes twinkling {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+@-webkit-keyframes twinkling {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+/*=================Loading=================*/
+#loading {
+    background-color: black;
+}
+.loadStr {
+    display: block;
     height: 200px;
-    width: 600px;
-    bottom: 10px
+    width: 150px;
+    color: white;
+    background-repeat: no-repeat;
+    background-image: url("media/ui/loading.jpg");
+    position: fixed;
+    right: 1%;
+    bottom: 1%;
+    font-family: cursive;
+    text-align: center;
+    line-height: 350px;
+}
+/*==============开始界面=================*/
+#main {
+    background: url("media/ui/main.jpg") right no-repeat;
+    background-size: cover;
+}
+#title {
+    background: url("media/ui/string.png") no-repeat;
+    height: 80px;
+    width: 520px;
+    position: fixed;
+    bottom: 5%;
+    left: 5%;
+}
+#mainMenu {
+    position: fixed;
+    bottom: 20%;
+    width: 100%
+}
+#mainMenu > div {
+    width: 180px;
+}
+#mainMenu a {
+    display: block;
+    height: 50px;
+    width: 180px;
+    margin-bottom: 10px;
+}
+#mainMenu a:not(.disable):hover {
+    background-position-x: -200px;
+}
+#newGame {
+    background: url("media/ui/string.png");
+    background-position-x: 0px;
+    background-position-y: -100px;
+}
+#loadGame {
+    background: url("media/ui/string.png");
+    background-position-x: 0px;
+    background-position-y: -150px;
+}
+.disable#loadGame {
+    background-position-x: -400px;
 }

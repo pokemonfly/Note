@@ -1,28 +1,24 @@
 // 工具
 ap.module("utils").defines(function() {
+	"use strict";
 	ap.utils = {
-		// CSS 操作
-		hasClass: function(obj, cls) {
-			return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
-		},
-		addClass: function(obj, cls) {
-			if (!this.hasClass(obj, cls)) {
-				obj.className += " " + cls;
-			}
-		},
-		removeClass: function(obj, cls) {
-			if (this.hasClass(obj, cls)) {
-				var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
-				obj.className = obj.className.replace(reg, '');
-			}
-		},
 		// 深度拷贝
-		deepCopy: function(obj) {
-			return obj;
-		},
-		// 播放剧情
-		playScenario: function() {
-
+		deepCopy: function(object) {
+			if (!object || typeof(object) != 'object') {
+				return object;
+			} else if (object instanceof Array) {
+				var c = [];
+				for (var i = 0, l = object.length; i < l; i++) {
+					c[i] = this.deepCopy(object[i]);
+				}
+				return c;
+			} else {
+				var c = {};
+				for (var i in object) {
+					c[i] = this.deepCopy(object[i]);
+				}
+				return c;
+			}
 		}
 	};
 
