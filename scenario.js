@@ -11,7 +11,7 @@ ap.module("scenario").requires("ui").defines(function() {
 			return ap.ui.playScenario(this);
 		},
 		// 剧情播放完毕的回调
-		callback : function () {
+		callback: function() {
 			ap.system.newGame();
 		},
 		// 剧情演出 台词
@@ -47,9 +47,11 @@ ap.module("scenario").requires("ui").defines(function() {
 			words: "那就偷偷出去看看。最好带点什么东西去吧，树林里有好多坏东西呢。"
 		}, {
 			icon: "Annie",
+			words: "带什么好呢？"
+		}, {
 			// 难度选择框
 			select: ["小熊布偶（简单）", "魔法手杖（普通）", "血纹咒印（困难，一周目慎选）"],
-			words: "带什么好呢？"
+			words: "(迷之音：请选择难度。通关后部分资料可以继承，建议从简单开始。)"
 		}, {
 			// 显示条件
 			which: function(diff) {
@@ -76,7 +78,8 @@ ap.module("scenario").requires("ui").defines(function() {
 			which: function(diff) {
 				return diff === 1;
 			},
-			words: "这次就走远点吧"
+			icon: "Annie",
+			words: "这次就走远点吧。"
 		}, {
 			which: function(diff) {
 				return diff === 1;
@@ -94,13 +97,13 @@ ap.module("scenario").requires("ui").defines(function() {
 			which: function(diff) {
 				return diff === 2;
 			},
+			icon: "Annie",
 			words: "这种感觉，我好像更厉害了。"
 		}, {
 			// 显示条件
 			which: function(diff) {
 				return diff === 2;
 			},
-			icon: "Annie",
 			words: "安妮带着血纹咒印出门了..."
 		}]
 	}, {

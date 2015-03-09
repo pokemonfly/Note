@@ -42,6 +42,9 @@ ap.module("ui").requires("utils").defines(function() {
 		head: null,
 		// 界面的文本
 		lines: null,
+		// 剧情界面的选择列表
+		selecter: null,
+		selectList: null,
 
 		init: function() {
 			this.loading = ap.$("#loading");
@@ -52,6 +55,8 @@ ap.module("ui").requires("utils").defines(function() {
 			this.scenario = ap.$("#scenario");
 			this.head = ap.$("#head");
 			this.lines = ap.$("#lines");
+			this.selecter = ap.$("#selecter");
+			this.selectList = ap.$("#selectList");
 
 			this.canvas = ap.$("canvas")[0];
 			this.shield = ap.$("#shield");
@@ -137,11 +142,7 @@ ap.module("ui").requires("utils").defines(function() {
 				if (this.callback) {
 					this.callback(this.returnValue);
 				}
-				if (this.scenarioHasEvent) {
-					window.removeEventListener("keyup", this.playNextHandler, false);
-					window.removeEventListener("mouseup", this.playNextHandler, false);
-					this.scenarioHasEvent = false;
-				}
+				this.scenarioRemoveListener();
 				return;
 			}
 			var section = this.script[this.cur];
@@ -163,14 +164,32 @@ ap.module("ui").requires("utils").defines(function() {
 			} else {
 				this.lines.innerHTML = "";
 			}
-			// 设置背景  设计保留
+			// 设置背景  设计保留 暂无合适背景Orz
 			// if (section.background) {
 			// } else {
 			// }
 			// 创建一个选择菜单 并关联监听器
 			if (section.select) {
-
+				this.removeClass(this.selecter, "hidden");
+				this.selectList.innerHTML = "";
+				var fr = document.createDocumentFragment();
+				var i = 0;
+				section.select.map(function(s) {
+					var li = ap.$new("li");
+					li.innerHTML = s;
+					li.addEventListener("click", (function(val) {
+						return function() {
+							ap.ui.returnValue = val;
+							ap.ui.playNext();
+						};
+					})(i));
+					fr.appendChild(li);
+					i++;
+				});
+				this.selectList.appendChild(fr);
+				this.scenarioRemoveListener();
 			} else {
+				this.addClass(this.selecter, "hidden");
 				// 添加动作
 				if (!this.scenarioHasEvent) {
 					window.addEventListener("keyup", this.playNextHandler, false);
@@ -189,6 +208,14 @@ ap.module("ui").requires("utils").defines(function() {
 			// 点击画面或者按下空格或Enter时
 			if (e.type !== 'keyup' || e.keyCode === 32 || e.keyCode === 13) {
 				ap.ui.playNext();
+			}
+		},
+		// 去掉剧情绑定的事件
+		scenarioRemoveListener: function() {
+			if (this.scenarioHasEvent) {
+				window.removeEventListener("keyup", this.playNextHandler, false);
+				window.removeEventListener("mouseup", this.playNextHandler, false);
+				this.scenarioHasEvent = false;
 			}
 		},
 		// 接收画面点击的选项
