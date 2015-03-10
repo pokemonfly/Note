@@ -160,12 +160,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 			}
 
 			// 普通攻击
-			if (ap.input.released("Attack1")) {
+			if (ap.input.pressed("Attack1")) {
 				// 鼠标攻击
 				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
 				this.attack("Pyromania");
 			}
-			if (ap.input.released("Attack2")) {
+			if (ap.input.pressed("Attack2")) {
 				// 键盘攻击
 				this.aim = this.moveAim;
 				this.attack("Pyromania");	

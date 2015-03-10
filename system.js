@@ -1,13 +1,12 @@
-// 系统 唯一
+// 系统对象 （创建游戏实例，运行游戏实例，不影响游戏实例本身）
 ap.module("system").requires("ui", "mediator", "config", "input", "timer").defines(function() {
 	"use strict";
 	ap.system = {
+		// 当前游戏是否运行中
 		running: false,
-		// 当前活动的game对象
-		delegate: null,
 		// 系统刷新用定时器的id
 		loopId: null,
-		context: null,
+		// context: null,
 		init: function() {
 			// DOM绑定 初始
 			ap.ui.init();
@@ -15,7 +14,7 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			ap.mediator.init();
 			// 输入组件 初始化
 			ap.input.init();
-			this.context = ap.ui.canvas.getContext('2d');
+			// this.context = ap.ui.canvas.getContext('2d');
 			// 初始化完毕后 显示主界面
 			ap.ui.showMain();
 		},
@@ -24,7 +23,7 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 		newGame: function(val) {
 			// console.log(val);
 			ap.ui.showGame();
-			this.delegate = new ap.Game();
+			ap.game = new ap.Game();
 			this.startLoop();
 		},
 		// 循环播放
@@ -43,7 +42,7 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 		run: function() {
 			ap.Timer.tick();
 			// 执行当前游戏的run
-			this.delegate.run();
+			ap.game.run();
 			// 清空当前释放过的按钮
 			ap.input.clearReleased();
 			this.fps();
@@ -62,7 +61,7 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 		},
 		// 读取中断的游戏
 		loadGame: function() {
-			this.delegate = new ap.Game({});
+			ap.game = new ap.Game({});
 		},
 		// 保存游戏
 		saveGame : function() {

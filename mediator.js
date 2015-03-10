@@ -1,9 +1,10 @@
-// 中介 负责对象之间的通信 
-ap.module("mediator").requires("scenario", "game", "ui").defines(function() {
+// 中介 负责对象之间的比较复杂的通信 
+ap.module("mediator").requires("scenario", "game").defines(function() {
 	"use strict";
 	ap.mediator = {
-		game : null,
+		// 装载过的剧本&事件
 		events: {},
+		// 剧本对象的引用
 		scenario: ap.scenario,
 		achieve: ap.Achievement,
 		// 初始化
@@ -18,7 +19,7 @@ ap.module("mediator").requires("scenario", "game", "ui").defines(function() {
 				}
 			}
 		},
-		// 攻击  攻击者，目标，伤害值，技能id，附加异常, 附加概率, 是否是反射伤害
+		// 攻击  参数：攻击者，目标，伤害值，技能id，附加异常, 附加概率, 是否是反射伤害
 		attack: function(attacker, target, damage, skillId, status, probability, isReflection) {
 			var isDead = false;
 			if (!isReflection) {
@@ -49,10 +50,6 @@ ap.module("mediator").requires("scenario", "game", "ui").defines(function() {
 			} else {
 				console.log("事件未触发：" + event);
 			}
-		},
-		// 调用game对象，创建投射物
-		createFlyer : function(property) {
-			this.game.createFlyer(property);
 		}
 
 	};

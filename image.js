@@ -10,12 +10,12 @@ ap.module('image').requires("class").defines(function() {
         heapht: 0,
         loadCallback: null,
         // 图片的偏移量
-        offset: {
+        offset: null,
+        // 偏移方式
+        offsetType: {
             x: 0,
             y: 0
         },
-        // 偏移方式
-        offsetType: 0,
         init: function(path, offsetType) {
             this.path = path;
             this.offsetType = offsetType || 0;
@@ -41,6 +41,7 @@ ap.module('image').requires("class").defines(function() {
             this.loaded = true;
             if (this.offsetType > 0) {
                 // 设置偏移量 
+                this.offset = {};
                 if (this.offsetType == ap.Image.OFFSET.BELOW) {
                     this.offset.x = ~~(this.width / 2 + 0.5);
                     this.offset.y = this.height;
@@ -67,7 +68,7 @@ ap.module('image').requires("class").defines(function() {
             sourceY = sourceY ? sourceY : 0;
             width = width ? width : this.width;
             height = height ? height : this.height;
-            ap.system.context.drawImage(this.data, sourceX, sourceY, width, height,
+            ap.game.context.drawImage(this.data, sourceX, sourceY, width, height,
                 targetX - this.offset.x, targetY - this.offset.y, width, height);
         }
     });

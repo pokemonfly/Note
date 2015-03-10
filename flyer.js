@@ -27,9 +27,9 @@ ap.module("flyer").requires("entity").defines(function() {
 		// 爆炸附加异常状态
 		explosionStatus: [],
 
-		init: function() {
+		init: function(property) {
 			this.durationTimer = new ap.Timer();
-			this.parent(arguments[0]);
+			this.parent(property);
 		},
 		// 移动时
 		onMove: function() {

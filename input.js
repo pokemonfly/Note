@@ -75,8 +75,8 @@ ap.module("input").defines(function() {
 			return this.release[action];
 		},
 		// 画面刷新后，清空按键抬起列表
-		clearReleased : function() {
-            this.release = {};
+		clearReleased: function() {
+			this.release = {};
 		},
 		contextmenu: function() {
 			// 绑定过鼠标右键的话，就不需要弹菜单了
@@ -86,16 +86,15 @@ ap.module("input").defines(function() {
 			}
 		},
 		mousemove: function(event) {
-			// TODO
 			var pos = {
-				left: 0,
-				top: 0
+				x: 0,
+				y: 0
 			};
-			// if (ap.system.canvas.getBoundingClientRect) {
-			// 	pos = ap.system.canvas.getBoundingClientRect();
-			// }
-			this.mouse.x = event.clientX - pos.left;
-			this.mouse.y = event.clientY - pos.top;
+			if (ap.game) {
+				pos = ap.game.getCameraPos();
+			}
+			this.mouse.x = event.clientX - pos.x ;
+			this.mouse.y = event.clientY - pos.y;
 		},
 		// 读取按键设定并加载
 		bindKey: function() {

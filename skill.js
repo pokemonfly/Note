@@ -18,7 +18,7 @@ ap.module("skill").requires("utils").defines(function() {
 					this.caster.attackCount = 0;
 				}
 				// 创造火球投射物
-				ap.mediator.createFlyer({
+				ap.game.createFlyer({
 					power: this.caster.power + this.caster.powerBonus,
 					duration: 3,
 					owner: this.caster,
@@ -60,6 +60,12 @@ ap.module("skill").requires("utils").defines(function() {
 	ap.skill.createSkill = function(name, caster) {
 		var newSkill = ap.utils.deepCopy(ap.skill[name]);
 		newSkill.caster = caster;
+		// 如果冷却未设定，则用未角色的攻击速度来设定
+		if (newSkill.coolDown === 0) {
+			newSkill.coolDown = 1 / caster.attackSpeed;
+		}
+		// 初始化时，追加属性 冷却用的计时器
+		newSkill.timer = new ap.Timer();
 		return newSkill;
 	};
 });

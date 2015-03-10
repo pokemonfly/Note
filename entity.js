@@ -54,7 +54,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 				this[i] = property[i];
 			}
 			// 如果当前配置指定了技能
-			if (property["skill"]) {
+			if (property && property["skill"]) {
 				for (var i = 0; i < property["skill"].length; i++) {
 					var sk = ap.skill.createSkill(property["skill"][i], this);
 					this.skills[property["skill"][i]] = sk;
@@ -64,7 +64,11 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		// 攻击动作 技能
 		attack: function(skill) {
 			var s = this.skills[skill];
-			s.cast();
+			// 检查是否可用
+			if (s.timer.delta() >= s.coolDown) {
+				s.cast();
+				s.timer.reset();
+			}
 		},
 		// 准备阶段 检查状态效果
 		onKeep: function() {
@@ -124,7 +128,8 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		update: function() {},
 		draw: function() {
 			if (this.animSheet) {
-				this.animSheet.draw(~~(this.pos.x + 0.5), ~~(this.pos.y + 0.5));
+				var pos = ap.game.getCameraPos();
+				this.animSheet.draw(~~(this.pos.x + 0.5) + pos.x, ~~(this.pos.y + 0.5) + pos.y);
 			}
 		},
 

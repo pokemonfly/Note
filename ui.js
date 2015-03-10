@@ -225,6 +225,7 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 		// 画面点击新游戏
 		newGame: function() {
+			// 触发新开游戏事件
 			ap.mediator.fire("NEWGAME");
 		},
 		showMain: function() {
