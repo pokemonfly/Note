@@ -31,7 +31,7 @@
             </div>
         </div>
         <!-- 技能条 -->
-        <div id="skill" class="ui noborder">
+        <div id="skill" class="ui">
             <div class="skillList noborder">
                 <div id="skill0" class="skill"></div>
                 <div id="skill1" class="skill"></div>
@@ -41,13 +41,23 @@
             </div>
         </div>
         <!-- 战斗信息 -->
-        <div id="message" class="ui"></div>
+        <div id="message" class="ui">
+            <div class='messageList'>
+                <ul id="messageInfo">
+                </ul>
+            </div>
+        </div>
         <!-- 状态栏 -->
         <div id="status" class="ui"></div>
         <!-- 快捷方式 点击打开各种面板-->
         <div id="shortcut" class="ui"></div>
         <!-- 场地特性表示 -->
-        <div id="feature" class="ui"></div>
+        <div id="feature" class="ui">
+            <p>区域 <span id="areaCount">1</span> <span id="rare">稀有</span></p>
+            <p class="subtitle">区域特性</p>
+            <p id="featureList"><span title="233">冲锋</span> <span>毒沼</span></p>
+            <p class="subtitle">离开前还需要击杀<span id="leaveKill">50</span>只怪兽</p>
+        </div>
         <!-- 角色属性 -->
         <div id="playerInfo" class="ui panel"></div>
         <!-- 统计 成就 -->
@@ -64,7 +74,7 @@
                 <div id="head" class="none"></div>
                 <!-- 对话框 -->
                 <div id="dialog" class="">
-                    <span id="lines"></span>
+                    <p id="lines"></p>
                     <img id="next" src="media/ui/next.png"></img>
                 </div>
             </div>
@@ -73,7 +83,6 @@
         <div id="selecter" class="selecter hidden">
             <div class="middle">
                 <ui id="selectList">
-                    <li>asdlkjf</li>
                 </ui>
             </div>
         </div>

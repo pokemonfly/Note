@@ -12,9 +12,8 @@ ap.module("ui").requires("utils").defines(function() {
 
 		shield: null,
 		skillList: [],
-		messageField: null,
-		// 缓存最近30条信息
-		messages: [],
+		// 战斗信息计数 最多30个
+		messageCount: 0,
 		// 当前播放的剧情
 		script: null,
 		// 当前播放到的位置
@@ -35,6 +34,8 @@ ap.module("ui").requires("utils").defines(function() {
 		loadGame: null,
 		// 游戏界面
 		gameUI: null,
+		// 战斗信息
+		messageList: null,
 		// 剧情界面
 		scenario: null,
 		scenarioHasEvent: false,
@@ -52,6 +53,7 @@ ap.module("ui").requires("utils").defines(function() {
 			this.startGame = ap.$("#newGame");
 			this.loadGame = ap.$("#loadGame");
 			this.gameUI = ap.$("#ui");
+			this.messageList = ap.$("#messageInfo");
 			this.scenario = ap.$("#scenario");
 			this.head = ap.$("#head");
 			this.lines = ap.$("#lines");
@@ -66,6 +68,31 @@ ap.module("ui").requires("utils").defines(function() {
 			this.canvas.width = document.body.clientWidth;
 
 			ap.$("#close").addEventListener("click", this.skipScenario.bind(this), false);
+
+			// 战斗信息列表的滚动事件
+			ap.$("#message").addEventListener("mousewheel", function(e) {
+				var w = e.wheelDelta > 0 ? 1 : -1,
+					ul = this.children[0].children[0],
+					height = ul.offsetHeight,
+					pHeight = ul.parentNode.offsetHeight,
+					top = +(ul.style.top || "0px").replace("px", ""),
+					newTop = top;
+				if (height > pHeight) {
+					newTop += 5 * w;
+					if (newTop > 0) {
+						newTop = 0;
+					}
+					if (newTop < pHeight - height) {
+						newTop = pHeight - height;
+					}
+					ul.style.top = newTop + "px";
+				}
+			}, false);
+			// 清空信息内容
+			if (this.messageList.children.length > 0) {
+				this.messageList.innerHTML = "";
+			}
+			this.addMessage("谜之音：欢迎开始冒险~");
 		},
 		// CSS 操作
 		hasClass: function(obj, cls) {
@@ -94,13 +121,23 @@ ap.module("ui").requires("utils").defines(function() {
 				this.removeClass(life, "hasShield");
 			}
 		},
-		setMessage: function(message) {
-			this.messages.push(message);
+		// 添加战斗信息
+		addMessage: function(message) {
+			this.messageCount++;
 			// 超出消除
-			if (this.messages.length > 30) {
-				this.messages.shift();
+			if (this.messageCount > 30) {
+				this.messageList.removeChild(this.messageList.children[0]);
+				this.messageCount--;
 			}
-			this.messagesField.innerHTML = this.messages.join("\n");
+			var m = ap.$new("li");
+			m.innerHTML = (new Date()).toTimeString().substr(0, 8) + " " + message;
+			this.messageList.appendChild(m);
+			// 保持显示最后一行
+			var height = this.messageList.offsetHeight,
+				pHeight = this.messageList.parentNode.offsetHeight;
+			if (height > pHeight) {
+				this.messageList.style.top = pHeight - height + "px";
+			}
 		},
 		// 动画循环播放
 		setAnimation: function(callback) {
