@@ -16,3 +16,5 @@ ap.module("achievement").defines(function() {
 		healingCount : 0,
 	};
 });
+
+// 本次游戏时间

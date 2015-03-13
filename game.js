@@ -1,5 +1,5 @@
 // 游戏对象 控制游戏整体的表现
-ap.module("game").requires("class", "player", "flyer", "image").defines(function() {
+ap.module("game").requires("class", "player", "monster", "flyer", "image", "field").defines(function() {
 	"use strict";
 	ap.Game = ap.Class.extend({
 		// canvas的context
@@ -12,6 +12,7 @@ ap.module("game").requires("class", "player", "flyer", "image").defines(function
 			x: 0,
 			y: 0
 		},
+		// =========背景显示相关=============
 		// 缓存背景 离屏canvas
 		background: null,
 		// 背景用的贴图 ground.png为4 * 2 共8个小片，随机拼接组成地面
@@ -26,6 +27,7 @@ ap.module("game").requires("class", "player", "flyer", "image").defines(function
 			x: 0,
 			y: 0
 		},
+		// ==========碰撞检测相关=================
 		// 场景活动区域大小 所有的实体都以此区域的左上角作为坐标原点
 		// (因为右,下边界是算出来的 需要记录下)
 		fieldSize: {
@@ -34,38 +36,74 @@ ap.module("game").requires("class", "player", "flyer", "image").defines(function
 		},
 		// 当前活动的实体
 		entities: [],
+		// 死亡的对象 播放完死亡动画即可删除
+		deferredKill: [],
+		// 当前的玩家实体
 		player: null,
+		// ===========游戏本身属性=========================
 		difficulty: null,
+		// 游戏设定 由难度决定
+		config: null,
+		// 离开前需要击杀数 如果为0则解锁当前区域
+		leaveKillCount: 0,
+		// 当前区域是否解锁
+		isUnLock: false,
+
 		init: function(config) {
-			// 与canvas建立关联
-			// this.context = ap.system.context;
+			// 初始化 与canvas建立关联
 			this.context = ap.ui.canvas.getContext('2d');
 			this.width = ap.ui.canvas.width;
 			this.height = ap.ui.canvas.height;
 			this.entities = [];
+			this.deferredKill = [];
+			// 取得当前难道的设定
+			this.config = ap.config.difficulty["EASY"];
 			// 初始化背景
 			this.createBackground();
+			// 场景初始化设置
+			ap.field.init(this.config.field);
 			// 创建第一个场景
 			this.nextField();
 			// 初始化玩家角色
 			this.player = new ap.Player(ap.config.player["Annie"]);
-			this.entities.push(this.player);
-			// 与中介建立引用
-			ap.mediator.game = this;
+			// 如果有存档则继承属性 TODO
 
+			this.entities.push(this.player);
 		},
 		// 跳到下一个场景
 		nextField: function() {
-
+			this.entities = this.entities.concat(ap.field.nextWave());
+			// 锁定当前场景
+			this.isUnLock = false;
+			this.leaveKillCount = ap.field.leaveKill;
+			// 更新UI界面 特性区域
+			// ap.ui.set
 		},
 		run: function() {
 			this.update();
 			this.draw();
 		},
 		update: function() {
-			this.entities.map(function(e) {
-				e.update();
+			// 伤害区域检测 TODO
+
+			// 遍历实体
+			this.entities.forEach(function(entity, index) {
+				entity.update();
+				// 剔除死亡的实体
+				if (entity.isKilled) {
+					this.deferredKill.push(entity);
+					this.entities.splice(index, 1);
+				}
 			});
+			// 
+			// 如果击杀数够了就解锁当前区域
+			if (this.leaveKillCount === 0) {
+				this.isUnLock = true;
+				ap.ui.addMessage("随着怪物的倒下，四周出现了新的道路。");
+			}
+			if (!this.isUnLock) {
+				// 添加出口
+			}
 		},
 		draw: function() {
 			// 确定背景位置
@@ -74,8 +112,10 @@ ap.module("game").requires("class", "player", "flyer", "image").defines(function
 			this.clear();
 			this.context.drawImage(this.background, -this.screen.x, -this.screen.y,
 				this.width, this.height, 0, 0, this.width, this.height);
+			// 绘制实体前需要按照坐标排序 TODO
+
 			// 逐个绘制实体
-			this.entities.map(function(e) {
+			this.entities.forEach(function(e) {
 				e.draw();
 			});
 		},

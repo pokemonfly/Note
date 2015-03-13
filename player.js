@@ -2,26 +2,13 @@
 ap.module("player").requires("entity", "image").defines(function() {
 	"use strict";
 	ap.Player = ap.Entity.extend({
-		// 等级
-		level: 1,
-		// 经验
-		exp: 0,
-		// 升级需要经验
-		nextLvExp: 280,
-		// 类型 中介用
-		type: "PLAYER",
+		// 类型 判定用
+		type: "player",
 
 		// 生命
 		life: 512,
 		// 生命上限
 		lifeLimit: 512,
-
-		// 精神
-		spirit: 0,
-		// 精神上限
-		spiritLimit: 200,
-		// 精神恢复速度 每秒恢复数值
-		spiritSpeed: 2,
 
 		// 攻击力
 		power: 50,
@@ -29,18 +16,15 @@ ap.module("player").requires("entity", "image").defines(function() {
 		attackSpeed: 0.6,
 		// 暴击
 		critical: 0.05,
-		// 爆炸范围加成
-		range: 0,
 		// 生命吸取
 		drainLife: 0.05,
+		// 爆炸范围加成
+		range: 0,
 		// 技能方向
 		aim: 0,
 
-		// 位置
-		pos: {
-			x: 0,
-			y: 0
-		},
+		// 移动速度 
+		moveSpeed: 200,
 		// 角色移动方向 弧度
 		moveAim: 0,
 		// 移动的目标地点
@@ -48,10 +32,22 @@ ap.module("player").requires("entity", "image").defines(function() {
 			x: 0,
 			y: 0
 		},
-		// 移动速度 
-		moveSpeed: 200,
 
-		// 是否有护盾
+		// 等级
+		level: 1,
+		// 经验
+		exp: 0,
+		// 升级需要经验
+		nextLvExp: 280,
+
+		// 精神 玩家独有属性
+		spirit: 0,
+		// 精神上限
+		spiritLimit: 200,
+		// 精神恢复速度 每秒恢复数值
+		spiritSpeed: 2,
+
+		// 是否有护盾 玩家独有属性
 		hasShield: false,
 		// 护盾值
 		shield: 0,
@@ -66,17 +62,29 @@ ap.module("player").requires("entity", "image").defines(function() {
 
 		// 是否无敌
 		isInvincible: false,
+		// 仇恨转移目标
+		redirect: null,
 
-		// 表示图像
+		// 状态 buff & debuff
+		status: [],
+		// 持有技能
+		skills: {},
+
+		// 位置
+		pos: {
+			x: 0,
+			y: 0
+		},
+		// 实体的动画效果
+		anims: {},
 		animSheet: null,
-
 		// 受到伤害
 		hurt: function(damage) {
 			// 检查是否无敌
-			if (isInvincible) {
+			if (this.isInvincible) {
 				return;
 			}
-
+			// 检查护盾
 			if (this.hasShield) {
 				this.shield -= damage;
 				if (this.shiled < 0) {
@@ -88,9 +96,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 				this.life -= damage;
 			}
 		},
-
-		update: function() {
-			// 角色移动
+		// 角色移动
+		move: function() {
 			// 是否使用键盘来移动
 			var useKey = false;
 			var keyAim = {
@@ -144,7 +151,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 						var distance = this.moveTimer.delta() * this.moveSpeed;
 
 						// 距离目标的长度
-						var current = Math.sqrt(Math.pow(Math.abs(this.moveTo.x - this.pos.x), 2) + Math.pow(Math.abs(this.moveTo.y - this.pos.y), 2), 0.5);
+						var current = ap.utils.getDistance(this.moveTo, this.pos);
 						if (distance < current) {
 							this.pos.x += distance * Math.cos(this.moveAim);
 							this.pos.y += distance * Math.sin(this.moveAim);
@@ -158,6 +165,10 @@ ap.module("player").requires("entity", "image").defines(function() {
 				}
 				this.moveTimer.reset();
 			}
+		},
+		// 攻击意向判定
+		decision: function() {
+			// 技能攻击 优先判定 TODO
 
 			// 普通攻击
 			if (ap.input.pressed("Attack1")) {
@@ -168,10 +179,15 @@ ap.module("player").requires("entity", "image").defines(function() {
 			if (ap.input.pressed("Attack2")) {
 				// 键盘攻击
 				this.aim = this.moveAim;
-				this.attack("Pyromania");	
+				this.attack("Pyromania");
 			}
-
-
+		},
+		update: function() {
+			this.parent();
+			// 角色移动
+			this.move();
+			// 攻击意向判定
+			this.decision();
 		}
 	});
 });

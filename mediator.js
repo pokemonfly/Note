@@ -32,7 +32,7 @@ ap.module("mediator").requires("scenario", "game").defines(function() {
 				isDead = target.onHurt(damage, attacker, false);
 			}
 			if (status !== null) {
-				// 判断是否附加异常
+				// 判断是否附加异常 TODO
 				if (Math.random() < probability) {
 					target.status.push(status);
 				}

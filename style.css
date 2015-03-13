@@ -8,11 +8,11 @@ div, ui, li {
     font-family: cursive;
 }
 .hidden {
-    display: none;
+    display: none !important;
 }
 /*=========TEST==========*/
 .border, div {
-    outline: 1px dotted gray;
+    /*outline: 1px dotted gray;*/
 }
 .noborder {
     outline: none;
@@ -47,24 +47,22 @@ canvas {
 #level {
     float: left;
 }
-/* 初期无护盾*/
-#shieldNum {
-    display: none;
-}
 /*护盾*/
 #shield {
     width: 260px;
     height: 40px;
     float: right;
     transform: skew(-20deg);
-    outline: 1px solid lightblue;
+    /*outline: 1px solid lightblue;*/
     box-shadow: 1px 1px 3px #888888;
+    background-color: white;
+    overflow: hidden;
 }
 /*护盾条*/
 #shieldInner {
     background-color: lightblue;
     z-index: -5;
-    width: 70%;
+    width: 90%;
 }
 /*经验条*/
 #exp {
@@ -102,8 +100,8 @@ canvas {
 /*血条本身*/
 #lifeInner {
     background-color: Crimson;
-    z-index: 5;
-    width: 30%;
+    /*z-index: 5;*/
+    width: 80%;
 }
 #lifeNum {
     line-height: 40px;
@@ -129,6 +127,7 @@ canvas {
     text-align: center;
     display: block;
     transform: skew(20deg);
+    z-index: 5;
 }
 /*技能条*/
 #skill {
@@ -211,7 +210,11 @@ canvas {
     top: 25px;
 }
 #featureList > span {
-    border-bottom: 1px #0099CC dotted
+    border-bottom: 1px #0099CC dotted;
+    margin-right: 10px;
+}
+#featureList > span:last-child {
+    margin-right: 0px;
 }
 .subtitle {
     margin-top: 5px !important;

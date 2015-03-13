@@ -2,21 +2,10 @@
 ap.module("entity").requires("timer", "class", "skill").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
-		// 生命
-		life: 100,
-		// 生命上限
-		lifeLimit: 100,
-
 		// 攻击力
 		power: 10,
 		// 因状态而改变的
 		powerBonus: 0,
-		// 攻速 每秒攻击次数 
-		attackSpeed: 1,
-		// 暴击
-		critical: 0,
-		// 生命吸取
-		drainLife: 0,
 
 		// 移动速度 每秒移动像素
 		moveSpeed: 100,
@@ -32,28 +21,16 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		// 是否死亡
 		isKilled: false,
 
-		// 状态 buff & debuff
-		status: [],
-		// 持有技能
-		skills: {},
-		// 瞄准方向
-		aim: 0,
-		anims: {},
-		animSheet: null,
-
 		// 碰撞体积 半径
 		radius: 10,
-		// 位置
-		pos: {
-			x: 0,
-			y: 0
-		},
+
 		// 初始化
 		init: function(property) {
+			// 复制参数的属性
 			for (var i in property) {
 				this[i] = property[i];
 			}
-			// 如果当前配置指定了技能
+			// 如果当前配置指定了技能 创建技能实例
 			if (property && property["skill"]) {
 				for (var i = 0; i < property["skill"].length; i++) {
 					var sk = ap.skill.createSkill(property["skill"][i], this);
@@ -64,24 +41,15 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		// 攻击动作 技能
 		attack: function(skill) {
 			var s = this.skills[skill];
-			// 检查是否可用
+			// 检查Cooldown
 			if (s.timer.delta() >= s.coolDown) {
 				s.cast();
+				// 重置冷却计时
 				s.timer.reset();
 			}
 		},
-		// 准备阶段 检查状态效果
-		onKeep: function() {
-			this.skills.map(function(s) {
-				s.effect(this);
-			});
-			// 如果有自定义的事件，一并执行
-			if (this.ready) {
-				this.ready();
-			}
-		},
 
-		// 受到治疗
+		// 受到治疗 吸血和恢复buff
 		onHeal: function(heal) {
 			this.life += heal;
 			if (this.life > this.lifeLimit) {
@@ -125,7 +93,12 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 			this.isKilled = true;
 		},
 
-		update: function() {},
+		update: function() {
+			// 检查自带的状态 （如果自带debuff效果，优先处理）
+			this.status.forEach(function(s) {
+				s.effect(this);
+			});
+		},
 		draw: function() {
 			if (this.animSheet) {
 				var pos = ap.game.getCameraPos();

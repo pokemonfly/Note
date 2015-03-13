@@ -19,6 +19,14 @@ ap.module("utils").defines(function() {
 				}
 				return c;
 			}
+		},
+		// 计算2点之间的距离
+		getDistance: function(a, b) {
+			var ax = a.x || 0,
+				ay = a.y || 0,
+				bx = b.x || 0,
+				by = b.y || 0;
+			return Math.sqrt(Math.pow(Math.abs(ax - bx), 2) + Math.pow(Math.abs(ay - by), 2), 0.5);
 		}
 	};
 

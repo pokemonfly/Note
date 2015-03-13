@@ -40,32 +40,40 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 		},
 		// 运行中
 		run: function() {
+			// 游戏时间前进
 			ap.Timer.tick();
 			// 执行当前游戏的run
 			ap.game.run();
 			// 清空当前释放过的按钮
 			ap.input.clearReleased();
-			this.fps();
-		},
-		_fps: 0,
-		_fpsCount : 0,
-		_fpsTimer: new ap.Timer(),
-		fps : function() {
-			if (this._fpsTimer.delta() > 1) {
-				this._fps = this._fpsCount;
-				this._fpsCount = 0;
-				this._fpsTimer.reset();
-			} else {
-				this._fpsCount ++;
-			}
+
+			// 测试代码
+			// this.fps();
 		},
 		// 读取中断的游戏
 		loadGame: function() {
 			ap.game = new ap.Game({});
 		},
-		// 保存游戏
+		// 保存游戏 保存当前角色的属性 场景数，选择难度，以获得的道具，本次游戏的成就
 		saveGame : function() {
 
+		},
+		// 保存游戏 保存总的成就，可继承物品信息
+		gameOver : function() {
+
 		}
+		// 测试代码 显示帧数
+		// _fps: 0,
+		// _fpsCount : 0,
+		// _fpsTimer: new ap.Timer(),
+		// fps : function() {
+		// 	if (this._fpsTimer.delta() > 1) {
+		// 		this._fps = this._fpsCount;
+		// 		this._fpsCount = 0;
+		// 		this._fpsTimer.reset();
+		// 	} else {
+		// 		this._fpsCount ++;
+		// 	}
+		// }
 	};
 });

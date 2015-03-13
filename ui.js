@@ -7,13 +7,14 @@ window.requestAnimationFrame = window.requestAnimationFrame ||
 ap.module("ui").requires("utils").defines(function() {
 	"use strict";
 	ap.ui = {
-		canvas: null,
-		life: null,
-
-		shield: null,
-		skillList: [],
+		// 当前游戏动画循环调用用
+		_anims: {},
+		_next: 1,
 		// 战斗信息计数 最多30个
 		messageCount: 0,
+		// 剧情界面是否加过listener
+		scenarioHasEvent: false,
+		// =============剧情相关=============
 		// 当前播放的剧情
 		script: null,
 		// 当前播放到的位置
@@ -22,51 +23,85 @@ ap.module("ui").requires("utils").defines(function() {
 		returnValue: 0,
 		// 剧情播放完的回调
 		callback: null,
-		// 当前游戏动画循环调用用
-		_anims: {},
-		_next: 1,
+
 		// =============DOM关联==================
-		// loading界面
+		// Loading界面
 		loading: null,
 		// 主界面
 		main: null,
+		// 主界面 - 选项
 		startGame: null,
 		loadGame: null,
-		// 游戏界面
-		gameUI: null,
-		// 战斗信息
-		messageList: null,
 		// 剧情界面
 		scenario: null,
-		scenarioHasEvent: false,
-		// 界面的头像		
+		// 剧情界面 - 头像		
 		head: null,
-		// 界面的文本
+		// 剧情界面 - 文本
 		lines: null,
-		// 剧情界面的选择列表
+		// 剧情界面 - 画面选项 框
 		selecter: null,
+		// 剧情界面 - 画面选项 内容
 		selectList: null,
+		// 游戏界面
+		gameUI: null,
+		// 游戏界面 - 战斗信息
+		messageList: null,
+		// 游戏界面 - 画布
+		canvas: null,
+		// 游戏界面 - 血条
+		life: null,
+		lifeNum: null,
+		// 游戏界面 - 护盾条
+		shield: null,
+		shieldNum: null,
+		// 游戏界面 - 技能栏
+		skillList: [],
+		// 游戏界面 - 区域特性栏 - 区域号
+		areaCount: null,
+		// 游戏界面 - 区域特性栏 - 稀有标识
+		rare: null,
+		// 游戏界面 - 区域特性栏 - 特性列表
+		featureList: null,
+		// 游戏界面 - 区域特性栏 - 剩余击杀数
+		leaveKill: null,
+		// 游戏界面 - 区域特性栏 - 文字说明 可以离开
+		canLeave: null,
+		// 游戏界面 - 区域特性栏 - 文字说明 不能离开
+		cannotLeave: null,
 
 		init: function() {
+			// loading 界面
 			this.loading = ap.$("#loading");
+			// 主界面
 			this.main = ap.$("#main");
 			this.startGame = ap.$("#newGame");
 			this.loadGame = ap.$("#loadGame");
-			this.gameUI = ap.$("#ui");
-			this.messageList = ap.$("#messageInfo");
+			// 剧情界面
 			this.scenario = ap.$("#scenario");
-			this.head = ap.$("#head");
-			this.lines = ap.$("#lines");
 			this.selecter = ap.$("#selecter");
 			this.selectList = ap.$("#selectList");
-
+			this.head = ap.$("#head");
+			this.messageList = ap.$("#messageInfo");
+			this.lines = ap.$("#lines");
+			// 游戏界面
+			this.gameUI = ap.$("#ui");
 			this.canvas = ap.$("canvas")[0];
-			this.shield = ap.$("#shield");
 			this.life = ap.$("#life");
+			this.lifeNum = ap.$("#lifeNum");
+			this.shield = ap.$("#shieldInner");
+			this.shieldNum = ap.$("#shieldNum");
+			// 游戏界面 - 区域特性栏
+			this.areaCount = ap.$("#areaCount");
+			this.rare = ap.$("#rare");
+			this.featureList = ap.$("#featureList");
+			this.leaveKill = ap.$("#leaveKill");
+			this.canLeave = ap.$("#canLeave");
+			this.cannotLeave = ap.$("#cannotLeave");
 
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
 
+			// 剧情界面的跳过按钮
 			ap.$("#close").addEventListener("click", this.skipScenario.bind(this), false);
 
 			// 战斗信息列表的滚动事件
@@ -88,12 +123,14 @@ ap.module("ui").requires("utils").defines(function() {
 					ul.style.top = newTop + "px";
 				}
 			}, false);
-			// 清空信息内容
+			// 清空信息战斗信息列表的内容
 			if (this.messageList.children.length > 0) {
 				this.messageList.innerHTML = "";
 			}
-			this.addMessage("谜之音：欢迎开始冒险~");
+
+			this.addMessage("欢迎开始冒险~");
 		},
+
 		// CSS 操作
 		hasClass: function(obj, cls) {
 			return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
@@ -109,36 +146,7 @@ ap.module("ui").requires("utils").defines(function() {
 				obj.className = obj.className.replace(reg, '');
 			}
 		},
-		setLife: function(per) {
 
-		},
-		setShield: function(per) {
-			if (per > 0) {
-				this.shield.style.display = "";
-				this.addClass(life, "hasShield");
-			} else {
-				this.shield.style.display = "none";
-				this.removeClass(life, "hasShield");
-			}
-		},
-		// 添加战斗信息
-		addMessage: function(message) {
-			this.messageCount++;
-			// 超出消除
-			if (this.messageCount > 30) {
-				this.messageList.removeChild(this.messageList.children[0]);
-				this.messageCount--;
-			}
-			var m = ap.$new("li");
-			m.innerHTML = (new Date()).toTimeString().substr(0, 8) + " " + message;
-			this.messageList.appendChild(m);
-			// 保持显示最后一行
-			var height = this.messageList.offsetHeight,
-				pHeight = this.messageList.parentNode.offsetHeight;
-			if (height > pHeight) {
-				this.messageList.style.top = pHeight - height + "px";
-			}
-		},
 		// 动画循环播放
 		setAnimation: function(callback) {
 			var current = this._next++;
@@ -157,6 +165,8 @@ ap.module("ui").requires("utils").defines(function() {
 		clearAnimation: function(id) {
 			delete this._anims[id];
 		},
+
+		// ==============剧情播放相关==============
 		// 播放剧情
 		playScenario: function(scenario) {
 			this.script = scenario.script;
@@ -265,6 +275,8 @@ ap.module("ui").requires("utils").defines(function() {
 			// 触发新开游戏事件
 			ap.mediator.fire("NEWGAME");
 		},
+
+		// 显示主界面
 		showMain: function() {
 			this.addClass(this.loading, "hidden");
 			this.removeClass(this.main, "hidden");
@@ -276,11 +288,78 @@ ap.module("ui").requires("utils").defines(function() {
 				event.preventDefault();
 			}).bind(this));
 		},
+		// 显示游戏界面
 		showGame: function() {
 			this.addClass(this.loading, "hidden");
 			this.addClass(this.main, "hidden");
 			this.addClass(this.scenario, "hidden");
 			this.removeClass(this.gameUI, "hidden");
+		},
+
+		// ==============游戏UI相关==============
+		// 刷新血量条
+		setLife: function(per) {
+
+		},
+		// 刷新护盾条
+		setShield: function(per) {
+			if (per > 0) {
+				this.addClass(this.life, "hasShield");
+				this.removeClass(this.shield, "hidden");
+				this.removeClass(this.shieldNum, "hidden");
+			} else {
+				this.removeClass(this.life, "hasShield");
+				this.addClass(this.shield, "hidden");
+				this.addClass(this.shieldNum, "hidden");
+			}
+		},
+		// 添加战斗信息
+		addMessage: function(message) {
+			this.messageCount++;
+			// 超出消除
+			if (this.messageCount > 30) {
+				this.messageList.removeChild(this.messageList.children[0]);
+				this.messageCount--;
+			}
+			var m = ap.$new("li");
+			m.innerHTML = (new Date()).toTimeString().substr(0, 8) + " " + message;
+			this.messageList.appendChild(m);
+			// 保持显示最后一行
+			var height = this.messageList.offsetHeight,
+				pHeight = this.messageList.parentNode.offsetHeight;
+			if (height > pHeight) {
+				this.messageList.style.top = pHeight - height + "px";
+			}
+		},
+		// 设置特性栏
+		setFeature: function(areaCount, isRare, feature, leaveKill) {
+			this.areaCount.innerHTML = areaCount;
+			if (isRare) {
+				this.removeClass(this.rare, "hidden");
+			} else {
+				this.addClass(this.rare, "hidden");
+			}
+			this.featureList.innerHTML = "";
+			var df = document.createDocumentFragment();
+			for (var i = 0; i < feature.length; i++) {
+				var span = ap.$new("span");
+				span.innerHTML = feature[i].name;
+				span.title = feature[i].description;
+				df.appendChild(span);
+			}
+			this.featureList.appendChild(df);
+			this.removeClass(this.cannotLeave, "hidden");
+			this.addClass(this.canLeave, "hidden");
+			this.leaveKill.innerHTML = leaveKill;
+		},
+		// 更新离开前击杀数
+		setLeaveKill: function(num) {
+			if (num === 0) {
+				this.removeClass(this.canLeave, "hidden");
+				this.addClass(this.cannotLeave, "hidden");
+			} else {
+				this.leaveKill.innerHTML = num;
+			}
 		}
 	};
 });

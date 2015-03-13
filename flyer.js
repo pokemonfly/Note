@@ -16,7 +16,7 @@ ap.module("flyer").requires("entity").defines(function() {
 		// 释放者
 		owner: null,
 
-		// 大小
+		// 伤害范围
 		range: 0,
 		// 附加异常状态
 		status: [],
