@@ -30,6 +30,13 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			x: 0,
 			y: 0
 		},
+		// 本次移动的位置偏移量
+		moveOffset: {
+			x: 0,
+			y: 0
+		},
+		// 碰撞体积 半径
+		radius: 30,
 		// 瞄准方向
 		aim: 0,
 		// 实体的动画效果
@@ -47,6 +54,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				this.lifeLimit = ~~(this.lifeLimit * this.strength);
 				this.life = this.lifeLimit;
 				this.power = ~~(this.power * this.strength);
+				this.hateRadius = this.hateRadius * this.strength;
 			}
 		},
 		// 警觉 如果警惕范围内有玩家目标，则加入仇恨列表
@@ -65,7 +73,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		// 使用技能
 		cast: function() {
 			if (Math.random() > this.strength - 0.8) {
-				// 设定：根据怪物的强度来判读，如果强度越大，攻击的积极性越高
+				// 设定：根据怪物的强度来判读，强度越大，发呆的几率越小
 				return;
 			}
 			// 遍历技能
@@ -82,9 +90,24 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				}
 			}
 		},
-		// 向目标移动
+		// 向目标移动 并指向目标
 		move: function() {
-
+			this.aim = ap.utils.getRad(this.pos, this.target.pos);
+			this.moveByRad(this.aim);
+		},
+		// 计算指定的角度移动的偏移量 具体移动在collision中实现
+		moveByRad: function(rad) {
+			var distance = this.moveTimer.delta() * this.moveSpeed;
+			this.moveOffset.x = distance * Math.cos(rad);
+			this.moveOffset.y = distance * Math.sin(rad);
+		},
+		// 修改角度，再移动一次
+		changeRad: function(num) {
+			// 按照次数修正方向
+			var f = num % 2 ? -1 : 1,
+				// 按照次数修正度数
+				rad = Math.round(num / 2) * 15 * Math.PI / 180;
+			this.moveByRad(this.aim + rad * f);
 		},
 		update: function() {
 			// 执行超类

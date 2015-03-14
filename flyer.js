@@ -1,6 +1,8 @@
 // 附带伤害性质的飞行物
 ap.module("flyer").requires("entity").defines(function() {
 	ap.Flyer = ap.Entity.extend({
+		// 伤害类型
+		type: null,
 		// 威力
 		power: 0,
 
@@ -16,10 +18,19 @@ ap.module("flyer").requires("entity").defines(function() {
 		// 释放者
 		owner: null,
 
+		// 位置
+		pos: {
+			x: 0,
+			y: 0
+		},
+		// 碰撞体积 半径
+		radius: 30,
 		// 伤害范围
 		range: 0,
 		// 附加异常状态
 		status: [],
+		// 异常附加概率
+		probability : 0,
 		// 爆炸威力
 		explosionPower: 0,
 		// 爆炸范围

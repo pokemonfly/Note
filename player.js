@@ -75,6 +75,13 @@ ap.module("player").requires("entity", "image").defines(function() {
 			x: 0,
 			y: 0
 		},
+		// 本次移动的位置偏移量
+		moveOffset: {
+			x: 0,
+			y: 0
+		},
+		// 碰撞体积 半径
+		radius: 30,
 		// 实体的动画效果
 		anims: {},
 		animSheet: null,
@@ -129,36 +136,41 @@ ap.module("player").requires("entity", "image").defines(function() {
 
 			// 设置移动方向
 			if (useKey) {
-				this.moveAim = Math.atan2(keyAim.y - this.pos.y, keyAim.x - this.pos.x);
+				// this.moveAim = Math.atan2(keyAim.y - this.pos.y, keyAim.x - this.pos.x);
+				this.moveAim = ap.utils.getRad(this.pos, keyAim);
 			} else {
-				this.moveAim = Math.atan2(this.moveTo.y - this.pos.y, this.moveTo.x - this.pos.x);
+				// this.moveAim = Math.atan2(this.moveTo.y - this.pos.y, this.moveTo.x - this.pos.x);
+				this.moveAim = ap.utils.getRad(this.pos, this.moveTo);
 			}
 
 			// 角色未定身的话开始移动
 			if (!this.isImmobilize) {
 				// 当前时间段可以移动的距离 像素
-				// if (Math.abs(this.moveTo.x - this.pos.x) >= 1 || Math.abs(this.moveTo.y - this.pos.y) >= 1) {
 				if (useKey) {
 					// 当前可以移动的长度
 					var distance = this.moveTimer.delta() * this.moveSpeed;
-					this.pos.x += distance * Math.cos(this.moveAim);
-					this.pos.y += distance * Math.sin(this.moveAim);
+					this.moveOffset.x = distance * Math.cos(this.moveAim);
+					this.moveOffset.y = distance * Math.sin(this.moveAim);
+					// this.pos.x += distance * Math.cos(this.moveAim);
+					// this.pos.y += distance * Math.sin(this.moveAim);
 					this.moveTo.x = this.pos.x;
 					this.moveTo.y = this.pos.y;
 				} else {
 					if (this.moveTo.x !== this.pos.x || this.moveTo.y !== this.pos.y) {
 						// 当前可以移动的长度
 						var distance = this.moveTimer.delta() * this.moveSpeed;
-
 						// 距离目标的长度
 						var current = ap.utils.getDistance(this.moveTo, this.pos);
 						if (distance < current) {
-							this.pos.x += distance * Math.cos(this.moveAim);
-							this.pos.y += distance * Math.sin(this.moveAim);
+							// this.pos.x += distance * Math.cos(this.moveAim);
+							// this.pos.y += distance * Math.sin(this.moveAim);
+							this.moveOffset.x = distance * Math.cos(this.moveAim);
+							this.moveOffset.y = distance * Math.sin(this.moveAim);
 						} else {
-							this.pos.x = this.moveTo.x;
-							this.pos.y = this.moveTo.y;
-
+							// this.pos.x = this.moveTo.x;
+							// this.pos.y = this.moveTo.y;
+							this.moveOffset.x = this.moveTo.x - this.pos.x;
+							this.moveOffset.y = this.moveTo.y - this.pos.y;
 						}
 
 					}

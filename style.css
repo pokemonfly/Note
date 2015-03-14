@@ -371,7 +371,7 @@ canvas {
     height: 200px;
     width: 150px;
     color: white;
-    background-image: url("media/ui/loading.jpg") no-repeat;
+    background: url("media/ui/loading.jpg") no-repeat;
     position: fixed;
     right: 1%;
     bottom: 1%;

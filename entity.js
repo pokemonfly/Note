@@ -2,6 +2,8 @@
 ap.module("entity").requires("timer", "class", "skill").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
+		// 实体的名字
+		name : null,
 		// 攻击力
 		power: 10,
 		// 因状态而改变的
@@ -20,9 +22,6 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		isReflection: false,
 		// 是否死亡
 		isKilled: false,
-
-		// 碰撞体积 半径
-		radius: 10,
 
 		// 初始化
 		init: function(property) {
@@ -92,7 +91,6 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		onKill: function() {
 			this.isKilled = true;
 		},
-
 		update: function() {
 			// 检查自带的状态 （如果自带debuff效果，优先处理）
 			this.status.forEach(function(s) {
