@@ -3,7 +3,7 @@ ap.module("skill").requires("utils").defines(function() {
 	"use strict";
 	ap.skill = {
 		// 玩家技能
-		Pyromania : {
+		Pyromania: {
 			id: "Pyromania",
 			name: "嗜火",
 			icon: "Pyromania.png",
@@ -19,13 +19,16 @@ ap.module("skill").requires("utils").defines(function() {
 				}
 				// 创造火球投射物
 				ap.game.createFlyer({
+					// 技能伤害
 					power: this.caster.power + this.caster.powerBonus,
+					// 火球持续时间 s
 					duration: 3,
 					owner: this.caster,
-					range: 30,
+					// 火球大小
+					radius: 30,
 					status: status,
-					pos: {x:this.caster.pos.x, y:this.caster.pos.y},
-					aim: this.caster.aim,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
+					moveAim: this.caster.aim,
 					animSheet: new ap.Image("media/item/fireball.png", ap.Image.OFFSET.LOWER_LEFT)
 				});
 			}
@@ -65,7 +68,7 @@ ap.module("skill").requires("utils").defines(function() {
 			newSkill.coolDown = 1 / caster.attackSpeed;
 		}
 		// 初始化时，追加属性 冷却用的计时器
-		newSkill.timer = new ap.Timer();
+		newSkill.timer = new ap.Timer(newSkill.coolDown);
 		return newSkill;
 	};
 });

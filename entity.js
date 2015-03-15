@@ -3,7 +3,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
 		// 实体的名字
-		name : null,
+		name: null,
 		// 攻击力
 		power: 10,
 		// 因状态而改变的
@@ -14,7 +14,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		// 移动速度奖励
 		moveSpeedBonus: 0,
 		// 移动用计时器
-		moveTimer: new ap.Timer(),
+		moveTimer: null,
 
 		// 是否定身
 		isImmobilize: false,
@@ -36,6 +36,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 					this.skills[property["skill"][i]] = sk;
 				}
 			}
+			this.moveTimer = new ap.Timer();
 		},
 		// 攻击动作 技能
 		attack: function(skill) {
@@ -47,7 +48,19 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 				s.timer.reset();
 			}
 		},
-
+		// 计算指定的角度移动的偏移量 具体移动在collision中实现
+		moveByRad: function(rad) {
+			this.moveOffset.x = this.lastMove * Math.cos(rad);
+			this.moveOffset.y = this.lastMove * Math.sin(rad);
+		},
+		// 修改角度，再移动一次
+		changeRad: function(num) {
+			// 按照次数修正方向
+			var f = num % 2 ? -1 : 1,
+				// 按照次数修正度数
+				rad = Math.round(num / 2) * 15 * Math.PI / 180;
+			this.moveByRad(this.moveAim + rad * f);
+		},
 		// 受到治疗 吸血和恢复buff
 		onHeal: function(heal) {
 			this.life += heal;
@@ -79,7 +92,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 			}
 
 			if (this.life <= 0) {
-				this.onDead();
+				this.onKill();
 				return true;
 			} else {
 				return false;
@@ -98,10 +111,12 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 			});
 		},
 		draw: function() {
+			var pos = ap.game.getCameraPos();
 			if (this.animSheet) {
-				var pos = ap.game.getCameraPos();
 				this.animSheet.draw(~~(this.pos.x + 0.5) + pos.x, ~~(this.pos.y + 0.5) + pos.y);
 			}
+			// 测试用 锚点
+			ap.game.context.fillRect(~~(this.pos.x + 0.5) + pos.x - 2, ~~(this.pos.y + 0.5) + pos.y - 2, 4, 4);
 		},
 
 	});

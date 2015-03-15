@@ -13,7 +13,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 攻击力
 		power: 50,
 		// 攻速 每秒攻击次数 
-		attackSpeed: 0.6,
+		attackSpeed: 1.6,
 		// 暴击
 		critical: 0.05,
 		// 生命吸取
@@ -29,8 +29,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 		moveAim: 0,
 		// 移动的目标地点
 		moveTo: {
-			x: 0,
-			y: 0
+			x: 100,
+			y: 100
 		},
 
 		// 等级
@@ -56,7 +56,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 护盾上限加成
 		shieldBonus: 0,
 		// 护盾创建时间
-		shieldCreateTime: 0,
+		shieldCreateTimer: null,
 		// 护盾持续时间
 		shieldDuration: 0,
 
@@ -72,9 +72,11 @@ ap.module("player").requires("entity", "image").defines(function() {
 
 		// 位置
 		pos: {
-			x: 0,
-			y: 0
+			x: 100,
+			y: 100
 		},
+		// 上次移动的距离用于再计算方向
+		lastMove: 0,
 		// 本次移动的位置偏移量
 		moveOffset: {
 			x: 0,
@@ -85,6 +87,11 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 实体的动画效果
 		anims: {},
 		animSheet: null,
+		init: function(property) {
+			this.parent(property);
+			// 刷新UI
+			ap.ui.setLife(this.life, this.lifeLimit);
+		},
 		// 受到伤害
 		hurt: function(damage) {
 			// 检查是否无敌
@@ -94,17 +101,36 @@ ap.module("player").requires("entity", "image").defines(function() {
 			// 检查护盾
 			if (this.hasShield) {
 				this.shield -= damage;
-				if (this.shiled < 0) {
+				if (this.shield <= 0) {
 					// 护盾被完全消耗
-					this.life += this.shiled;
+					this.life += this.shield;
 					this.hasShield = false;
+					ap.ui.setShield(0);
+					ap.ui.setLife(this.life, this.lifeLimit);
+				} else {
+					ap.ui.setShield(this.shield, this.shieldLimit);
 				}
 			} else {
 				this.life -= damage;
+				ap.ui.setLife(this.life, this.lifeLimit);
 			}
 		},
+
+		// 检查角色护盾的状态
+		_checkShield: function() {
+			if (this.shieldCreateTimer.delta() > this.shieldDuration) {
+				// 护盾时间到， 消灭当前护盾
+				this.hasShield = false;
+				this.shieldCreateTimer = null;
+				ap.ui.setShield(0);
+			} else {
+				// 有护盾的话，刷新护盾UI显示
+				ap.ui.setShield(this.shield, this.shieldLimit);
+			}
+		},
+
 		// 角色移动
-		move: function() {
+		_move: function() {
 			// 是否使用键盘来移动
 			var useKey = false;
 			var keyAim = {
@@ -148,38 +174,36 @@ ap.module("player").requires("entity", "image").defines(function() {
 				// 当前时间段可以移动的距离 像素
 				if (useKey) {
 					// 当前可以移动的长度
-					var distance = this.moveTimer.delta() * this.moveSpeed;
-					this.moveOffset.x = distance * Math.cos(this.moveAim);
-					this.moveOffset.y = distance * Math.sin(this.moveAim);
-					// this.pos.x += distance * Math.cos(this.moveAim);
-					// this.pos.y += distance * Math.sin(this.moveAim);
+					this.lastMove = this.moveTimer.delta() * this.moveSpeed;
+					this.moveOffset.x = this.lastMove * Math.cos(this.moveAim);
+					this.moveOffset.y = this.lastMove * Math.sin(this.moveAim);
 					this.moveTo.x = this.pos.x;
 					this.moveTo.y = this.pos.y;
 				} else {
 					if (this.moveTo.x !== this.pos.x || this.moveTo.y !== this.pos.y) {
 						// 当前可以移动的长度
-						var distance = this.moveTimer.delta() * this.moveSpeed;
+						this.lastMove = this.moveTimer.delta() * this.moveSpeed;
 						// 距离目标的长度
 						var current = ap.utils.getDistance(this.moveTo, this.pos);
-						if (distance < current) {
-							// this.pos.x += distance * Math.cos(this.moveAim);
-							// this.pos.y += distance * Math.sin(this.moveAim);
-							this.moveOffset.x = distance * Math.cos(this.moveAim);
-							this.moveOffset.y = distance * Math.sin(this.moveAim);
+						if (this.lastMove < current) {
+							this.moveOffset.x = this.lastMove * Math.cos(this.moveAim);
+							this.moveOffset.y = this.lastMove * Math.sin(this.moveAim);
 						} else {
-							// this.pos.x = this.moveTo.x;
-							// this.pos.y = this.moveTo.y;
+							this.lastMove = current;
 							this.moveOffset.x = this.moveTo.x - this.pos.x;
 							this.moveOffset.y = this.moveTo.y - this.pos.y;
 						}
 
+					} else {
+						this.moveOffset.x = 0;
+						this.moveOffset.y = 0;
 					}
 				}
 				this.moveTimer.reset();
 			}
 		},
 		// 攻击意向判定
-		decision: function() {
+		_decision: function() {
 			// 技能攻击 优先判定 TODO
 
 			// 普通攻击
@@ -197,9 +221,11 @@ ap.module("player").requires("entity", "image").defines(function() {
 		update: function() {
 			this.parent();
 			// 角色移动
-			this.move();
+			this._move();
 			// 攻击意向判定
-			this.decision();
+			this._decision();
+			// 判断护盾的变化
+			this._checkShield();
 		}
 	});
 });

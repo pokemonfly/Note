@@ -53,7 +53,7 @@ ap.module("config").requires("image").defines(function() {
 		monsters: [{
 			name: "杂鱼",
 			skill: null,
-			rank: 0,
+			animSheet: new ap.Image("media/ui/1.png", ap.Image.OFFSET.BELOW)
 		}],
 		// 游戏中掉落的道具
 		items: {

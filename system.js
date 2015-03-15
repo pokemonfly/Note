@@ -24,6 +24,7 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			// console.log(val);
 			ap.ui.showGame();
 			ap.game = new ap.Game();
+			ap.game.start();
 			this.startLoop();
 		},
 		// 循环播放

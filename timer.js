@@ -5,8 +5,9 @@ ap.module("timer").requires("class").defines(function() {
 		// 计时器实例用
 		base: 0,
 		// 初始化计时器 自动执行方法
-		init: function() {
-			this.base = ap.Timer.time;
+		init: function(basetime) {
+			var basetime = basetime || 0;
+			this.base = ap.Timer.time - basetime;
 		},
 		// 时间差值
 		delta: function() {

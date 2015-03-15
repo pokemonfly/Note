@@ -95,20 +95,8 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			this.aim = ap.utils.getRad(this.pos, this.target.pos);
 			this.moveByRad(this.aim);
 		},
-		// 计算指定的角度移动的偏移量 具体移动在collision中实现
-		moveByRad: function(rad) {
-			var distance = this.moveTimer.delta() * this.moveSpeed;
-			this.moveOffset.x = distance * Math.cos(rad);
-			this.moveOffset.y = distance * Math.sin(rad);
-		},
-		// 修改角度，再移动一次
-		changeRad: function(num) {
-			// 按照次数修正方向
-			var f = num % 2 ? -1 : 1,
-				// 按照次数修正度数
-				rad = Math.round(num / 2) * 15 * Math.PI / 180;
-			this.moveByRad(this.aim + rad * f);
-		},
+
+
 		update: function() {
 			// 执行超类
 			this.parent();
@@ -116,7 +104,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			this.vigilance();
 			if (this.target) {
 				// 执行移动
-				this.move();
+				// this.move();
 				// 开始攻击
 				this.cast();
 			}

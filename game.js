@@ -1,5 +1,5 @@
 // 游戏对象 控制游戏整体的表现
-ap.module("game").requires("class", "player", "monster", "flyer", "image", "field").defines(function() {
+ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area", "image", "field", "collision").defines(function() {
 	"use strict";
 	ap.Game = ap.Class.extend({
 		// canvas的context
@@ -49,6 +49,7 @@ ap.module("game").requires("class", "player", "monster", "flyer", "image", "fiel
 		// 当前区域是否解锁
 		isUnLock: false,
 
+		// 初始化game对象本身
 		init: function(config) {
 			// 初始化 与canvas建立关联
 			this.context = ap.ui.canvas.getContext('2d');
@@ -58,8 +59,13 @@ ap.module("game").requires("class", "player", "monster", "flyer", "image", "fiel
 			this.deferredKill = [];
 			// 取得当前难道的设定
 			this.config = ap.config.difficulty["EASY"];
+		},
+		// 初始化游戏内容
+		start: function() {
 			// 初始化背景
 			this.createBackground();
+			// 初始化碰撞检查
+			ap.collision.init();
 			// 场景初始化设置
 			ap.field.init(this.config.field);
 			// 创建第一个场景
@@ -69,6 +75,7 @@ ap.module("game").requires("class", "player", "monster", "flyer", "image", "fiel
 			// 如果有存档则继承属性 TODO
 
 			this.entities.push(this.player);
+
 		},
 		// 跳到下一个场景
 		nextField: function() {
@@ -84,18 +91,21 @@ ap.module("game").requires("class", "player", "monster", "flyer", "image", "fiel
 			this.draw();
 		},
 		update: function() {
-			// 伤害区域检测 TODO
-
+			// 伤害区域检测
+			ap.collision.checkDamage();
 			// 遍历实体
-			this.entities.forEach(function(entity, index) {
+			for (var i = 0; i < this.entities.length; i++) {
+				var entity = this.entities[i];
 				entity.update();
 				// 剔除死亡的实体
 				if (entity.isKilled) {
 					this.deferredKill.push(entity);
-					this.entities.splice(index, 1);
+					this.entities.splice(i, 1);
+					i--;
 				}
-			});
-			// 
+			}
+			// 移动后碰撞检查
+			ap.collision.checkMoveAll();
 			// 如果击杀数够了就解锁当前区域
 			if (this.leaveKillCount === 0) {
 				this.isUnLock = true;
@@ -132,7 +142,6 @@ ap.module("game").requires("class", "player", "monster", "flyer", "image", "fiel
 				// 图像交错比例
 				v = 0.6;
 			cache.width = this.backgroundWidth;
-			// this.backgroundWidth + 2 * wallW + (this.backgroundWidth + 1.6 * wallW) % (0.6 * wallW);
 			cache.height = this.backgroundHeight;
 			// 平铺地面 
 			for (var i = 0, x = Math.ceil(cache.width / tileW); i < x; i++) {
@@ -156,17 +165,15 @@ ap.module("game").requires("class", "player", "monster", "flyer", "image", "fiel
 					}
 				}
 			}
-			// 区域测试用
-			// context.strokeRect(wallW, wallH, Math.ceil(cache.width / wallW / v - 2) * v * wallW - wallW,
-			// 	Math.ceil(cache.height / wallH / v - 2) * v * wallH - wallH);
-			//document.body.appendChild(cache);
 
 			// 设置背景的偏移量
 			this.backgroundOffset.x = wallW;
 			this.backgroundOffset.y = wallH;
 			// 设置可以活动的区域
 			this.fieldSize.x = Math.ceil(cache.width / wallW / v - 2) * v * wallW - wallW;
-			this.fieldSize.y = Math.ceil(cache.width / wallW / v - 2) * v * wallW - wallW;
+			this.fieldSize.y = Math.ceil(cache.height / wallH / v - 2) * v * wallH - wallH;
+			// 区域测试用
+			// context.strokeRect(wallW, wallH, this.fieldSize.x, this.fieldSize.y);
 			// 保存缓存
 			this.background = cache;
 		},

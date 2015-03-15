@@ -55,7 +55,7 @@ ap.module("pat").requires("monster").defines(function() {
 					s.cast();
 					// 重置冷却计时
 					s.timer.reset();
-					break;
+					// break;
 				}
 			});
 		},

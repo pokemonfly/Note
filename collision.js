@@ -2,12 +2,9 @@
 ap.module("collision").defines(function() {
 	"use strict";
 	ap.collision = {
-		// 当前需要检查的实体列表
-		entities: null,
 		// 场地边界
 		border: null,
 		init: function() {
-			this.entities = ap.game.entities;
 			this.border = ap.game.fieldSize;
 		},
 		// 找出一个随机坐标，可以放置新对象 参数 碰撞体积半径
@@ -16,39 +13,45 @@ ap.module("collision").defines(function() {
 				x: ~~(Math.random() * this.border.x),
 				y: ~~(Math.random() * this.border.y)
 			};
-			while (this._checkCollision(pos, radius)) {
+			while (this._checkCollision(pos, radius).length > 0) {
 				pos.x = ~~(Math.random() * this.border.x);
 				pos.y = ~~(Math.random() * this.border.y);
 			}
 			return pos;
 		},
-
 		// 检查实体是否可以按照移动偏移量移动
 		checkMoveAll: function() {
 			var current = null;
-			for (var i = 0, l = this.entities.length; i < l; i++) {
-				current = this.entities[i];
+			for (var i = 0, l = ap.game.entities.length; i < l; i++) {
+				current = ap.game.entities[i];
 				if (current instanceof ap.Monster || current instanceof ap.Player || current instanceof ap.Pat) {
 					// 尝试去移动
-					var offset = this._tryToMove(current);
-					current.pos.x += moveOffset.x;
-					current.pos.y += moveOffset.y;
+					if (current.moveOffset.x != 0 || current.moveOffset.y != 0) {
+						var offset = this._tryToMove(current);
+						current.pos.x += current.moveOffset.x;
+						current.pos.y += current.moveOffset.y;
+					}
+				} else {
+					current.pos.x += current.moveOffset.x;
+					current.pos.y += current.moveOffset.y;
 				}
 			}
 		},
 		// 检查实体与伤害区域&飞行物的碰撞 计算伤害是否发生
 		checkDamage: function() {
 			var current = null;
-			for (var i = 0, l = this.entities.length; i < l; i++) {
-				current = this.entities[i];
+			for (var i = 0, l = ap.game.entities.length; i < l; i++) {
+				current = ap.game.entities[i];
 				if (current instanceof ap.Flyer || current instanceof ap.Area) {
 					var collisionList = this._checkCollision(current.pos, current.radius);
 					// 对每个被命中的目标执行伤害
 					collisionList.forEach(function(target) {
-						ap.mediator.attack(current.owner, target, current.power, current.name, current.status, current.probability);
+						if (target.type !== current.type) {
+							ap.mediator.attack(current.owner, target, current.power, current.name, current.status, current.probability);
+							// 碰撞后消灭
+							current.isKilled = true;
+						}
 					});
-					// 碰撞后消灭
-					current.isKilled = true;
 				}
 			}
 		},
@@ -61,17 +64,19 @@ ap.module("collision").defines(function() {
 					y: 0
 				};
 			}
-			var collisionList = this._checkCollision({
-				x: current.pos.x + current.moveOffset.x,
-				y: current.pos.y + current.moveOffset.y
-			}, current.radius, current)，
-			count = count || 0;
-			if (collisionList.length === 0) {
+			var pos = {
+					x: current.pos.x + current.moveOffset.x,
+					y: current.pos.y + current.moveOffset.y
+				},
+				collisionList = this._checkCollision(pos, current.radius, current),
+				count = count || 0;
+			if (collisionList.length === 0 && this._checkBorder(pos, current.radius)) {
 				return current.moveOffset;
 			} else {
 				// 移动失败，通知实体修改角度
 				current.changeRad(count);
-				return this._tryToMove(current, ++count);
+				count ++;
+				return this._tryToMove(current, count);
 			}
 		},
 		// 判断指定点和半径 是否与其他实体有交集 并返回有交集的实体列表 cursor:当前正在检查的目标
@@ -79,8 +84,8 @@ ap.module("collision").defines(function() {
 			var current = null,
 				distance = 0,
 				result = [];
-			for (var i = 0, l = this.entities.length; i < l; i++) {
-				current = this.entities[i];
+			for (var i = 0, l = ap.game.entities.length; i < l; i++) {
+				current = ap.game.entities[i];
 				if (current === cursor) {
 					continue;
 				}
@@ -92,6 +97,14 @@ ap.module("collision").defines(function() {
 				}
 			}
 			return result;
+		},
+		// 判断指定点和半径是否与边界相交 
+		_checkBorder: function(pos, radius) {
+			if (pos.x - radius < 0 || pos.x + radius > this.border.x || pos.y < 0 || pos.y > this.border.y) {
+				return false;
+			} else {
+				return true;
+			}
 		}
 
 	};

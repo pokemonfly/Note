@@ -61,7 +61,8 @@ ap.module("field").requires("feature").defines(function() {
 			var i, m;
 			// 生成怪兽
 			for (i = 0; i < this.monstersAmount; i++) {
-				m = new ap.Monster();
+				m = new ap.Monster(ap.config.monsters[0]);
+				m.pos = ap.collision.getRandomPos(30);
 				this.monsters.push(m);
 			}
 			// 生成boss

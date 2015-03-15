@@ -51,9 +51,11 @@ ap.module("ui").requires("utils").defines(function() {
 		// 游戏界面 - 血条
 		life: null,
 		lifeNum: null,
+		lifeBar: null,
 		// 游戏界面 - 护盾条
 		shield: null,
 		shieldNum: null,
+		shieldBar: null,
 		// 游戏界面 - 技能栏
 		skillList: [],
 		// 游戏界面 - 区域特性栏 - 区域号
@@ -87,9 +89,11 @@ ap.module("ui").requires("utils").defines(function() {
 			this.gameUI = ap.$("#ui");
 			this.canvas = ap.$("canvas")[0];
 			this.life = ap.$("#life");
+			this.lifeBar = ap.$("#lifeInner");
 			this.lifeNum = ap.$("#lifeNum");
 			this.shield = ap.$("#shieldInner");
 			this.shieldNum = ap.$("#shieldNum");
+			this.shieldBar = ap.$("#shieldInner");
 			// 游戏界面 - 区域特性栏
 			this.areaCount = ap.$("#areaCount");
 			this.rare = ap.$("#rare");
@@ -298,12 +302,27 @@ ap.module("ui").requires("utils").defines(function() {
 
 		// ==============游戏UI相关==============
 		// 刷新血量条
-		setLife: function(per) {
-
+		setLife: function(num, max) {
+			this.lifeNum.innerHTML = num + "/" + max;
+			this.lifeBar.style.width = (num / max * 100) + "%";
 		},
 		// 刷新护盾条
-		setShield: function(per) {
-			if (per > 0) {
+		setShield: function(num, max) {
+			if (num == 0) {
+				// 护盾耗尽 消除护盾
+				this._showShield(false);
+				return;
+			}
+			if (num == max) {
+				// 初次添加
+				this._showShield(true);
+			}
+			this.shieldNum.innerHTML = num + "/" + max;
+			this.shieldBar.style.width = (num / max * 100) + "%";
+		},
+		// 控制护盾界面是否显示
+		_showShield: function(flg) {
+			if (flg) {
 				this.addClass(this.life, "hasShield");
 				this.removeClass(this.shield, "hidden");
 				this.removeClass(this.shieldNum, "hidden");
