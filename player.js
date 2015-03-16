@@ -13,13 +13,15 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 攻击力
 		power: 50,
 		// 攻速 每秒攻击次数 
-		attackSpeed: 1.6,
+		attackSpeed: 1.2,
 		// 暴击
 		critical: 0.05,
 		// 生命吸取
 		drainLife: 0.05,
-		// 爆炸范围加成
-		range: 0,
+		// 攻击射程加成
+		attackRange: 1,
+		// 技能范围加成
+		skillRange: 1,
 		// 技能方向
 		aim: 0,
 
@@ -39,6 +41,10 @@ ap.module("player").requires("entity", "image").defines(function() {
 		exp: 0,
 		// 升级需要经验
 		nextLvExp: 280,
+		// 经验获得速度
+		expRate: 1,
+		// 升级时可以获得的奖励属性个数
+		levelUpBonusCount: 3,
 
 		// 精神 玩家独有属性
 		spirit: 0,
@@ -60,8 +66,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 护盾持续时间
 		shieldDuration: 0,
 
+		// 闪避 玩家自带10%闪避
+		dodge: 0.1,
 		// 是否无敌
 		isInvincible: false,
+		// 技能消耗体力 比例
+		skillCost: 0,
 		// 仇恨转移目标
 		redirect: null,
 
@@ -118,14 +128,16 @@ ap.module("player").requires("entity", "image").defines(function() {
 
 		// 检查角色护盾的状态
 		_checkShield: function() {
-			if (this.shieldCreateTimer.delta() > this.shieldDuration) {
-				// 护盾时间到， 消灭当前护盾
-				this.hasShield = false;
-				this.shieldCreateTimer = null;
-				ap.ui.setShield(0);
-			} else {
-				// 有护盾的话，刷新护盾UI显示
-				ap.ui.setShield(this.shield, this.shieldLimit);
+			if (this.hasShield) {
+				if (this.shieldCreateTimer.delta() > this.shieldDuration) {
+					// 护盾时间到， 消灭当前护盾
+					this.hasShield = false;
+					this.shieldCreateTimer = null;
+					ap.ui.setShield(0);
+				} else {
+					// 有护盾的话，刷新护盾UI显示
+					ap.ui.setShield(this.shield, this.shieldLimit);
+				}
 			}
 		},
 
@@ -210,13 +222,21 @@ ap.module("player").requires("entity", "image").defines(function() {
 			if (ap.input.pressed("Attack1")) {
 				// 鼠标攻击
 				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
-				this.attack("Pyromania");
+				this.attack("pyromania");
 			}
 			if (ap.input.pressed("Attack2")) {
 				// 键盘攻击
 				this.aim = this.moveAim;
-				this.attack("Pyromania");
+				this.attack("pyromania");
 			}
+		},
+		// 获得经验
+		getExp: function(num) {
+
+		},
+		// 升级 获得属性加成
+		levelUp: function() {
+
 		},
 		update: function() {
 			this.parent();

@@ -3,8 +3,8 @@ ap.module("skill").requires("utils").defines(function() {
 	"use strict";
 	ap.skill = {
 		// 玩家技能
-		Pyromania: {
-			id: "Pyromania",
+		pyromania: {
+			id: "pyromania",
 			name: "嗜火",
 			icon: "Pyromania.png",
 			description: "普通攻击。\n附加效果：每进行4个攻击后，安妮的下一次伤害就会对目标造成短暂的定身效果。",
@@ -33,9 +33,10 @@ ap.module("skill").requires("utils").defines(function() {
 				});
 			}
 		},
+		// disintegrate
 		// 怪物技能列表
 		Charge: {
-			id: "Charge",
+			id: "charge",
 			name: "冲锋",
 			description: null,
 			coolDown: 10,
@@ -46,7 +47,7 @@ ap.module("skill").requires("utils").defines(function() {
 			}
 		},
 		Fire: {
-			id: "Fire",
+			id: "fire",
 			name: "冲锋",
 			description: null,
 			coolDown: 10,
@@ -61,6 +62,9 @@ ap.module("skill").requires("utils").defines(function() {
 	};
 	// 生成新的技能对象
 	ap.skill.createSkill = function(name, caster) {
+		if (!ap.skill[name]) {
+			throw new Error("技能对象未找到");
+		}
 		var newSkill = ap.utils.deepCopy(ap.skill[name]);
 		newSkill.caster = caster;
 		// 如果冷却未设定，则用未角色的攻击速度来设定

@@ -1,7 +1,7 @@
 // 成就 与成就面板绑定
 "use strict";
 ap.module("achievement").defines(function() {
-	ap.Achievement = {
+	ap.achievement = {
 		// 杀死怪物数
 		killCount : 0,
 		// 使用特定技能杀死怪物数
@@ -14,6 +14,9 @@ ap.module("achievement").defines(function() {
 			burn : 0
 		},
 		healingCount : 0,
+		// 稀有物品收集
+		rareItemCollect: []
+
 	};
 });
 

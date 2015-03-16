@@ -35,7 +35,7 @@ ap.module("config").requires("image").defines(function() {
 					// 区域强化间隔数
 					updateNum: 5,
 					// 稀有区域概率
-					rare : 0.1
+					rare: 0.1
 				}
 			},
 			"NORMAL": {},
@@ -46,7 +46,7 @@ ap.module("config").requires("image").defines(function() {
 			// 安妮的初始属性大多已经在player中预设
 			"Annie": {
 				animSheet: new ap.Image("media/sprites/annie.png", ap.Image.OFFSET.BELOW),
-				skill: ["Pyromania"]
+				skill: ["pyromania"]
 			}
 		},
 		// 怪物列表
@@ -58,13 +58,169 @@ ap.module("config").requires("image").defines(function() {
 		// 游戏中掉落的道具
 		items: {
 			// 普通道具，不限制次数获得
-			"NORMAL": {
+			"NORMAL": [{
+				name: "活力夹心饼干",
+				description: "获得额外的经验",
+				effect: function() {
+					ap.game.player.getExp(100);
+				}
+			}, {
+				name: "多兰碎片",
+				description: "攻击力永久提高",
+				effect: function() {
+					ap.game.player.power += 1;
+				}
+			}, {
+				name: "生命宝珠",
+				description: "生命上限永久提高",
+				effect: function() {
+					ap.game.player.lifeLimit += 5;
+				}
+			}, {
+				name: "法力药水",
+				description: "恢复一些精神能量",
+				effect: function() {
+					ap.game.player.spirit += 50;
+					if (ap.game.player.spirit > ap.game.player.spiritLimit) {
+						ap.game.player.spirit = ap.game.player.spiritLimit;
+					}
+				}
+			}, {
+				name: "狂野合剂",
+				description: "获得激怒",
+				effect: function() {
 
-			},
-			// 稀有道具， 只能获得一次，计入成就，可以继承
-			"RARE": {
+				}
+			}, {
+				name: "怒火合剂",
+				description: "获得威能",
+				effect: function() {
 
-			}
+				}
+			}, {
+				name: "生命药水",
+				description: "获得治疗",
+				effect: function() {
+
+				}
+			}, {
+				name: "坚韧合剂",
+				description: "获得反弹",
+				effect: function() {
+
+				}
+			}, {
+				name: "迅捷药水",
+				description: "获得迅捷",
+				effect: function() {
+
+				}
+			}],
+			// 稀有道具 只能获得一次，计入成就，可以继承
+			"RARE": [
+			{
+				name: "蜂刺",
+				description: "攻击速度增加",
+				effect: function() {
+					ap.game.player.attackSpeed = 1.6;
+				}
+			},{
+				name: "魔宗",
+				description: "所有攻击射程增加",
+				effect: function() {
+					ap.game.player.attackRange = 1.2;
+				}
+			}, {
+				name: "智慧末刃",
+				description: "技能范围加大",
+				effect: function() {
+					ap.game.player.skillRange = 1.2;
+				}
+			}, {
+				name: "黯炎火炬",
+				description: "普通攻击附带爆炸",
+				effect: function() {
+
+				}
+			}, {
+				name: "轻灵之靴",
+				description: "移动速度加快",
+				effect: function() {
+					ap.game.player.moveSpeed += 50;
+				}
+			}, {
+				name: "日炎斗篷",
+				description: "护盾吸收效果加强",
+				effect: function() {
+
+				}
+			}, {
+				name: "幽梦之灵",
+				description: "物品掉落提高",
+				effect: function() {
+					ap.game.dropRate *= 2;
+				}
+			}, {
+				name: "时光之杖",
+				description: "击杀后恢复效果提高",
+				effect: function() {
+
+				}
+			}, {
+				name: "燃烧宝石",
+				description: "技能冷却缩减",
+				effect: function() {
+
+				}
+			}, {
+				name: "冰霜之心",
+				description: "精神恢复速度加快",
+				effect: function() {
+					ap.game.player.spiritSpeed += 3;
+				}
+			}, {
+				name: "禁忌雕像",
+				description: "提伯斯的持续时间延长",
+				effect: function() {
+
+				}
+			}, {
+				name: "熊灵号角",
+				description: "提伯斯的伤害和血量加强",
+				effect: function() {
+
+				}
+			}, {
+				name: "双生暗影",
+				description: "普通攻击小几率附加毒伤",
+				effect: function() {
+
+				}
+			}, {
+				name: "女神之泪",
+				description: "经验获得速度加快",
+				effect: function() {
+					ap.game.player.expRate *= 1.2;
+				}
+			}, {
+				name: "启示灵药",
+				description: "升级奖励 + 1",
+				effect: function() {
+					ap.game.player.levelUpBonusCount += 1;
+				}
+			}, {
+				name: "狂怒灵药",
+				description: "升级奖励 + 1",
+				effect: function() {
+					ap.game.player.levelUpBonusCount += 1;
+				}
+			}, {
+				name: "神谕精粹",
+				description: "升级奖励 + 1",
+				effect: function() {
+					ap.game.player.levelUpBonusCount += 1;
+				}
+			}]
 		}
 	};
 });

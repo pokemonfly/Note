@@ -4,6 +4,10 @@ ap.module("monster").requires("entity", "image").defines(function() {
 	ap.Monster = ap.Entity.extend({
 		// 类型 判定用
 		type: "monster",
+		// 怪物的品种 成就统计用 幽灵，野兽，植物
+		breed : null,
+		// 精英标识 0 普通 1 稀有 2 特殊
+		rank: 0,
 		// 生命
 		life: 100,
 		// 生命上限

@@ -36,14 +36,14 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 		},
 		// 当前活动的实体
 		entities: [],
-		// 死亡的对象 播放完死亡动画即可删除
-		deferredKill: [],
 		// 当前的玩家实体
 		player: null,
 		// ===========游戏本身属性=========================
 		difficulty: null,
 		// 游戏设定 由难度决定
 		config: null,
+		// 击杀后物品掉率倍率
+		dropRate: 1,
 		// 离开前需要击杀数 如果为0则解锁当前区域
 		leaveKillCount: 0,
 		// 当前区域是否解锁
@@ -99,7 +99,8 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 				entity.update();
 				// 剔除死亡的实体
 				if (entity.isKilled) {
-					this.deferredKill.push(entity);
+					// 死亡后判断是否需要掉落物品
+					this.dropItem(entity);
 					this.entities.splice(i, 1);
 					i--;
 				}
@@ -113,6 +114,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			}
 			if (!this.isUnLock) {
 				// 添加出口
+			}
+			// 处理死亡的对象
+			if (this.deferredKill.length > 0) {
+
 			}
 		},
 		draw: function() {
@@ -213,6 +218,33 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 		createFlyer: function(property) {
 			var flyer = new ap.Flyer(property);
 			this.entities.push(flyer);
+		},
+		// 物品掉落
+		dropItem: function(entity) {
+			if (entity instanceof ap.Monster) {
+				var item = null,
+					isRare = false;
+				switch (entity.rank) {
+					case 0:
+						item = ap.mediator.getItem("NORMAL", 0.1 * this.dropRate);
+						break;
+					case 1:
+						item = ap.mediator.getItem("NORMAL", 0.5 * this.dropRate);
+						break;
+					case 2:
+						isRare = true;
+						item = ap.mediator.getItem("RARE", 0.2 * this.dropRate);
+						break;
+				}
+				// 获得物品
+				if (item) {
+					// 使用物品
+					item.effect();
+					// 显示消息
+					ap.ui.addMessage("获得了物品<span class='" + (isRare ? "rare" : "") + "' title='" + item.description + "'>[" + item.name + "]</span>");
+				}
+			}
 		}
+
 	});
 });

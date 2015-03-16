@@ -8,6 +8,8 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		power: 10,
 		// 因状态而改变的
 		powerBonus: 0,
+		// 暴击加成
+		criticalBonus: 0,
 
 		// 移动速度 每秒移动像素
 		moveSpeed: 100,
@@ -22,6 +24,8 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		isReflection: false,
 		// 是否死亡
 		isKilled: false,
+		// 是否在被干扰
+		isJam : false,
 
 		// 初始化
 		init: function(property) {

@@ -1,12 +1,12 @@
 // 中介 负责对象之间的比较复杂的通信 
-ap.module("mediator").requires("scenario", "game").defines(function() {
+ap.module("mediator").requires("scenario", "game", "achievement").defines(function() {
 	"use strict";
 	ap.mediator = {
 		// 装载过的剧本&事件
 		events: {},
 		// 剧本对象的引用
 		scenario: ap.scenario,
-		achieve: ap.Achievement,
+		achieve: ap.achievement,
 		// 初始化
 		init: function() {
 			for (var i = 0, l = this.scenario.length; i < l; i++) {
@@ -50,6 +50,25 @@ ap.module("mediator").requires("scenario", "game").defines(function() {
 			} else {
 				console.log("事件未触发：" + event);
 			}
+		},
+		// 物品掉落 type : NORMAL  RARE rate :获得概率
+		getItem: function(type, rate) {
+			var item = null;
+			if (Math.random() < rate) {
+				if (type == "RARE" && this.achieve.rareItemCollect.length == ap.config.items[type].length) {
+					// 稀有物品已经收集完
+					return item;
+				}
+				// 随机获得一个
+				var r = ~~(Math.random() * ap.config.items[type].length),
+					item = ap.config.items[type][r];
+				// 稀有的话，不可以重复
+				while (type == "RARE" && item.own) {
+					r = ~~(Math.random() * ap.config.items[type].length);
+					item = ap.config.items[type][r];
+				}
+			}
+			return item;
 		}
 
 	};
