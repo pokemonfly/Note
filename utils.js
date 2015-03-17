@@ -4,7 +4,8 @@ ap.module("utils").defines(function() {
 	ap.utils = {
 		// 深度拷贝
 		deepCopy: function(object) {
-			if (!object || typeof(object) != 'object') {
+			if (!object || typeof(object) != 'object' || object instanceof HTMLElement || object instanceof ap.Class) {
+				// 此处如果不加HTMLElement的话，可能因拷贝DOM发生浏览器崩溃
 				return object;
 			} else if (object instanceof Array) {
 				var c = [];

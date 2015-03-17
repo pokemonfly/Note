@@ -28,10 +28,10 @@ ap.module("collision").defines(function() {
 					// 尝试去移动
 					if (current.moveOffset.x != 0 || current.moveOffset.y != 0) {
 						var offset = this._tryToMove(current);
-						current.pos.x += current.moveOffset.x;
-						current.pos.y += current.moveOffset.y;
+						current.pos.x += offset.x;
+						current.pos.y += offset.y;
 					}
-				} else {
+				} else if (current instanceof ap.Flyer){
 					current.pos.x += current.moveOffset.x;
 					current.pos.y += current.moveOffset.y;
 				}
@@ -42,7 +42,8 @@ ap.module("collision").defines(function() {
 			var current = null;
 			for (var i = 0, l = ap.game.entities.length; i < l; i++) {
 				current = ap.game.entities[i];
-				if (current instanceof ap.Flyer || current instanceof ap.Area) {
+				//  投射物
+				if (current instanceof ap.Flyer) {
 					var collisionList = this._checkCollision(current.pos, current.radius);
 					// 对每个被命中的目标执行伤害
 					collisionList.forEach(function(target) {
@@ -50,6 +51,17 @@ ap.module("collision").defines(function() {
 							ap.mediator.attack(current.owner, target, current.power, current.name, current.status, current.probability);
 							// 碰撞后消灭
 							current.isKilled = true;
+						}
+					});
+				}
+				// 区域
+				if (current instanceof ap.Area && current.isReady) {
+					// 区域不会直接对目标造成伤害，但会给目标添加状态
+					var collisionList = this._checkCollision(current.pos, current.radius, null, current.aimS, current.aimE);
+					// 对每个被命中的目标添加状态
+					collisionList.forEach(function(target) {
+						if (target.type !== current.type) {
+							ap.mediator.attack(current.owner, target, 0, current.name, current.status, 1);
 						}
 					});
 				}
@@ -75,12 +87,12 @@ ap.module("collision").defines(function() {
 			} else {
 				// 移动失败，通知实体修改角度
 				current.changeRad(count);
-				count ++;
+				count++;
 				return this._tryToMove(current, count);
 			}
 		},
-		// 判断指定点和半径 是否与其他实体有交集 并返回有交集的实体列表 cursor:当前正在检查的目标
-		_checkCollision: function(pos, radius, cursor) {
+		// 判断指定点和半径 是否与其他实体有交集 并返回有交集的实体列表 cursor:当前正在检查的目标 aimS aimE 扇形的话，2个角度
+		_checkCollision: function(pos, radius, cursor, aimS, aimE) {
 			var current = null,
 				distance = 0,
 				result = [];
@@ -92,6 +104,14 @@ ap.module("collision").defines(function() {
 				if (current instanceof ap.Monster || current instanceof ap.Player || current instanceof ap.Pat) {
 					distance = ap.utils.getDistance(pos, current.pos);
 					if (distance < current.radius + radius) {
+						if (aimS || aimE) {
+							// 如果是扇形区域的话
+							var rad = ap.utils.getRad(pos, current.pos);
+							if (rad < aimS || rad > aimE) {
+								// 区域外的话，排除
+								continue;
+							}
+						}
 						result.push(current);
 					}
 				}

@@ -24,6 +24,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 		skillRange: 1,
 		// 技能方向
 		aim: 0,
+		// 攻击计数
+		attackCount: 0,
 
 		// 移动速度 
 		moveSpeed: 200,
@@ -60,7 +62,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 护盾上限
 		shieldLimit: 0,
 		// 护盾上限加成
-		shieldBonus: 0,
+		// shieldBonus: 0,
 		// 护盾创建时间
 		shieldCreateTimer: null,
 		// 护盾持续时间
@@ -74,7 +76,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 		skillCost: 0,
 		// 仇恨转移目标
 		redirect: null,
-
+		// 是否在瞄准中
+		isAimming: false,
+		// 瞄准区域的角度
+		aimmingRad: 0,
+		// 瞄准区域的半径
+		aimmingRadius: 0,
 		// 状态 buff & debuff
 		status: [],
 		// 持有技能
@@ -216,18 +223,54 @@ ap.module("player").requires("entity", "image").defines(function() {
 		},
 		// 攻击意向判定
 		_decision: function() {
-			// 技能攻击 优先判定 TODO
-
 			// 普通攻击
 			if (ap.input.pressed("Attack1")) {
 				// 鼠标攻击
 				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
-				this.attack("pyromania");
+				this.useSkill("pyromania");
 			}
 			if (ap.input.pressed("Attack2")) {
 				// 键盘攻击
 				this.aim = this.moveAim;
-				this.attack("pyromania");
+				this.useSkill("pyromania");
+			}
+			// 技能攻击 
+			this.aim = ap.input.useMouse ? Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x) : this.moveAim;
+			this.isAimming = false;
+			for (var skillId in this.skills) {
+				if (ap.input.pressed(skillId)) {
+					this._showSkillPreview(skillId);
+				}
+				if (ap.input.released(skillId)) {
+					this.useSkill(skillId);
+				}
+
+			}
+
+			// if (ap.input.pressed("Disintegrate")) {
+			// 	// TODO
+
+			// }
+			// if (ap.input.pressed("Incinerate")) {
+			// 	this._showSkillPreview("incinerate");
+			// }
+			// if (ap.input.pressed("MoltenShield")) {
+			// 	this.attack("moltenShield");
+			// }
+
+		},
+		// 准备描绘技能方向
+		_showSkillPreview: function(skillId) {
+			var s = this.skills[skillId];
+			if (s) {
+				// 检查技能是否可用 
+				if (s.timer.delta() >= s.coolDown && s.hasPreview) {
+					this.isAimming = true;
+					this.aimmingRad = s.rad;
+					this.aimmingRadius = s.radius;
+				}
+			} else {
+				throw new Error("_checkSkillAvailable参数不正:" + skillId);
 			}
 		},
 		// 获得经验
@@ -246,6 +289,17 @@ ap.module("player").requires("entity", "image").defines(function() {
 			this._decision();
 			// 判断护盾的变化
 			this._checkShield();
+		},
+		draw: function() {
+			this.parent();
+			// 如果使用技能瞄准的话，描绘技能范围
+			if (this.isAimming) {
+				if (this.aimmingRad) {
+					ap.game.drawPreviewCircle(this.pos, this.aimmingRadius, this.aim - this.aimmingRad / 2, this.aim + this.aimmingRad / 2);
+				} else {
+					ap.game.drawPreviewArrow(this.pos, this.aimmingRadius, this.aim);
+				}
+			}
 		}
 	});
 });

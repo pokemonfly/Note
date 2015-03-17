@@ -29,6 +29,8 @@ ap.module("input").defines(function() {
 			x: 0,
 			y: 0
 		},
+		// 使用鼠标标识
+		useMouse: true,
 		init: function() {
 			this.bindings = {};
 			this.presses = {};
@@ -53,6 +55,10 @@ ap.module("input").defines(function() {
 				this.presses[action] = true;
 				event.stopPropagation();
 				event.preventDefault();
+			}
+			// 如果使用了键盘方向的话，就标记为键盘操作
+			if (action === "Left" || action === "Up" || action === "Right" || action === "Down") {
+				this.useMouse = false;
 			}
 		},
 		keyup: function() {
@@ -93,8 +99,9 @@ ap.module("input").defines(function() {
 			if (ap.game) {
 				pos = ap.game.getCameraPos();
 			}
-			this.mouse.x = event.clientX - pos.x ;
+			this.mouse.x = event.clientX - pos.x;
 			this.mouse.y = event.clientY - pos.y;
+			this.useMouse = true;
 		},
 		// 读取按键设定并加载
 		bindKey: function() {
@@ -113,11 +120,11 @@ ap.module("input").defines(function() {
 		// 右键点击移动
 		'MOUSE2': 'Go',
 		// 技能：碎裂之火
-		'Q': 'Disintegrate',
+		'Q': 'disintegrate',
 		// 技能：焚烧
-		'W': 'Incinerate',
+		'W': 'incinerate',
 		// 技能：熔岩护盾
-		'E': 'MoltenShield',
+		'E': 'moltenShield',
 		// 技能：提伯斯之怒
 		'R': 'Tibbers',
 		// 功能：精神爆发，解锁当前区域的出口

@@ -5,7 +5,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		// 类型 判定用
 		type: "monster",
 		// 怪物的品种 成就统计用 幽灵，野兽，植物
-		breed : null,
+		breed: null,
 		// 精英标识 0 普通 1 稀有 2 特殊
 		rank: 0,
 		// 生命
@@ -26,19 +26,13 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		strength: 1,
 
 		// 状态 buff & debuff
-		status: [],
+		status: null,
 		// 持有技能
-		skills: {},
+		skills: null,
 		// 位置
-		pos: {
-			x: 0,
-			y: 0
-		},
+		pos: null,
 		// 本次移动的位置偏移量
-		moveOffset: {
-			x: 0,
-			y: 0
-		},
+		moveOffset: null,
 		// 碰撞体积 半径
 		radius: 30,
 		// 瞄准方向
@@ -50,6 +44,17 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			this.parent(property);
 			// 强化怪兽
 			this.buff();
+			// 初始化引用类型属性
+			this.status = [];
+			this.skills = {};
+			this.pos = {
+				x: 0,
+				y: 0
+			};
+			this.moveOffset = {
+				x: 0,
+				y: 0
+			};
 		},
 		// 用强度强化怪兽
 		buff: function() {

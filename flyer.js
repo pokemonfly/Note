@@ -40,8 +40,8 @@ ap.module("flyer").requires("entity").defines(function() {
 		explosionStatus: [],
 
 		init: function(property) {
-			this.durationTimer = new ap.Timer();
 			this.parent(property);
+			this.durationTimer = new ap.Timer();
 			this.moveOffset = {
 				x: 0,
 				y: 0
@@ -56,7 +56,7 @@ ap.module("flyer").requires("entity").defines(function() {
 			// 计算出此次可以移动的距离
 			this.lastMove = this.moveTimer.delta() * this.moveSpeed;
 			this.moveByRad(this.moveAim);
-
+			// 重置移动的计时器
 			this.moveTimer.reset();
 		},
 

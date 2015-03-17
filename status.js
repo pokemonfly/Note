@@ -4,16 +4,43 @@ ap.module("status").defines(function() {
 	ap.status = {
 		// 共同的属性
 		prototype: {
+			// 技能id 用于统计
+			id: null,
 			// 持续时间
 			duration: 1,
 			// 效果周期
 			cycle: 1,
+			// 效果施放者
+			caster: null,
 			// 效果的宿主
 			target: null,
 			// 效果计时器
 			timer: null,
 			// 状态图标在Sprites中的位置
-			icon: null
+			icon: null,
+			// 执行效果
+			execute: function() {
+				// 第一次执行时初始化
+				if (this.timer === null) {
+					this.timer = new ap.Timer();
+				}
+				var delta = this.timer.delta();
+				if (delta > this.cycle) {
+					if (this.effect) {
+						this.effect();
+					}
+					this.timer.reset();
+					this.duration -= delta;
+				}
+				// 效果过期 消除
+				if (delta > this.duration) {
+					if (this.vanish) {
+						this.vanish();
+					}
+					return false;
+				}
+				return true;
+			}
 		},
 		fury : {
 			name: "激怒",
@@ -69,7 +96,7 @@ ap.module("status").defines(function() {
 		},
 		charge: {
 			name: "冲锋",
-			description: "冲锋，以最大速度移动"
+			description: "冲锋，以最大速度移动",
 			effect: function() {
 				this.target.moveSpeedBonus = 500;
 			},
@@ -94,7 +121,8 @@ ap.module("status").defines(function() {
 			intensity: 10,
 			cycle: 0.5,
 			effect: function() {
-				this.target.onHurt(this.intensity);
+				// this.target.onHurt(this.intensity);
+				ap.mediator.attack(this.caster, this.target, this.intensity, this.id);
 			}
 		},
 		slow: {
@@ -128,8 +156,8 @@ ap.module("status").defines(function() {
 			}
 		}
 	};
-	// 创建一个状态  名称，状态宿主，持续时间，强度
-	ap.status.createStatus = function(name, target, duration, intensity) {
+	// 创建一个状态  名称，状态宿主，持续时间，效果周期,强度
+	ap.status.createStatus = function(name, id, caster, intensity, duration, cycle) {
 		if (!ap.status[name]) {
 			throw new Error("指定的状态不存在");
 		}
@@ -138,10 +166,12 @@ ap.module("status").defines(function() {
 		for (var i in copy) {
 			newStatus[i] = copy[i];
 		}
-		newStatus.timer = new ap.Timer();
-		newStatus.target = target;
+		newStatus.id = id;
+		newStatus.caster = caster;
 		// 持续时间最短1秒
 		newStatus.duration = duration || 1;
+		// 每一跳的时间
+		newStatus.cycle = cycle || 1;
 		// 部分buff没有强度概念
 		newStatus.intensity = intensity || 0;
 		return newStatus;

@@ -31,10 +31,12 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 				// 反射攻击没有吸血 并且不会再次反射
 				isDead = target.onHurt(damage, attacker, false);
 			}
-			if (status !== null) {
-				// 判断是否附加异常 TODO
-				if (Math.random() < probability) {
-					target.status.push(status);
+			if (status) {
+				// 判断是否附加异常
+				for (var n = 0; n < status.length; n++) {
+					if (Math.random() < probability) {
+						target.status.push(ap.utils.deepCopy(status[0]));
+					}
 				}
 			}
 			if (attacker.type == "PLAYER" && isDead) {
@@ -66,6 +68,9 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 				while (type == "RARE" && item.own) {
 					r = ~~(Math.random() * ap.config.items[type].length);
 					item = ap.config.items[type][r];
+					this.achieve.rareItemCollect.push(item.name);
+					item.own = true;
+					break;
 				}
 			}
 			return item;

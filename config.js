@@ -45,8 +45,9 @@ ap.module("config").requires("image").defines(function() {
 		player: {
 			// 安妮的初始属性大多已经在player中预设
 			"Annie": {
+				name: "安妮",
 				animSheet: new ap.Image("media/sprites/annie.png", ap.Image.OFFSET.BELOW),
-				skill: ["pyromania"]
+				skill: ["pyromania", "disintegrate", "incinerate", "moltenShield"]
 			}
 		},
 		// 怪物列表
@@ -117,14 +118,13 @@ ap.module("config").requires("image").defines(function() {
 				}
 			}],
 			// 稀有道具 只能获得一次，计入成就，可以继承
-			"RARE": [
-			{
+			"RARE": [{
 				name: "蜂刺",
 				description: "攻击速度增加",
 				effect: function() {
 					ap.game.player.attackSpeed = 1.6;
 				}
-			},{
+			}, {
 				name: "魔宗",
 				description: "所有攻击射程增加",
 				effect: function() {

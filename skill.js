@@ -7,9 +7,13 @@ ap.module("skill").requires("utils").defines(function() {
 			id: "pyromania",
 			name: "嗜火",
 			icon: "Pyromania.png",
-			description: "普通攻击。\n附加效果：每进行4个攻击后，安妮的下一次伤害就会对目标造成短暂的定身效果。",
+			description: "普通攻击。\n被动效果：每进行4个攻击后，安妮的下一次伤害就会对目标造成短暂的定身效果。",
 			coolDown: 0,
 			caster: null,
+			// 技能范围
+			radius: 900,
+			// 需要技能指向预览
+			hasPreview: true,
 			// 施法 参数：方向
 			cast: function() {
 				var status = [];
@@ -31,6 +35,95 @@ ap.module("skill").requires("utils").defines(function() {
 					moveAim: this.caster.aim,
 					animSheet: new ap.Image("media/item/fireball.png", ap.Image.OFFSET.LOWER_LEFT)
 				});
+			}
+		},
+		disintegrate: {
+			id: "disintegrate",
+			name: "碎裂之火",
+			icon: "Disintegrate.png",
+			description: "安妮向前方施放巨大的魔法火球并造成伤害。",
+			coolDown: 0,
+			caster: null,
+			// 技能范围
+			radius: 900,
+			// 需要技能指向预览
+			hasPreview: true,
+			// 施法 参数：方向
+			cast: function() {
+				var status = [];
+				this.caster.attackCount += 1;
+				if (this.caster.attackCount >= 5) {
+					this.caster.attackCount = 0;
+				}
+				// 创造火球投射物
+				ap.game.createFlyer({
+					// 技能伤害
+					power: this.caster.power + this.caster.powerBonus,
+					// 火球持续时间 s
+					duration: 3,
+					owner: this.caster,
+					// 火球大小
+					radius: 30,
+					status: status,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
+					moveAim: this.caster.aim,
+					animSheet: new ap.Image("media/item/fireball.png", ap.Image.OFFSET.LOWER_LEFT)
+				});
+			}
+		},
+		incinerate: {
+			id: "incinerate",
+			name: "焚烧",
+			icon: "Incinerate.png",
+			description: "安妮向锥形区域施放一道烈焰，引燃区域内的所有敌人。",
+			coolDown: 2,
+			caster: null,
+			// 技能施法角度
+			rad: 75 * Math.PI / 180,
+			// 技能伤害倍率
+			scale: 3,
+			// 技能范围
+			radius: 450,
+			hasPreview: true,
+			// 抬起按键时释放
+			cast: function() {
+				var status = [];
+				// 创造一个在0.1s内只有一跳伤害的dot
+				status.push(ap.status.createStatus("burn", "incinerate", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
+					0.1, 0.1));
+				// 区域也是只存在0.1s 在0.06s后，区域的目标将被附加dot
+				ap.game.createArea({
+					duration: 0.1,
+					owner: this.caster,
+					pos: {
+						x: this.caster.pos.x,
+						y: this.caster.pos.y
+					},
+					radius: this.radius,
+					status: status,
+					aimS:this.caster.aim - this.caster.aimmingRad / 2,
+					aimE:this.caster.aim + this.caster.aimmingRad / 2,
+					coolDown: 0.06
+				});
+			}
+		},
+		moltenShield: {
+			id: "moltenShield",
+			name: "熔岩护盾",
+			icon: "MoltenShield.png",
+			description: "安妮施放一个火焰护盾来保护自己。任何对安妮的攻击都将消耗护盾，在护盾消耗尽之前，安妮本身不会受到伤害。",
+			coolDown: 30,
+			caster: null,
+			// 护盾吸收比例
+			scale: 0.3,
+			// 抬起按键时释放
+			cast: function() {
+				// 为施法者添加护盾
+				this.caster.hasShield = true;
+				this.caster.shield = ~~(this.caster.lifeLimit * this.scale);
+				this.caster.shieldLimit = this.caster.shield;
+				this.caster.shieldDuration = 15;
+				this.caster.shieldCreateTimer = new ap.Timer();
 			}
 		},
 		// disintegrate

@@ -133,6 +133,7 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			this.entities.forEach(function(e) {
 				e.draw();
 			});
+
 		},
 		// 绘制背景 使用缓存 
 		createBackground: function() {
@@ -219,6 +220,11 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			var flyer = new ap.Flyer(property);
 			this.entities.push(flyer);
 		},
+		// 生成区域
+		createArea: function(property) {
+			var area = new ap.Area(property);
+			this.entities.push(area);
+		},
 		// 物品掉落
 		dropItem: function(entity) {
 			if (entity instanceof ap.Monster) {
@@ -244,6 +250,71 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					ap.ui.addMessage("获得了物品<span class='" + (isRare ? "rare" : "") + "' title='" + item.description + "'>[" + item.name + "]</span>");
 				}
 			}
+		},
+		// 绘制技能预览 圆心位置 半径 扇形的2个角度
+		drawPreviewCircle: function(pos, radius, aimS, aimE) {
+			var aimS = aimS || 0,
+				aimE = aimE || 0,
+				posOffset = ap.game.getCameraPos(),
+				context = this.context;
+			context.save();
+			// 填充颜色浅蓝色
+			context.fillStyle = "#3399ff";
+			context.strokeStyle = "#3399ff";
+			context.globalAlpha = 0.4;
+			// 位移到目标点
+			context.translate(pos.x + posOffset.x, pos.y + posOffset.y);
+			// 绘制区域
+			context.beginPath();
+			if (aimS === aimE) {
+				// 角度相等的时候就是绘制圆形
+				context.arc(0, 0, radius, 0, 2 * Math.PI);
+			} else {
+				//扇形
+				context.rotate(aimE);
+				context.moveTo(radius, 0);
+				context.lineTo(0, 0);
+				context.rotate(aimS - aimE);
+				context.lineTo(radius, 0);
+				context.rotate(-aimS);
+				// 画出圆弧
+				context.arc(0, 0, radius, aimS, aimE);
+			}
+			context.closePath();
+			// 填充颜色
+			context.fill();
+			// 描边
+			context.globalAlpha = 1;
+			context.lineWidth = 2;
+			context.stroke();
+			context.restore();
+		},
+		// 绘制技能预览 直线
+		drawPreviewArrow: function(pos, length, aim) {
+			var posOffset = ap.game.getCameraPos(),
+				context = this.context;
+
+			context.save();
+			// 填充颜色浅蓝色
+			context.fillStyle = "#3399ff";
+			context.strokeStyle = "#3399ff";
+			context.globalAlpha = 0.4;
+			// 位移到目标点
+			context.translate(pos.x + posOffset.x, pos.y + posOffset.y);
+			// 绘制区域
+			context.beginPath();
+			context.rotate(aim);
+			context.moveTo(0, -3);
+			context.lineTo(0, 3);
+			context.lineTo(length, 0);
+			context.closePath();
+			// 填充颜色
+			context.fill();
+			// 描边
+			context.globalAlpha = 1;
+			context.lineWidth = 2;
+			context.stroke();
+			context.restore();
 		}
 
 	});

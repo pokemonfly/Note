@@ -1,5 +1,5 @@
 // 实体 所有的参与碰撞物体
-ap.module("entity").requires("timer", "class", "skill").defines(function() {
+ap.module("entity").requires("timer", "class", "skill", "status").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
 		// 实体的名字
@@ -25,7 +25,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		// 是否死亡
 		isKilled: false,
 		// 是否在被干扰
-		isJam : false,
+		isJam: false,
 
 		// 初始化
 		init: function(property) {
@@ -42,8 +42,8 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 			}
 			this.moveTimer = new ap.Timer();
 		},
-		// 攻击动作 技能
-		attack: function(skill) {
+		// 攻击 使用技能
+		useSkill: function(skill) {
 			var s = this.skills[skill];
 			// 检查Cooldown
 			if (s.timer.delta() >= s.coolDown) {
@@ -87,6 +87,7 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 				this.hurt(damage);
 			} else {
 				this.life -= damage;
+				ap.ui.addMessage("受到伤害" + damage);
 			}
 
 			// 检查反射Buff
@@ -110,9 +111,20 @@ ap.module("entity").requires("timer", "class", "skill").defines(function() {
 		},
 		update: function() {
 			// 检查自带的状态 （如果自带debuff效果，优先处理）
-			this.status.forEach(function(s) {
-				s.effect(this);
-			});
+			for (var i = 0; i < this.status.length; i++) {
+				var s = this.status[i];
+				// 状态目标设为自身
+				if (!s.target) {
+					s.target = this;
+				}
+				// 执行状态的效果
+				var durationFlg = s.execute();
+				// 剔除失效的实体
+				if (!durationFlg) {
+					this.status.splice(i, 1);
+					i--;
+				}
+			}
 		},
 		draw: function() {
 			var pos = ap.game.getCameraPos();
