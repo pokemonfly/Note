@@ -35,7 +35,9 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			y: 0
 		},
 		// 当前活动的实体
-		entities: [],
+		entities: null,
+		// 当前场地上的活动的怪物数目
+		monsterCount: 0,
 		// 当前的玩家实体
 		player: null,
 		// ===========游戏本身属性=========================
@@ -68,23 +70,26 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			ap.collision.init();
 			// 场景初始化设置
 			ap.field.init(this.config.field);
-			// 创建第一个场景
-			this.nextField();
 			// 初始化玩家角色
 			this.player = new ap.Player(ap.config.player["Annie"]);
-			// 如果有存档则继承属性 TODO
-
-			this.entities.push(this.player);
-
+			// 如果有存档则继承属性
+			// TODO
+			// 创建第一个场景
+			this.nextField();
 		},
 		// 跳到下一个场景
 		nextField: function() {
-			this.entities = this.entities.concat(ap.field.nextWave());
+			// 重置场地上的实体
+			this.entities = [];
+			// 加入玩家实体 优先加入是为了防止怪物的坐标与玩家重复
+			this.entities.push(this.player);
+			// 获得怪物信息
+			var monsters = ap.field.nextWave();
+			this.entities = this.entities.concat(monsters);
+			this.monsterCount = monsters.length;
 			// 锁定当前场景
 			this.isUnLock = false;
 			this.leaveKillCount = ap.field.leaveKill;
-			// 更新UI界面 特性区域
-			// ap.ui.set
 		},
 		run: function() {
 			this.update();
@@ -102,22 +107,95 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					// 死亡后判断是否需要掉落物品
 					this.dropItem(entity);
 					this.entities.splice(i, 1);
+					if (entity instanceof ap.Monster) {
+						// 更新场上怪物数
+						this.monsterCount -= 1;
+						this.leaveKillCount -= 1;
+						// 更新UI
+						ap.ui.setLeaveKill(this.leaveKillCount);
+					}
 					i--;
 				}
 			}
 			// 移动后碰撞检查
 			ap.collision.checkMoveAll();
 			// 如果击杀数够了就解锁当前区域
-			if (this.leaveKillCount === 0) {
+			if (!this.isUnLock && this.leaveKillCount <= 0) {
 				this.isUnLock = true;
 				ap.ui.addMessage("随着怪物的倒下，四周出现了新的道路。");
+				// 添加4个出口
+				this.createArea({
+					// 特殊区域 传送门
+					type: "portal",
+					duration: 9999,
+					pos: {
+						x: 0,
+						y: this.fieldSize.y / 2
+					},
+					radius: 100,
+					coolDown: 0.01,
+					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					// 下次角色出现的位置
+					nextPlayerPos: {
+						x: this.fieldSize.x - 30,
+						y: this.fieldSize.y / 2
+					}
+				});
+				this.createArea({
+					// 特殊区域 传送门
+					type: "portal",
+					duration: 9999,
+					pos: {
+						x: this.fieldSize.x,
+						y: this.fieldSize.y / 2
+					},
+					radius: 100,
+					coolDown: 0.01,
+					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					nextPlayerPos: {
+						x: 30,
+						y: this.fieldSize.y / 2
+					}
+				});
+				this.createArea({
+					// 特殊区域 传送门
+					type: "portal",
+					duration: 9999,
+					pos: {
+						x: this.fieldSize.x / 2,
+						y: 0
+					},
+					radius: 100,
+					coolDown: 0.01,
+					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					nextPlayerPos: {
+						x: this.fieldSize.x / 2,
+						y: this.fieldSize.y - 30
+					}
+				});
+				this.createArea({
+					// 特殊区域 传送门
+					type: "portal",
+					duration: 9999,
+					pos: {
+						x: this.fieldSize.x / 2,
+						y: this.fieldSize.y
+					},
+					radius: 100,
+					coolDown: 0.01,
+					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					nextPlayerPos: {
+						x: this.fieldSize.x / 2,
+						y: 30
+					}
+				});
 			}
-			if (!this.isUnLock) {
-				// 添加出口
-			}
-			// 处理死亡的对象
-			if (this.deferredKill.length > 0) {
-
+			// 场上怪物数不够的话
+			if (!this.isUnLock && this.monsterCount < ap.field.monstersPlus) {
+				var append = ap.field.appendMonster();
+				this.entities = this.entities.concat(append);
+				this.monsterCount += append.length;
+				ap.ui.addMessage("怪物倒下的悲鸣吸引了更多怪物出现。");
 			}
 		},
 		draw: function() {

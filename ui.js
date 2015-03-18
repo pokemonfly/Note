@@ -48,6 +48,8 @@ ap.module("ui").requires("utils").defines(function() {
 		messageList: null,
 		// 游戏界面 - 画布
 		canvas: null,
+		// 等级
+		level: null,
 		// 游戏界面 - 血条
 		life: null,
 		lifeNum: null,
@@ -88,6 +90,7 @@ ap.module("ui").requires("utils").defines(function() {
 			// 游戏界面
 			this.gameUI = ap.$("#ui");
 			this.canvas = ap.$("canvas")[0];
+			this.level = ap.$("#level");
 			this.life = ap.$("#life");
 			this.lifeBar = ap.$("#lifeInner");
 			this.lifeNum = ap.$("#lifeNum");
@@ -301,6 +304,10 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 
 		// ==============游戏UI相关==============
+		// 设置等级
+		setLevel:function(lv) {
+			this.level.innerHTML = lv;
+		},
 		// 刷新血量条
 		setLife: function(num, max) {
 			this.lifeNum.innerHTML = num + "/" + max;

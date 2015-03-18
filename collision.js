@@ -30,8 +30,9 @@ ap.module("collision").defines(function() {
 						var offset = this._tryToMove(current);
 						current.pos.x += offset.x;
 						current.pos.y += offset.y;
+
 					}
-				} else if (current instanceof ap.Flyer){
+				} else if (current instanceof ap.Flyer) {
 					current.pos.x += current.moveOffset.x;
 					current.pos.y += current.moveOffset.y;
 				}
@@ -56,14 +57,29 @@ ap.module("collision").defines(function() {
 				}
 				// 区域
 				if (current instanceof ap.Area && current.isReady) {
-					// 区域不会直接对目标造成伤害，但会给目标添加状态
 					var collisionList = this._checkCollision(current.pos, current.radius, null, current.aimS, current.aimE);
-					// 对每个被命中的目标添加状态
-					collisionList.forEach(function(target) {
-						if (target.type !== current.type) {
-							ap.mediator.attack(current.owner, target, 0, current.name, current.status, 1);
-						}
-					});
+					if (current.type != "portal") {
+						// 对每个被命中的目标执行伤害 添加状态
+						collisionList.forEach(function(target) {
+							if (target.type !== current.type) {
+								ap.mediator.attack(current.owner, target, 0, current.name, current.status, 1);
+							}
+						});
+					} else {
+						// 传送门
+						collisionList.forEach(function(target) {
+							if (target.type == "player") {
+								var p = ap.game.player;
+								// 重置玩家坐标
+								p.pos.x = current.nextPlayerPos.x;
+								p.pos.y = current.nextPlayerPos.y;
+								p.moveTo.x = p.pos.x;
+								p.moveTo.y = p.pos.y;
+								// 移动到下一个区域
+								ap.game.nextField();
+							}
+						});
+					}
 				}
 			}
 		},

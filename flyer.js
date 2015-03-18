@@ -47,6 +47,7 @@ ap.module("flyer").requires("entity").defines(function() {
 				y: 0
 			};
 			this.type = this.owner.type;
+			this.moveTimer = new ap.Timer();
 		},
 		move: function() {
 			if (this.autoFocus) {

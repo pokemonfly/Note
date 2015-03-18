@@ -67,8 +67,9 @@ ap.module("field").requires("feature").defines(function() {
 			}
 			// 生成boss
 			for (i = 0; i < this.bossAmount; i++) {
-				m = new ap.Monster();
-				this.bosses.push(m);
+				m = new ap.Monster(ap.config.monsters[0]);
+				m.pos = ap.collision.getRandomPos(40);
+				this.monsters.push(m);
 			}
 			// 执行特性 强化场景
 			for (i = 0; i < this.features.length; i++) {
@@ -79,15 +80,21 @@ ap.module("field").requires("feature").defines(function() {
 			}
 			// 刷新UI显示内容
 			ap.ui.setFeature(this.num, this.isRare, this.features, this.leaveKill);
-			
+			ap.ui.addMessage("进入区域" + this.num);
 			return [].concat(this.monsters).concat(this.bosses);
 		},
 		// 添加援军
 		appendMonster: function() {
 			this.monsters = [];
+			var i, m;
 			for (i = 0; i <= this.monstersPlus; i++) {
-				m = new ap.Monster();
+				m = new ap.Monster(ap.config.monsters[0]);
+				m.pos = ap.collision.getRandomPos(30);
 				this.monsters.push(m);
+			}
+			// 执行特性 强化场景
+			for (i = 0; i < this.features.length; i++) {
+				this.features[i].effect(this);
 			}
 			return this.monsters;
 		},

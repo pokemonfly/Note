@@ -17,6 +17,8 @@ ap.module("entity").requires("timer", "class", "skill", "status").defines(functi
 		moveSpeedBonus: 0,
 		// 移动用计时器
 		moveTimer: null,
+		// 上次移动的距离用于再计算方向
+		lastMove: 0,
 
 		// 是否定身
 		isImmobilize: false,
@@ -40,7 +42,6 @@ ap.module("entity").requires("timer", "class", "skill", "status").defines(functi
 					this.skills[property["skill"][i]] = sk;
 				}
 			}
-			this.moveTimer = new ap.Timer();
 		},
 		// 攻击 使用技能
 		useSkill: function(skill) {
@@ -62,12 +63,13 @@ ap.module("entity").requires("timer", "class", "skill", "status").defines(functi
 			// 按照次数修正方向
 			var f = num % 2 ? -1 : 1,
 				// 按照次数修正度数
-				rad = Math.round(num / 2) * 15 * Math.PI / 180;
-			this.moveByRad(this.moveAim + rad * f);
+				rad = Math.round(num / 2) * 15 * Math.PI / 180,
+				moveAim = this.moveAim || this.aim;
+			this.moveByRad(moveAim + rad * f);
 		},
 		// 受到治疗 吸血和恢复buff
 		onHeal: function(heal) {
-			this.life += heal;
+			this.life += ~~heal;
 			if (this.life > this.lifeLimit) {
 				this.life = this.lifeLimit;
 			}
@@ -83,14 +85,17 @@ ap.module("entity").requires("timer", "class", "skill", "status").defines(functi
 
 		// 受到伤害  canReflection: 伤害能否反射
 		onHurt: function(damage, attacker, canReflection) {
+			if (damage == 0) {
+				return;
+			}
 			if (this.hurt) {
 				this.hurt(damage);
 			} else {
 				this.life -= damage;
-				ap.ui.addMessage("受到伤害" + damage);
+				ap.ui.addMessage("对" + this.name + "造成" + damage + "伤害。");
 			}
 
-			// 检查反射Buff
+			// 检查反射Buff 就算是玩家闪避了攻击也需要反射伤害
 			if (this.isReflection && !canReflection) {
 				// 反射的伤害不会再次触发反射
 				ap.Mediator.attack(this, attacker, damage * 0.5, "reflection", null, null, true);

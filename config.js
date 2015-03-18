@@ -53,7 +53,8 @@ ap.module("config").requires("image").defines(function() {
 		// 怪物列表
 		monsters: [{
 			name: "杂鱼",
-			skill: null,
+			skill: [],
+			exp : 30,
 			animSheet: new ap.Image("media/ui/1.png", ap.Image.OFFSET.BELOW)
 		}],
 		// 游戏中掉落的道具

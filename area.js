@@ -4,6 +4,8 @@ ap.module("area").requires("entity", "image").defines(function() {
 	ap.Area = ap.Entity.extend({
 		// 伤害类型
 		type: null,
+		// 威力
+		power: 0,
 		// 持续时间
 		duration: 0,
 		// 持续时间 计时器
@@ -32,7 +34,9 @@ ap.module("area").requires("entity", "image").defines(function() {
 			this.parent(property);
 			this.durationTimer = new ap.Timer();
 			this.coolDownTimer = new ap.Timer();
-			this.type = this.owner.type;
+			if (this.owner) {
+				this.type = this.owner.type;
+			}
 		},
 		update: function() {
 			// 超时后消失

@@ -111,7 +111,7 @@ ap.module("status").defines(function() {
 			intensity: 10,
 			cycle: 0.5,
 			effect: function() {
-				this.target.onHurt(this.intensity);
+				ap.mediator.attack(this.caster, this.target, this.intensity, this.id);
 			}
 		},
 		// 玩家对怪物使用的dot
@@ -121,7 +121,6 @@ ap.module("status").defines(function() {
 			intensity: 10,
 			cycle: 0.5,
 			effect: function() {
-				// this.target.onHurt(this.intensity);
 				ap.mediator.attack(this.caster, this.target, this.intensity, this.id);
 			}
 		},
@@ -156,7 +155,7 @@ ap.module("status").defines(function() {
 			}
 		}
 	};
-	// 创建一个状态  名称，状态宿主，持续时间，效果周期,强度
+	// 创建一个状态  名称，状态宿主，强度，持续时间，效果周期
 	ap.status.createStatus = function(name, id, caster, intensity, duration, cycle) {
 		if (!ap.status[name]) {
 			throw new Error("指定的状态不存在");

@@ -13,7 +13,7 @@ ap.module("skill").requires("utils").defines(function() {
 			// 技能范围
 			radius: 900,
 			// 需要技能指向预览
-			hasPreview: true,
+			hasPreview: false,
 			// 施法 参数：方向
 			cast: function() {
 				var status = [];
@@ -42,7 +42,7 @@ ap.module("skill").requires("utils").defines(function() {
 			name: "碎裂之火",
 			icon: "Disintegrate.png",
 			description: "安妮向前方施放巨大的魔法火球并造成伤害。",
-			coolDown: 0,
+			coolDown: 3,
 			caster: null,
 			// 技能范围
 			radius: 900,
@@ -101,8 +101,8 @@ ap.module("skill").requires("utils").defines(function() {
 					},
 					radius: this.radius,
 					status: status,
-					aimS:this.caster.aim - this.caster.aimmingRad / 2,
-					aimE:this.caster.aim + this.caster.aimmingRad / 2,
+					aimS: this.caster.aim - this.caster.aimmingRad / 2,
+					aimE: this.caster.aim + this.caster.aimmingRad / 2,
 					coolDown: 0.06
 				});
 			}
@@ -126,28 +126,56 @@ ap.module("skill").requires("utils").defines(function() {
 				this.caster.shieldCreateTimer = new ap.Timer();
 			}
 		},
-		// disintegrate
 		// 怪物技能列表
-		Charge: {
+		charge: {
 			id: "charge",
 			name: "冲锋",
 			description: null,
 			coolDown: 10,
-			cost: 0,
 			caster: null,
 			cast: function() {
-				//this.caster.status.push(new ap.Status["CHARGE"]);
+				// 移动速度加大
+				this.caster.status.push(ap.status.createStatus("charge", "", this.caster, 0,
+					2, 0.5));
 			}
 		},
-		Fire: {
+		fire: {
 			id: "fire",
-			name: "冲锋",
+			name: "连射",
 			description: null,
 			coolDown: 10,
 			cost: 0,
 			caster: null,
 			cast: function() {
-				//this.caster.status.push(new ap.Status["CHARGE"]);
+				// 同时向5个方向发射投射物
+
+			}
+		},
+		miasma: {
+			id: "miasma",
+			name: "毒沼",
+			description: null,
+			coolDown: 15,
+			cost: 0,
+			caster: null,
+			scale: 0.3,
+			cast: function() {
+				var status = [];
+				// 毒Dot
+				status.push(ap.status.createStatus("poison", "", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
+					8, 0.5));
+				// 毒区域
+				ap.game.createArea({
+					duration: 12,
+					owner: this.caster,
+					pos: {
+						x: ap.game.player.pos.x,
+						y: ap.game.player.pos.y
+					},
+					radius: 60,
+					status: status,
+					coolDown: 0.1
+				});
 			}
 		}
 

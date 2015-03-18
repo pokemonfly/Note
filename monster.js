@@ -24,6 +24,8 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		hateRadius: 500,
 		// 强度
 		strength: 1,
+		// 杀死后的经验
+		exp: 0,
 
 		// 状态 buff & debuff
 		status: null,
@@ -41,9 +43,6 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		anims: {},
 		animSheet: null,
 		init: function(property) {
-			this.parent(property);
-			// 强化怪兽
-			this.buff();
 			// 初始化引用类型属性
 			this.status = [];
 			this.skills = {};
@@ -55,6 +54,9 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				x: 0,
 				y: 0
 			};
+			this.parent(property);
+			// 强化怪兽
+			this.buff();
 		},
 		// 用强度强化怪兽
 		buff: function() {
@@ -76,6 +78,10 @@ ap.module("monster").requires("entity", "image").defines(function() {
 					this.target = player.redirect;
 				} else {
 					this.target = player;
+				}
+				// FIX 怪物近身后就取消冲锋效果
+				if (d < this.radius + player.radius + 10) {
+					this.moveSpeedBonus = 0;
 				}
 			}
 		},
@@ -101,11 +107,16 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		},
 		// 向目标移动 并指向目标
 		move: function() {
+			// 因为怪物是发现目标后才移动，所以移动时再初始化
+			if (!this.moveTimer) {
+				this.moveTimer = new ap.Timer();
+			}
 			this.aim = ap.utils.getRad(this.pos, this.target.pos);
+			// 当前可以移动的长度
+			this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
 			this.moveByRad(this.aim);
+			this.moveTimer.reset();
 		},
-
-
 		update: function() {
 			// 执行超类
 			this.parent();
@@ -113,7 +124,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			this.vigilance();
 			if (this.target) {
 				// 执行移动
-				// this.move();
+				this.move();
 				// 开始攻击
 				this.cast();
 			}

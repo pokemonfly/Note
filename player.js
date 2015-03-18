@@ -62,7 +62,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 护盾上限
 		shieldLimit: 0,
 		// 护盾上限加成
-		// shieldBonus: 0,
+		shieldBonus: 0,
 		// 护盾创建时间
 		shieldCreateTimer: null,
 		// 护盾持续时间
@@ -92,8 +92,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 			x: 100,
 			y: 100
 		},
-		// 上次移动的距离用于再计算方向
-		lastMove: 0,
+		// // 上次移动的距离用于再计算方向
+		// lastMove: 0,
 		// 本次移动的位置偏移量
 		moveOffset: {
 			x: 0,
@@ -108,6 +108,14 @@ ap.module("player").requires("entity", "image").defines(function() {
 			this.parent(property);
 			// 刷新UI
 			ap.ui.setLife(this.life, this.lifeLimit);
+			// 初始化移动用计时器
+			this.moveTimer = new ap.Timer();
+		},
+		// 受到治疗 吸血和恢复buff
+		onHeal: function(heal) {
+			this.parent(heal);
+			// 刷新UI
+			ap.ui.setLife(this.life, this.lifeLimit);
 		},
 		// 受到伤害
 		hurt: function(damage) {
@@ -115,22 +123,31 @@ ap.module("player").requires("entity", "image").defines(function() {
 			if (this.isInvincible) {
 				return;
 			}
+			// 检查闪避
+			if (Math.random() < this.dodge) {
+				ap.ui.addMessage("闪避" + damage + "伤害。");
+				return;
+			}
 			// 检查护盾
+			var guardDamage = 0;
 			if (this.hasShield) {
-				this.shield -= damage;
-				if (this.shield <= 0) {
+				if (this.shield <= damage) {
+					guardDamage = this.shield;
 					// 护盾被完全消耗
-					this.life += this.shield;
+					this.life -= damage - this.shield;
 					this.hasShield = false;
 					ap.ui.setShield(0);
 					ap.ui.setLife(this.life, this.lifeLimit);
 				} else {
+					guardDamage = damage;
+					this.shield -= damage;
 					ap.ui.setShield(this.shield, this.shieldLimit);
 				}
 			} else {
 				this.life -= damage;
 				ap.ui.setLife(this.life, this.lifeLimit);
 			}
+			ap.ui.addMessage("受到" + damage + "伤害。" + (guardDamage > 0 ? "（" + guardDamage + "吸收)" : ""));
 		},
 
 		// 检查角色护盾的状态
@@ -246,18 +263,6 @@ ap.module("player").requires("entity", "image").defines(function() {
 				}
 
 			}
-
-			// if (ap.input.pressed("Disintegrate")) {
-			// 	// TODO
-
-			// }
-			// if (ap.input.pressed("Incinerate")) {
-			// 	this._showSkillPreview("incinerate");
-			// }
-			// if (ap.input.pressed("MoltenShield")) {
-			// 	this.attack("moltenShield");
-			// }
-
 		},
 		// 准备描绘技能方向
 		_showSkillPreview: function(skillId) {
@@ -275,11 +280,96 @@ ap.module("player").requires("entity", "image").defines(function() {
 		},
 		// 获得经验
 		getExp: function(num) {
-
+			var num = ~~(num * this.expRate);
+			this.exp += num;
+			ap.ui.addMessage("获得" + num + "经验。");
+			while (this.exp > this.nextLvExp) {
+				this.exp -= this.nextLvExp;
+				// 升级
+				this.levelUp();
+				// 更新UI
+				ap.ui.setLevel(this.level);
+				ap.ui.setLife(this.life, this.lifeLimit);
+			}
 		},
 		// 升级 获得属性加成
 		levelUp: function() {
-
+			this.level += 1;
+			ap.ui.addMessage("升级！ " + this.level);
+			ap.ui.addMessage("属性提升：");
+			this.lifeLimit += 50;
+			ap.ui.addMessage("生命上限提高： 50");
+			this.power += 10;
+			ap.ui.addMessage("攻击力提高： 10");
+			// 获得额外的升级奖励
+			var i = this.levelUpBonusCount;
+			ap.ui.addMessage("额外属性提升：");
+			while (i--) {
+				var select = ~~(Math.random() * 12);
+				switch (select) {
+					case 0:
+						// 攻速奖励
+						this.attackSpeed *= 1.1;
+						ap.ui.addMessage("攻速提升10%");
+						break;
+					case 1:
+						// 技能CD减少
+						ap.ui.addMessage("技能冷却时间减少10%");
+						break;
+					case 2:
+						// 攻击力提高
+						this.power += 30;
+						ap.ui.addMessage("攻击力提高：30");
+						break;
+					case 3:
+						// 生命上限提高
+						this.lifeLimit += 100;
+						ap.ui.addMessage("生命上限提高：100");
+						break;
+					case 4:
+						// 暴击
+						this.critical += 0.03;
+						ap.ui.addMessage("暴击几率提升：3%");
+						break;
+					case 5:
+						// 生命吸取
+						this.drainLife += 0.01;
+						ap.ui.addMessage("生命吸取提升：1%");
+						break;
+					case 6:
+						// 攻击射程加成
+						this.attackRange *= 1.1;
+						ap.ui.addMessage("攻击射程增加10%");
+						break;
+					case 7:
+						// 技能范围加成
+						this.skillRange *= 1.1;
+						ap.ui.addMessage("技能范围扩大10%");
+						break;
+					case 8:
+						// 移动速度
+						this.moveSpeed *= 1.05;
+						ap.ui.addMessage("移动速度提升5%");
+						break;
+					case 9:
+						// 经验获得速度
+						this.expRate += 0.05;
+						ap.ui.addMessage("经验获得速度提高5%");
+						break;
+					case 10:
+						// 闪避
+						this.dodge += 0.03;
+						ap.ui.addMessage("闪避几率提高3%");
+						break;
+					case 11:
+						// 护盾上限加成
+						this.shieldBonus += 50;
+						ap.ui.addMessage("护盾上限加成：50");
+						break;
+				}
+			}
+			// 提高下一次升级需要的经验
+			this.nextLvExp += 50;
 		},
 		update: function() {
 			this.parent();

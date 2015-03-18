@@ -39,10 +39,12 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 					}
 				}
 			}
-			if (attacker.type == "PLAYER" && isDead) {
-				// 如果是玩家杀死怪物，则更新成就 并通知玩家
-				achieve.killCount += 1;
-				achieve.skillKillCount[skillId] += 1;
+			if (attacker.type == "player" && isDead) {
+				// 如果是玩家杀死怪物，则更新成就 
+				this.achieve.killCount += 1;
+				this.achieve.skillKillCount[skillId] += 1;
+				// 给玩家经验
+				ap.game.player.getExp(target.exp);
 			}
 		},
 		// 触发自定义事件
