@@ -72,6 +72,39 @@ ap.module("ui").requires("utils").defines(function() {
 		canLeave: null,
 		// 游戏界面 - 区域特性栏 - 文字说明 不能离开
 		cannotLeave: null,
+		// 游戏界面 - 角色面板 
+		playerInfo: null,
+		// 游戏界面 - 角色面板 - 名称
+		nameInfo: null,
+		// 游戏界面 - 角色面板 - 等级
+		levelInfo: null,
+		// 游戏界面 - 角色面板 - 距离升级
+		nextLvExpInfo: null,
+		// 游戏界面 - 角色面板 - 生命
+		lifeInfo: null,
+		// 游戏界面 - 角色面板 - 攻击力
+		powerInfo: null,
+		// 游戏界面 - 角色面板 - 攻速
+		attackSpeedInfo: null,
+		// 游戏界面 - 角色面板 - 暴击
+		criticalInfo: null,
+		// 游戏界面 - 角色面板 - 生命吸取
+		drainLifeInfo: null,
+		// 游戏界面 - 角色面板 - 移动速度
+		moveSpeedInfo: null,
+		// 游戏界面 - 角色面板 - 闪避
+		dodgeInfo: null,
+		// 游戏界面 - 技能栏 - 技能0 - 普通攻击
+		skill0: null,
+		// 游戏界面 - 技能栏 - 技能1
+		skill1: null,
+		// 游戏界面 - 技能栏 - 技能2
+		skill2: null,
+		// 游戏界面 - 技能栏 - 技能3
+		skill3: null,
+		// 游戏界面 - 技能栏 - 技能4
+		skill4: null,
+
 
 		init: function() {
 			// loading 界面
@@ -104,6 +137,24 @@ ap.module("ui").requires("utils").defines(function() {
 			this.leaveKill = ap.$("#leaveKill");
 			this.canLeave = ap.$("#canLeave");
 			this.cannotLeave = ap.$("#cannotLeave");
+			// 游戏界面 - 角色面板
+			this.playerInfo = ap.$("#playerInfo");
+			this.nameInfo = ap.$("#nameInfo");
+			this.levelInfo = ap.$("#levelInfo");
+			this.nextLvExpInfo = ap.$("#nextLvExpInfo");
+			this.lifeInfo = ap.$("#lifeInfo");
+			this.powerInfo = ap.$("#powerInfo");
+			this.attackSpeedInfo = ap.$("#attackSpeedInfo");
+			this.criticalInfo = ap.$("#criticalInfo");
+			this.drainLifeInfo = ap.$("#drainLifeInfo");
+			this.moveSpeedInfo = ap.$("#moveSpeedInfo");
+			this.dodgeInfo = ap.$("#dodgeInfo");
+			// 游戏界面 - 技能栏
+			this.skill0 = ap.$("#skill0");
+			this.skill1 = ap.$("#skill1");
+			this.skill2 = ap.$("#skill2");
+			this.skill3 = ap.$("#skill3");
+			this.skill4 = ap.$("#skill4");
 
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
@@ -305,17 +356,19 @@ ap.module("ui").requires("utils").defines(function() {
 
 		// ==============游戏UI相关==============
 		// 设置等级
-		setLevel:function(lv) {
+		setLevel: function(lv) {
 			this.level.innerHTML = lv;
 		},
 		// 刷新血量条
 		setLife: function(num, max) {
 			this.lifeNum.innerHTML = num + "/" + max;
 			this.lifeBar.style.width = (num / max * 100) + "%";
+			// 刷新角色面板
+			this.refreshRoleJoho();
 		},
 		// 刷新护盾条
 		setShield: function(num, max) {
-			if (num == 0) {
+			if (num === 0) {
 				// 护盾耗尽 消除护盾
 				this._showShield(false);
 				return;
@@ -386,6 +439,42 @@ ap.module("ui").requires("utils").defines(function() {
 			} else {
 				this.leaveKill.innerHTML = num;
 			}
+		},
+		// 显示 / 隐藏 角色信息面板
+		showRolePanel: function() {
+			if (this.hasClass(this.playerInfo, "hidden")) {
+				// 显示面板
+				this.removeClass(this.playerInfo, "hidden");
+			} else {
+				// 隐藏面板
+				this.addClass(this.playerInfo, "hidden");
+			}
+		},
+		// 刷新角色面板内容
+		refreshRoleJoho: function() {
+			var player = ap.game.player;
+			if (player) {
+				this.nameInfo.innerHTML = player.name;
+				this.levelInfo.innerHTML = player.level;
+				this.nextLvExpInfo.innerHTML = player.nextLvExp - player.exp;
+				this.lifeInfo.innerHTML = ~~player.life + "/" + player.lifeLimit;
+				this.powerInfo.innerHTML = ~~player.power;
+				this.attackSpeedInfo.innerHTML = player.attackSpeed.toFixed(2);
+				this.criticalInfo.innerHTML = ~~(player.critical * 100);
+				this.drainLifeInfo.innerHTML = ~~(player.drainLife * 100);
+				this.moveSpeedInfo.innerHTML = ~~player.moveSpeed;
+				this.dodgeInfo.innerHTML = ~~(player.dodge * 100);
+			}
+		},
+		initSkillUI : function() {
+			var skills = ap.game.player.skills;
+			// 玩家的技能默认有5个
+			for (var i = 0 ; i < skills.length ; i++) {
+				var s = this["skill"+i];
+				// s.
+			}
+
 		}
+
 	};
 });

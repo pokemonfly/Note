@@ -132,7 +132,7 @@ ap.module("input").defines(function() {
 		// 面板：成就
 		'Y': 'Achievement',
 		// 面板：角色
-		'C': 'Character',
+		'C': 'character',
 		// 面板：中断退出
 		'ESC': 'Escape',
 		// 不使用鼠标的操作

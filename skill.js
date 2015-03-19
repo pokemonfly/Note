@@ -6,7 +6,7 @@ ap.module("skill").requires("utils").defines(function() {
 		pyromania: {
 			id: "pyromania",
 			name: "嗜火",
-			icon: "Pyromania.png",
+			icon: "media/ui/Pyromania.png",
 			description: "普通攻击。\n被动效果：每进行4个攻击后，安妮的下一次伤害就会对目标造成短暂的定身效果。",
 			coolDown: 0,
 			caster: null,
@@ -40,7 +40,7 @@ ap.module("skill").requires("utils").defines(function() {
 		disintegrate: {
 			id: "disintegrate",
 			name: "碎裂之火",
-			icon: "Disintegrate.png",
+			icon: "media/ui/Disintegrate.png",
 			description: "安妮向前方施放巨大的魔法火球并造成伤害。",
 			coolDown: 3,
 			caster: null,
@@ -74,7 +74,7 @@ ap.module("skill").requires("utils").defines(function() {
 		incinerate: {
 			id: "incinerate",
 			name: "焚烧",
-			icon: "Incinerate.png",
+			icon: "media/ui/Incinerate.png",
 			description: "安妮向锥形区域施放一道烈焰，引燃区域内的所有敌人。",
 			coolDown: 2,
 			caster: null,
@@ -110,7 +110,7 @@ ap.module("skill").requires("utils").defines(function() {
 		moltenShield: {
 			id: "moltenShield",
 			name: "熔岩护盾",
-			icon: "MoltenShield.png",
+			icon: "media/ui/MoltenShield.png",
 			description: "安妮施放一个火焰护盾来保护自己。任何对安妮的攻击都将消耗护盾，在护盾消耗尽之前，安妮本身不会受到伤害。",
 			coolDown: 30,
 			caster: null,

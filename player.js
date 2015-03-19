@@ -4,7 +4,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 	ap.Player = ap.Entity.extend({
 		// 类型 判定用
 		type: "player",
-
+		// 玩家角色名
+		name: "",
 		// 生命
 		life: 512,
 		// 生命上限
@@ -263,6 +264,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 				}
 
 			}
+			// 面板相关
+			if (ap.input.released("character")) {
+				// 角色面板
+				ap.ui.showRolePanel();
+			}
+			
 		},
 		// 准备描绘技能方向
 		_showSkillPreview: function(skillId) {
@@ -291,6 +298,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 				ap.ui.setLevel(this.level);
 				ap.ui.setLife(this.life, this.lifeLimit);
 			}
+			// 刷新角色面板
+			ap.ui.refreshRoleJoho();
 		},
 		// 升级 获得属性加成
 		levelUp: function() {

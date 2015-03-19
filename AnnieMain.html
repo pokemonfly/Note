@@ -13,7 +13,7 @@
     <div id="ui" class="fullscreen hidden">
         <!--主画面-->
         <canvas id="canvas" class="ui"></canvas>
-        <!-- 角色名 血条 经验条 护盾-->
+        <!-- 血条 经验条 护盾-->
         <div id="player" class="ui noborder">
             <div class="middle playerPanel">
                 <span id="level" class="">1</span>
@@ -28,16 +28,28 @@
                 <div id="exp" class="noborder">
                     <div id="expInner" class="noborder"></div>
                 </div>
+                 <!-- 血条 技能条 的背景-->
+                <div class="lifeBgImage"></div>
             </div>
         </div>
         <!-- 技能条 -->
         <div id="skill" class="ui">
             <div class="skillList noborder">
-                <div id="skill0" class="skill"></div>
-                <div id="skill1" class="skill"></div>
-                <div id="skill2" class="skill"></div>
-                <div id="skill3" class="skill"></div>
-                <div id="skill4" class="skill"></div>
+                <div id="skill0" class="skill">
+                    <div class="cooldown playCd"></div>
+                </div>
+                <div id="skill1" class="skill">
+                    <div class="cooldown playCd"></div>
+                </div>
+                <div id="skill2" class="skill">
+                    <div class="cooldown playCd"></div>
+                </div>
+                <div id="skill3" class="skill">
+                    <div class="cooldown playCd"></div>
+                </div>
+                <div id="skill4" class="skill">
+                    <div class="cooldown playCd"></div>
+                </div>
             </div>
         </div>
         <!-- 战斗信息 -->
@@ -55,12 +67,57 @@
         <div id="feature" class="ui">
             <p>区域 <span id="areaCount">1</span> <span id="rare">稀有</span></p>
             <p class="subtitle">区域特性</p>
-            <p id="featureList"><span title="233">冲锋</span><span>毒沼</span></p>
-            <p id="cannotLeave" class="subtitle">离开前还需要击杀<span id="leaveKill">50</span>只怪兽</p>
+            <p id="featureList"></p>
+            <p id="cannotLeave" class="subtitle">离开前还需要击杀<span id="leaveKill">0</span>只怪兽</p>
             <p id="canLeave" class="subtitle hidden">当前区域已经可以离开了</p>
         </div>
         <!-- 角色属性 -->
-        <div id="playerInfo" class="ui panel"></div>
+        <div id="playerInfo" class="ui hidden">
+            <div id="roleImage" class="annieImage"></div>
+            <div id="roleInfo">
+                <table>
+                    <tr>
+                        <th id="nameInfo" colspan='2'>安妮</th>
+                    </tr>
+                    <tr>
+                        <td>等级</td>
+                        <td id="levelInfo">1</td>
+                    </tr>
+                    <tr>
+                        <td>距离升级</td>
+                        <td><span id="nextLvExpInfo">300</span>经验</td>
+                    </tr>
+                    <tr>
+                        <td>生命</td>
+                        <td id="lifeInfo">512/512</td>
+                    </tr>
+                    <tr>
+                        <td>攻击力</td>
+                        <td id="powerInfo">50</td>
+                    </tr>
+                    <tr>
+                        <td>攻击速度</td>
+                        <td id="attackSpeedInfo">1.2</td>
+                    </tr>
+                    <tr>
+                        <td>暴击几率</td>
+                        <td><span id="criticalInfo">10</span>%</td>
+                    </tr>
+                    <tr>
+                        <td>生命吸取</td>
+                        <td><span id="drainLifeInfo">3</span>%</td>
+                    </tr>
+                    <tr>
+                        <td>移动速度</td>
+                        <td id="moveSpeedInfo">200</td>
+                    </tr>
+                    <tr>
+                        <td>闪避几率</td>
+                        <td><span id="dodgeInfo">10</span>%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
         <!-- 统计 成就 -->
         <div id="achievement" class="ui panel"></div>
         <!-- 系统菜单 -->
@@ -102,7 +159,6 @@
     <div id="loading" class="fullscreen">
         <span class="loadStr">Loading...</span>
     </div>
-
 </body>
 
 </html>
