@@ -104,7 +104,8 @@ ap.module("ui").requires("utils").defines(function() {
 		skill3: null,
 		// 游戏界面 - 技能栏 - 技能4
 		skill4: null,
-
+		// 游戏界面 - 状态栏
+		statusList: null,
 
 		init: function() {
 			// loading 界面
@@ -155,6 +156,8 @@ ap.module("ui").requires("utils").defines(function() {
 			this.skill2 = ap.$("#skill2");
 			this.skill3 = ap.$("#skill3");
 			this.skill4 = ap.$("#skill4");
+			// 游戏界面 - 状态栏
+			this.statusList = ap.$("#statusList");
 
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
@@ -466,14 +469,55 @@ ap.module("ui").requires("utils").defines(function() {
 				this.dodgeInfo.innerHTML = ~~(player.dodge * 100);
 			}
 		},
-		initSkillUI : function() {
-			var skills = ap.game.player.skills;
+		// 初始化技能栏图标
+		initSkillUI: function(player) {
+			var skills = [];
+			// 对象转换为数组
+			for (var s in player.skills) {
+				skills.push(player.skills[s]);
+			}
 			// 玩家的技能默认有5个
-			for (var i = 0 ; i < skills.length ; i++) {
-				var s = this["skill"+i];
-				// s.
+			for (var i = 0; i < skills.length; i++) {
+				var dom = this["skill" + i],
+					sk = skills[i];
+				dom.style.background = "url('" + sk.icon + "')";
+				dom.title = sk.description;
+				// 建立DOM关联
+				sk.dom = dom;
 			}
 
+		},
+		// 设置技能冷却中的动画效果 dom: 技能图标节点 cd：动画效果时间
+		setCoolDown: function(dom, cd) {
+			var node = dom.children[0];
+			// 设置冷却时间
+			node.style.webkitAnimationDuration = cd + "s";
+			ap.ui.removeClass(node, "playCd");
+			// 使用异步来实现dom的绘制
+			window.setTimeout(function() {
+				ap.ui.addClass(node, "playCd");
+			}, 1);
+		},
+		// 初始化玩家状态栏图标
+		initStatusUI: function() {
+			var fr = document.createDocumentFragment();
+			for (var s in ap.status) {
+				var status = ap.status[s];
+				if (status.hasOwnProperty("icon")) {
+					// 只对有编号的状态初始化
+					var li = ap.$new("li");
+					// buff左对齐，debuff右对齐
+					this.addClass(li, status.type);
+					// 初期不显示
+					this.addClass(li, "hidden");
+					li.style.backgroundPositionX = -status.icon * 30 + "px";
+					li.style.backgroundPositionY = "0px";
+					li.title = status.description;
+					status.dom = li;
+					fr.appendChild(li);
+				}
+			}
+			this.statusList.appendChild(fr);
 		}
 
 	};

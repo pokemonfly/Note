@@ -33,7 +33,24 @@ ap.module("skill").requires("utils").defines(function() {
 					status: status,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
 					moveAim: this.caster.aim,
-					animSheet: new ap.Image("media/item/fireball.png", ap.Image.OFFSET.LOWER_LEFT)
+					anims: new ap.Animation([
+						new ap.Image("media/sprites/fireball.png", {
+							x: 65,
+							y: 24
+						}, 0, 0, 90, 50),
+						new ap.Image("media/sprites/fireball.png", {
+							x: 65,
+							y: 24
+						}, 0, 50, 90, 50),
+						new ap.Image("media/sprites/fireball.png", {
+							x: 65,
+							y: 24
+						}, 0, 100, 90, 50),
+						new ap.Image("media/sprites/fireball.png", {
+							x: 65,
+							y: 24
+						}, 0, 150, 90, 50)
+					], 0.2)
 				});
 			}
 		},
@@ -58,7 +75,7 @@ ap.module("skill").requires("utils").defines(function() {
 				// 创造火球投射物
 				ap.game.createFlyer({
 					// 技能伤害
-					power: this.caster.power + this.caster.powerBonus,
+					power: (this.caster.power + this.caster.powerBonus) * 1.5,
 					// 火球持续时间 s
 					duration: 3,
 					owner: this.caster,
@@ -67,7 +84,24 @@ ap.module("skill").requires("utils").defines(function() {
 					status: status,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
 					moveAim: this.caster.aim,
-					animSheet: new ap.Image("media/item/fireball.png", ap.Image.OFFSET.LOWER_LEFT)
+					anims: new ap.Animation([
+						new ap.Image("media/sprites/fireballBig.png", {
+							x: 130,
+							y: 48
+						}, 0, 0, 180, 100),
+						new ap.Image("media/sprites/fireballBig.png", {
+							x: 130,
+							y: 48
+						}, 0, 100, 180, 100),
+						new ap.Image("media/sprites/fireballBig.png", {
+							x: 130,
+							y: 48
+						}, 0, 200, 180, 100),
+						new ap.Image("media/sprites/fireballBig.png", {
+							x: 130,
+							y: 48
+						}, 0, 300, 180, 100)
+					], 0.2)
 				});
 			}
 		},

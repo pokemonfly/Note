@@ -1,5 +1,5 @@
 // 实体 所有的参与碰撞物体
-ap.module("entity").requires("timer", "class", "skill", "status").defines(function() {
+ap.module("entity").requires("timer", "class", "skill", "status", "animation").defines(function() {
 	"use strict";
 	ap.Entity = ap.Class.extend({
 		// 实体的名字
@@ -51,6 +51,13 @@ ap.module("entity").requires("timer", "class", "skill", "status").defines(functi
 				s.cast();
 				// 重置冷却计时
 				s.timer.reset();
+				// 只有玩家的技能会关联DOM
+				if (s.dom) {
+					// 如果是玩家的技能话，设置冷却时间动画
+					ap.ui.setCoolDown(s.dom, s.coolDown);
+				}
+				// 设置角色动作
+				this.action = "attack";
 			}
 		},
 		// 计算指定的角度移动的偏移量 具体移动在collision中实现
@@ -134,7 +141,10 @@ ap.module("entity").requires("timer", "class", "skill", "status").defines(functi
 		draw: function() {
 			var pos = ap.game.getCameraPos();
 			if (this.animSheet) {
-				this.animSheet.draw(~~(this.pos.x + 0.5) + pos.x, ~~(this.pos.y + 0.5) + pos.y);
+				this.animSheet.draw(~~(this.pos.x + 0.5) + pos.x, ~~(this.pos.y + 0.5) + pos.y, this.angle);
+			}
+			if (this.anims) {
+				this.anims.draw(~~(this.pos.x + 0.5) + pos.x, ~~(this.pos.y + 0.5) + pos.y, this.angle);
 			}
 			// 测试用 锚点
 			ap.game.context.fillRect(~~(this.pos.x + 0.5) + pos.x - 2, ~~(this.pos.y + 0.5) + pos.y - 2, 4, 4);

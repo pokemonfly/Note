@@ -38,6 +38,8 @@ ap.module("flyer").requires("entity").defines(function() {
 		explosionRange: 100,
 		// 爆炸附加异常状态
 		explosionStatus: [],
+		// 图像角度
+		angle: 0,
 
 		init: function(property) {
 			this.parent(property);
@@ -48,6 +50,7 @@ ap.module("flyer").requires("entity").defines(function() {
 			};
 			this.type = this.owner.type;
 			this.moveTimer = new ap.Timer();
+			this.angle = this.moveAim;
 		},
 		move: function() {
 			if (this.autoFocus) {
@@ -75,6 +78,9 @@ ap.module("flyer").requires("entity").defines(function() {
 		},
 
 		update: function() {
+			if (this.anims) {
+				this.anims.update();
+			}
 			if (this.duration > this.durationTimer.delta()) {
 				this.move();
 			} else {

@@ -1,5 +1,5 @@
 // 游戏对象 控制游戏整体的表现
-ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area", "image", "field", "collision").defines(function() {
+ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area", "image", "animation", "field", "collision").defines(function() {
 	"use strict";
 	ap.Game = ap.Class.extend({
 		// canvas的context

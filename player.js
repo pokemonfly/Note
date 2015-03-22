@@ -14,7 +14,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 攻击力
 		power: 50,
 		// 攻速 每秒攻击次数 
-		attackSpeed: 1.2,
+		attackSpeed: 1,
 		// 暴击
 		critical: 0.05,
 		// 生命吸取
@@ -102,15 +102,22 @@ ap.module("player").requires("entity", "image").defines(function() {
 		},
 		// 碰撞体积 半径
 		radius: 30,
-		// 实体的动画效果
-		anims: {},
-		animSheet: null,
+		// 当前动画效果
+		anims: null,
+		// 当前玩家动作
+		action: null,
+		// 动画设定
+		animsSet: null,
 		init: function(property) {
 			this.parent(property);
 			// 刷新UI
 			ap.ui.setLife(this.life, this.lifeLimit);
+			ap.ui.initSkillUI(this);
+			ap.ui.initStatusUI();
 			// 初始化移动用计时器
 			this.moveTimer = new ap.Timer();
+			// 初始化动作
+			this.action = "stand";
 		},
 		// 受到治疗 吸血和恢复buff
 		onHeal: function(heal) {
@@ -199,10 +206,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 
 			// 设置移动方向
 			if (useKey) {
-				// this.moveAim = Math.atan2(keyAim.y - this.pos.y, keyAim.x - this.pos.x);
 				this.moveAim = ap.utils.getRad(this.pos, keyAim);
+				if (keyAim.x != this.pos.x || keyAim != this.pos.y) {
+					// 键盘瞄准
+					this.aim = this.moveAim;
+				}
 			} else {
-				// this.moveAim = Math.atan2(this.moveTo.y - this.pos.y, this.moveTo.x - this.pos.x);
 				this.moveAim = ap.utils.getRad(this.pos, this.moveTo);
 			}
 
@@ -238,22 +247,32 @@ ap.module("player").requires("entity", "image").defines(function() {
 				}
 				this.moveTimer.reset();
 			}
+			// 判断玩家动作
+			if (this.moveAim === 0) {
+				this.action = "stand";
+			} else {
+				this.action = "move";
+			}
 		},
 		// 攻击意向判定
 		_decision: function() {
+			// 使用鼠标的话即时瞄准
+			if (ap.input.useMouse) {
+				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
+			}
 			// 普通攻击
 			if (ap.input.pressed("Attack1")) {
 				// 鼠标攻击
-				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
+				// this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
 				this.useSkill("pyromania");
 			}
 			if (ap.input.pressed("Attack2")) {
 				// 键盘攻击
-				this.aim = this.moveAim;
+				// this.aim = this.moveAim;
 				this.useSkill("pyromania");
 			}
+			// this.aim = ap.input.useMouse ? Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x) : this.moveAim;
 			// 技能攻击 
-			this.aim = ap.input.useMouse ? Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x) : this.moveAim;
 			this.isAimming = false;
 			for (var skillId in this.skills) {
 				if (ap.input.pressed(skillId)) {
@@ -262,14 +281,13 @@ ap.module("player").requires("entity", "image").defines(function() {
 				if (ap.input.released(skillId)) {
 					this.useSkill(skillId);
 				}
-
 			}
 			// 面板相关
 			if (ap.input.released("character")) {
 				// 角色面板
 				ap.ui.showRolePanel();
 			}
-			
+
 		},
 		// 准备描绘技能方向
 		_showSkillPreview: function(skillId) {
@@ -380,6 +398,15 @@ ap.module("player").requires("entity", "image").defines(function() {
 			// 提高下一次升级需要的经验
 			this.nextLvExp += 50;
 		},
+		_setAnimes: function() {
+			if (!this.anims || (this.action != this.anims.name && this.anims.end())) {
+				// 当前动画未设定 或 当前动作需要改变
+				this.anims = this.animsSet[this.action];
+				this.anims.name = this.action;
+				this.anims.reset();
+			}
+			this.anims.update();
+		},
 		update: function() {
 			this.parent();
 			// 角色移动
@@ -388,6 +415,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 			this._decision();
 			// 判断护盾的变化
 			this._checkShield();
+			// 更新动画
+			this._setAnimes();
 		},
 		draw: function() {
 			this.parent();

@@ -28,7 +28,7 @@ ap.module("pat").requires("monster").defines(function() {
 		// 瞄准方向
 		aim: 0,
 		// 实体的动画效果
-		anims: {},
+		anims: null,
 		animSheet: null,
 		// 警觉 如果警惕范围内有玩家目标，则加入仇恨列表
 		vigilance: function() {

@@ -1,5 +1,5 @@
 // 游戏设定 & 配置
-ap.module("config").requires("image").defines(function() {
+ap.module("config").requires("image", "animation").defines(function() {
 	"use strict";
 	ap.config = {
 		// 难度影响的设定
@@ -46,16 +46,43 @@ ap.module("config").requires("image").defines(function() {
 			// 安妮的初始属性大多已经在player中预设
 			"Annie": {
 				name: "安妮",
-				animSheet: new ap.Image("media/sprites/annie.png", ap.Image.OFFSET.BELOW),
-				skill: ["pyromania", "disintegrate", "incinerate", "moltenShield"]
+				skill: ["pyromania", "disintegrate", "incinerate", "moltenShield"],
+				animsSet: {
+					"stand": new ap.Animation(
+						new ap.Image("media/sprites/annie.png", {
+							x: 75,
+							y: 195
+						})
+					),
+					"move": new ap.Animation(
+						[new ap.Image("media/sprites/annie.png", {
+								x: 75,
+								y: 195
+							}),
+							new ap.Image("media/sprites/annie1.png", {
+								x: 75,
+								y: 195
+							})
+						], 0.5),
+					"attack": new ap.Animation(
+						[new ap.Image("media/sprites/annie1.png", {
+								x: 75,
+								y: 195
+							}),
+							new ap.Image("media/sprites/annie2.png", {
+								x: 75,
+								y: 195
+							})
+						], 0.2, false)
+				}
 			}
 		},
 		// 怪物列表
 		monsters: [{
 			name: "杂鱼",
 			skill: [],
-			exp : 30,
-			animSheet: new ap.Image("media/ui/1.png", ap.Image.OFFSET.BELOW)
+			exp: 30,
+			animSheet: new ap.Image("media/ui/1.png")
 		}],
 		// 游戏中掉落的道具
 		items: {

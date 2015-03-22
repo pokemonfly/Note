@@ -40,7 +40,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		// 瞄准方向
 		aim: 0,
 		// 实体的动画效果
-		anims: {},
+		anims: null,
 		animSheet: null,
 		init: function(property) {
 			// 初始化引用类型属性
