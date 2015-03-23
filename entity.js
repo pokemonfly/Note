@@ -5,7 +5,7 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 		// 实体的名字
 		name: null,
 		// 攻击力
-		power: 10,
+		power: 0,
 		// 因状态而改变的
 		powerBonus: 0,
 		// 暴击加成
@@ -131,7 +131,7 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 				}
 				// 执行状态的效果
 				var durationFlg = s.execute();
-				// 剔除失效的实体
+				// 剔除失效的状态
 				if (!durationFlg) {
 					this.status.splice(i, 1);
 					i--;

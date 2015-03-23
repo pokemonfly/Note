@@ -12,35 +12,49 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		life: 100,
 		// 生命上限
 		lifeLimit: 100,
+		// 生命成长
+		lifeUp: 20,
+		// 攻击力
+		power: 10,
+		// 攻击成长
+		powerUp: 5,
 		// 攻速 每秒攻击次数 
 		attackSpeed: 1,
 		// 暴击
 		critical: 0,
 		// 生命吸取
 		drainLife: 0,
+		// 瞄准方向
+		aim: 0,
 		// 仇恨
 		target: null,
-		// 警觉范围 px
-		hateRadius: 500,
 		// 强度
 		strength: 1,
 		// 杀死后的经验
 		exp: 0,
-
-		// 状态 buff & debuff
-		status: null,
-		// 持有技能
-		skills: null,
+		// 警觉范围 px
+		hateRadius: 500,
+		// 攻击距离
+		attackRadius: 300,
+		// 移动速度 每秒移动像素
+		moveSpeed: 100,
+		// 移动速度奖励
+		moveSpeedBonus: 0,
+		// 碰撞体积 半径
+		radius: 30,
 		// 位置
 		pos: null,
 		// 本次移动的位置偏移量
 		moveOffset: null,
-		// 碰撞体积 半径
-		radius: 30,
-		// 瞄准方向
-		aim: 0,
+		// 是否需要移动
+		needMove: false,
+		// 状态 buff & debuff
+		status: null,
+		// 持有技能
+		skills: null,
 		// 实体的动画效果
 		anims: null,
+		// 静态画
 		animSheet: null,
 		init: function(property) {
 			// 初始化引用类型属性
@@ -55,6 +69,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				y: 0
 			};
 			this.parent(property);
+			this.lifeLimit = this.life;
 			// 强化怪兽
 			this.buff();
 		},
@@ -84,13 +99,15 @@ ap.module("monster").requires("entity", "image").defines(function() {
 					this.moveSpeedBonus = 0;
 				}
 			}
+			// 判断是否需要移动
+			if (this.target && d > this.attackRadius) {
+				this.needMove = true;
+			} else {
+				this.needMove = false;
+			}
 		},
 		// 使用技能
 		cast: function() {
-			if (Math.random() > this.strength - 0.8) {
-				// 设定：根据怪物的强度来判读，强度越大，发呆的几率越小
-				return;
-			}
 			// 遍历技能
 			for (var i in this.skills) {
 				var s = this.skills[i];
@@ -113,7 +130,11 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			}
 			this.aim = ap.utils.getRad(this.pos, this.target.pos);
 			// 当前可以移动的长度
-			this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
+			if (this.needMove) {
+				this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
+			} else {
+				this.lastMove = 0;
+			}
 			this.moveByRad(this.aim);
 			this.moveTimer.reset();
 		},
@@ -128,7 +149,11 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				// 开始攻击
 				this.cast();
 			}
-
+		},
+		draw: function() {
+			this.parent();
+			// 绘制血条
+			ap.game.drawLifeBar(this);
 		}
 	});
 });

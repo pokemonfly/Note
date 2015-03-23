@@ -16,6 +16,8 @@ ap.module("status").defines(function() {
 			target: null,
 			// 效果计时器
 			timer: null,
+			// 附加概率
+			probability: 1,
 			// 执行效果
 			execute: function() {
 				// 第一次执行时初始化
@@ -175,8 +177,8 @@ ap.module("status").defines(function() {
 			}
 		}
 	};
-	// 创建一个状态  名称，状态宿主，强度，持续时间，效果周期
-	ap.status.createStatus = function(name, id, caster, intensity, duration, cycle) {
+	// 创建一个状态  名称，状态宿主，强度，持续时间，效果周期, 附加概率
+	ap.status.createStatus = function(name, id, caster, intensity, duration, cycle, probability) {
 		if (!ap.status[name]) {
 			throw new Error("指定的状态不存在");
 		}
@@ -193,6 +195,8 @@ ap.module("status").defines(function() {
 		newStatus.cycle = cycle || 1;
 		// 部分buff没有强度概念
 		newStatus.intensity = intensity || 0;
+		// 默认100%附加
+		newStatus.probability = probability || 1;
 		return newStatus;
 	};
 });

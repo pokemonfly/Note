@@ -79,9 +79,15 @@ ap.module("config").requires("image", "animation").defines(function() {
 		},
 		// 怪物列表
 		monsters: [{
-			name: "杂鱼",
-			skill: [],
+			name: "投掷型杂草·I",
+			skill: ["throwing"],
+			breed: "plant",
+			life: 80,
 			exp: 30,
+			attackRadius:400,
+			hateRadius: 800,
+			attackSpeed: 0.5,
+			radius: 30,
 			animSheet: new ap.Image("media/ui/1.png")
 		}],
 		// 游戏中掉落的道具

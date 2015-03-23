@@ -34,8 +34,29 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 			if (status) {
 				// 判断是否附加异常
 				for (var n = 0; n < status.length; n++) {
-					if (Math.random() < probability) {
-						target.status.push(ap.utils.deepCopy(status[0]));
+					if (Math.random() < status[0].probability) {
+						var s = ap.utils.deepCopy(status[0]),
+							uidCheck = true;
+						// 判断目标是否已经有这个状态 同一个状态只会刷新时间
+						for (var i = 0; i < target.status.length; i++) {
+							if (target.status[i].uid == s.uid) {
+								uidCheck = false;
+								target.status[i].duration = s.duration;
+								// 如果是玩家的状态，还需要刷新时间
+								if (target.type == "player" && s.dom) {
+									// 更新状态栏
+									ap.ui.showStatus(s.dom, s.duration);
+								}
+							}
+						}
+						if (uidCheck) {
+							if (target.type == "player") {
+								// 玩家受到异常的话
+								target.getStatus(s);
+							} else {
+								target.status.push(s);
+							}
+						}
 					}
 				}
 			}

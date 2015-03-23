@@ -134,7 +134,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					},
 					radius: 100,
 					coolDown: 0.01,
-					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					animSheet: new ap.Image("media/ui/door.png", {
+						x: 140,
+						y: 140
+					}),
 					// 下次角色出现的位置
 					nextPlayerPos: {
 						x: this.fieldSize.x - 30,
@@ -151,7 +154,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					},
 					radius: 100,
 					coolDown: 0.01,
-					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					animSheet: new ap.Image("media/ui/door.png", {
+						x: 140,
+						y: 140
+					}),
 					nextPlayerPos: {
 						x: 30,
 						y: this.fieldSize.y / 2
@@ -167,7 +173,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					},
 					radius: 100,
 					coolDown: 0.01,
-					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					animSheet: new ap.Image("media/ui/door.png", {
+						x: 140,
+						y: 140
+					}),
 					nextPlayerPos: {
 						x: this.fieldSize.x / 2,
 						y: this.fieldSize.y - 30
@@ -183,7 +192,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					},
 					radius: 100,
 					coolDown: 0.01,
-					animSheet: new ap.Image("media/ui/door.png", ap.Image.OFFSET.BELOW),
+					animSheet: new ap.Image("media/ui/door.png", {
+						x: 140,
+						y: 140
+					}),
 					nextPlayerPos: {
 						x: this.fieldSize.x / 2,
 						y: 30
@@ -392,6 +404,25 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			context.globalAlpha = 1;
 			context.lineWidth = 2;
 			context.stroke();
+			context.restore();
+		},
+		// 绘制怪物的血条
+		drawLifeBar: function(monster) {
+			var posOffset = ap.game.getCameraPos(),
+				context = this.context,
+				lifePercent = monster.life / monster.lifeLimit,
+				animSheet = monster.animSheet || monster.anims.sheet[0],
+				barWidth = animSheet.width + 10,
+				barHeight = 5,
+				barPosX = monster.pos.x - animSheet.offset.x - 5 + posOffset.x,
+				barPosY = monster.pos.y - animSheet.offset.y - 10 + posOffset.y;
+			context.save();
+			// 血条背景： 黑色   
+			context.fillStyle = "#111506";
+			context.fillRect(barPosX, barPosY, barWidth, barHeight);
+			// 血条内容： 绿
+			context.fillStyle = "#71b871";
+			context.fillRect(barPosX + 1, barPosY + 1, ~~((barWidth - 2) * lifePercent), barHeight - 2);
 			context.restore();
 		}
 

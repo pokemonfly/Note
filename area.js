@@ -4,6 +4,8 @@ ap.module("area").requires("entity", "image").defines(function() {
 	ap.Area = ap.Entity.extend({
 		// 伤害类型
 		type: null,
+		// 唯一码 防止效果重复
+		uid: 0,
 		// 威力
 		power: 0,
 		// 持续时间
@@ -29,6 +31,10 @@ ap.module("area").requires("entity", "image").defines(function() {
 		coolDown: 0,
 		// 触发判断用 能否有效果
 		isReady: true,
+		// 显示图案
+		animSheet: null,
+		// 图像角度
+		angle: 0,
 
 		init: function(property) {
 			this.parent(property);
@@ -37,6 +43,9 @@ ap.module("area").requires("entity", "image").defines(function() {
 			if (this.owner) {
 				this.type = this.owner.type;
 			}
+			// 随机一个数作为唯一标识
+			this.uid = +new Date();
+			this.angle = this.aimS ? (this.aimS + this.aimE) / 2 : 0;
 		},
 		update: function() {
 			// 超时后消失

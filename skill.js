@@ -123,11 +123,12 @@ ap.module("skill").requires("utils").defines(function() {
 			cast: function() {
 				var status = [];
 				// 创造一个在0.1s内只有一跳伤害的dot
-				status.push(ap.status.createStatus("burn", "incinerate", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
-					0.1, 0.1));
+				// status.push(ap.status.createStatus("burn", "incinerate", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
+				// 	0.1, 0.1));
 				// 区域也是只存在0.1s 在0.06s后，区域的目标将被附加dot
 				ap.game.createArea({
-					duration: 0.1,
+					power: (this.caster.power + this.caster.powerBonus) * this.scale,
+					duration: 0.3,
 					owner: this.caster,
 					pos: {
 						x: this.caster.pos.x,
@@ -137,7 +138,11 @@ ap.module("skill").requires("utils").defines(function() {
 					status: status,
 					aimS: this.caster.aim - this.caster.aimmingRad / 2,
 					aimE: this.caster.aim + this.caster.aimmingRad / 2,
-					coolDown: 0.06
+					coolDown: 0.16,
+					anims: new ap.Animation([new ap.Image("media/ui/flame.png", {
+						x: 0,
+						y: 105
+					})])
 				});
 			}
 		},
@@ -161,6 +166,34 @@ ap.module("skill").requires("utils").defines(function() {
 			}
 		},
 		// 怪物技能列表
+		throwing: {
+			id: "throwing",
+			name: "普通远程攻击",
+			description: null,
+			coolDown: 0,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				ap.game.createFlyer({
+					// 技能伤害
+					power: (this.caster.power + this.caster.powerBonus),
+					// 持续时间 s
+					duration: 8,
+					moveSpeed: 350,
+					owner: this.caster,
+					radius: 10,
+					status: null,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
+					moveAim: this.caster.aim,
+					anims: new ap.Animation([
+						new ap.Image("media/ui/throwing.png", {
+							x: 13,
+							y: 15
+						})
+					])
+				});
+			}
+		},
 		charge: {
 			id: "charge",
 			name: "冲锋",
@@ -177,12 +210,31 @@ ap.module("skill").requires("utils").defines(function() {
 			id: "fire",
 			name: "连射",
 			description: null,
-			coolDown: 10,
+			coolDown: 15,
 			cost: 0,
 			caster: null,
 			cast: function() {
 				// 同时向5个方向发射投射物
-
+				for (var i = 0; i < 5; i++) {
+					ap.game.createFlyer({
+						// 技能伤害
+						power: (this.caster.power + this.caster.powerBonus),
+						// 持续时间 s
+						duration: 10,
+						moveSpeed: 300,
+						owner: this.caster,
+						radius: 15,
+						status: null,
+						pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
+						moveAim: this.caster.aim + (i * 15 - 30) / 180 * Math.PI,
+						anims: new ap.Animation([
+							new ap.Image("media/ui/fire.png", {
+								x: 84,
+								y: 16
+							})
+						])
+					});
+				}
 			}
 		},
 		miasma: {
@@ -197,18 +249,22 @@ ap.module("skill").requires("utils").defines(function() {
 				var status = [];
 				// 毒Dot
 				status.push(ap.status.createStatus("poison", "", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
-					8, 0.5));
+					4, 0.5));
 				// 毒区域
 				ap.game.createArea({
-					duration: 12,
+					duration: 8,
 					owner: this.caster,
 					pos: {
 						x: ap.game.player.pos.x,
 						y: ap.game.player.pos.y
 					},
-					radius: 60,
+					radius: 150,
 					status: status,
-					coolDown: 0.1
+					coolDown: 0.1,
+					animSheet: new ap.Image("media/ui/miasma.png", {
+						x: 150,
+						y: 150
+					})
 				});
 			}
 		}

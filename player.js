@@ -68,6 +68,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 		shieldCreateTimer: null,
 		// 护盾持续时间
 		shieldDuration: 0,
+		// 护盾效果
+		shieldImage: new ap.Image("media/ui/shield.png", {x:93,y:90}),
 
 		// 闪避 玩家自带10%闪避
 		dodge: 0.1,
@@ -110,9 +112,14 @@ ap.module("player").requires("entity", "image").defines(function() {
 		animsSet: null,
 		init: function(property) {
 			this.parent(property);
-			// 刷新UI
+			// 初始化UI
+			// 血条
 			ap.ui.setLife(this.life, this.lifeLimit);
+			// 经验条
+			ap.ui.setExpUI(this.exp, this.nextLvExp);
+			// 技能栏
 			ap.ui.initSkillUI(this);
+			// 状态栏
 			ap.ui.initStatusUI();
 			// 初始化移动用计时器
 			this.moveTimer = new ap.Timer();
@@ -305,7 +312,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		},
 		// 获得经验
 		getExp: function(num) {
-			var num = ~~(num * this.expRate);
+			num = ~~(num * this.expRate);
 			this.exp += num;
 			ap.ui.addMessage("获得" + num + "经验。");
 			while (this.exp > this.nextLvExp) {
@@ -318,6 +325,16 @@ ap.module("player").requires("entity", "image").defines(function() {
 			}
 			// 刷新角色面板
 			ap.ui.refreshRoleJoho();
+			// 更新界面上的经验条
+			ap.ui.setExpUI(this.exp, this.nextLvExp);
+		},
+		// 玩家获得状态
+		getStatus: function(s) {
+			this.status.push(s);
+			if (s.dom) {
+				// 更新状态栏
+				ap.ui.showStatus(s.dom, s.duration);
+			}
 		},
 		// 升级 获得属性加成
 		levelUp: function() {
@@ -345,13 +362,13 @@ ap.module("player").requires("entity", "image").defines(function() {
 						break;
 					case 2:
 						// 攻击力提高
-						this.power += 30;
-						ap.ui.addMessage("攻击力提高：30");
+						this.power += 10;
+						ap.ui.addMessage("攻击力提高：10");
 						break;
 					case 3:
 						// 生命上限提高
-						this.lifeLimit += 100;
-						ap.ui.addMessage("生命上限提高：100");
+						this.lifeLimit += 50;
+						ap.ui.addMessage("生命上限提高：50");
 						break;
 					case 4:
 						// 暴击
@@ -398,6 +415,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 			// 提高下一次升级需要的经验
 			this.nextLvExp += 50;
 		},
+		// 根据当前动作更新动画
 		_setAnimes: function() {
 			if (!this.anims || (this.action != this.anims.name && this.anims.end())) {
 				// 当前动画未设定 或 当前动作需要改变
@@ -427,6 +445,11 @@ ap.module("player").requires("entity", "image").defines(function() {
 				} else {
 					ap.game.drawPreviewArrow(this.pos, this.aimmingRadius, this.aim);
 				}
+			}
+			// 如果有护盾，绘制护盾效果
+			if (this.hasShield) {
+				var pos = ap.game.getCameraPos();
+				this.shieldImage.draw(~~(this.pos.x + 0.5) + pos.x, ~~(this.pos.y + 0.5) + pos.y);
 			}
 		}
 	});

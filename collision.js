@@ -13,7 +13,7 @@ ap.module("collision").defines(function() {
 				x: ~~(Math.random() * this.border.x),
 				y: ~~(Math.random() * this.border.y)
 			};
-			while (this._checkCollision(pos, radius).length > 0) {
+			while (this._checkCollision(pos, radius).length > 0 || !this._checkBorder(pos, radius)) {
 				pos.x = ~~(Math.random() * this.border.x);
 				pos.y = ~~(Math.random() * this.border.y);
 			}
@@ -26,7 +26,7 @@ ap.module("collision").defines(function() {
 				current = ap.game.entities[i];
 				if (current instanceof ap.Monster || current instanceof ap.Player || current instanceof ap.Pat) {
 					// 尝试去移动
-					if (current.moveOffset.x != 0 || current.moveOffset.y != 0) {
+					if (current.moveOffset.x !== 0 || current.moveOffset.y !== 0) {
 						var offset = this._tryToMove(current);
 						current.pos.x += offset.x;
 						current.pos.y += offset.y;
@@ -49,7 +49,7 @@ ap.module("collision").defines(function() {
 					// 对每个被命中的目标执行伤害
 					collisionList.forEach(function(target) {
 						if (target.type !== current.type) {
-							ap.mediator.attack(current.owner, target, current.power, current.name, current.status, current.probability);
+							ap.mediator.attack(current.owner, target, current.power, current.name, current.status);
 							// 碰撞后消灭
 							current.isKilled = true;
 						}
@@ -62,7 +62,7 @@ ap.module("collision").defines(function() {
 						// 对每个被命中的目标执行伤害 添加状态
 						collisionList.forEach(function(target) {
 							if (target.type !== current.type) {
-								ap.mediator.attack(current.owner, target, 0, current.name, current.status, 1);
+								ap.mediator.attack(current.owner, target, current.power, current.name, current.status);
 							}
 						});
 					} else {
@@ -96,7 +96,7 @@ ap.module("collision").defines(function() {
 					x: current.pos.x + current.moveOffset.x,
 					y: current.pos.y + current.moveOffset.y
 				},
-				collisionList = this._checkCollision(pos, current.radius, current),
+				collisionList = this._checkCollision(pos, current.radius, current);
 				count = count || 0;
 			if (collisionList.length === 0 && this._checkBorder(pos, current.radius)) {
 				return current.moveOffset;

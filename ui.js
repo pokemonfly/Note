@@ -58,6 +58,8 @@ ap.module("ui").requires("utils").defines(function() {
 		shield: null,
 		shieldNum: null,
 		shieldBar: null,
+		// 游戏界面 - 经验条
+		exp: null,
 		// 游戏界面 - 技能栏
 		skillList: [],
 		// 游戏界面 - 区域特性栏 - 区域号
@@ -131,8 +133,9 @@ ap.module("ui").requires("utils").defines(function() {
 			this.shield = ap.$("#shieldInner");
 			this.shieldNum = ap.$("#shieldNum");
 			this.shieldBar = ap.$("#shieldInner");
-			// 游戏界面 - 区域特性栏
-			this.areaCount = ap.$("#areaCount");
+			this.exp = ap.$("#expInner"),
+				// 游戏界面 - 区域特性栏
+				this.areaCount = ap.$("#areaCount");
 			this.rare = ap.$("#rare");
 			this.featureList = ap.$("#featureList");
 			this.leaveKill = ap.$("#leaveKill");
@@ -198,7 +201,7 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 		addClass: function(obj, cls) {
 			if (!this.hasClass(obj, cls)) {
-				obj.className += " " + cls;
+				obj.className += " " + cls + " ";
 			}
 		},
 		removeClass: function(obj, cls) {
@@ -383,6 +386,13 @@ ap.module("ui").requires("utils").defines(function() {
 			this.shieldNum.innerHTML = num + "/" + max;
 			this.shieldBar.style.width = (num / max * 100) + "%";
 		},
+		// 更新经验条
+		setExpUI: function(num, max) {
+			var per = ~~(num / max * 100);
+			this.exp.style.width = per + "%";
+			this.exp.parentNode.title = "当前经验：" + num + " 距离升级还有：" + (max - num);
+			this.level.title = "当前经验：" + num + " 距离升级还有：" + (max - num);
+		},
 		// 控制护盾界面是否显示
 		_showShield: function(flg) {
 			if (flg) {
@@ -467,6 +477,11 @@ ap.module("ui").requires("utils").defines(function() {
 				this.drainLifeInfo.innerHTML = ~~(player.drainLife * 100);
 				this.moveSpeedInfo.innerHTML = ~~player.moveSpeed;
 				this.dodgeInfo.innerHTML = ~~(player.dodge * 100);
+			} else {
+				// 在player初始化的时候是取不到ap.game.player的
+				window.setTimeout(function() {
+					ap.ui.refreshRoleJoho();
+				}, 1);
 			}
 		},
 		// 初始化技能栏图标
@@ -496,7 +511,7 @@ ap.module("ui").requires("utils").defines(function() {
 			// 使用异步来实现dom的绘制
 			window.setTimeout(function() {
 				ap.ui.addClass(node, "playCd");
-			}, 1);
+			}, 0);
 		},
 		// 初始化玩家状态栏图标
 		initStatusUI: function() {
@@ -518,7 +533,41 @@ ap.module("ui").requires("utils").defines(function() {
 				}
 			}
 			this.statusList.appendChild(fr);
-		}
+		},
+		// 状态显示
+		showStatus: function(dom, time) {
+			var timer = dom.getAttribute("timer");
+			// 刷新状态的场合， 去掉旧状态的setTimeout
+			if (timer !== null) {
+				// 转换为数组
+				timer = timer.split(",");
+				for (var i = 0; i < timer.length; i++) {
+					window.clearTimeout(timer[i]);
+				}
+			}
+			timer = [];
+			// 显示图标
+			this.removeClass(dom, "hidden");
+			// 时间到了 自动消失
+			var t = window.setTimeout(function() {
+				ap.ui.addClass(dom, "hidden");
+				ap.log("clear");
+			}, time * 1000);
+			timer.push(t);
+			// 少于3秒的时候状态栏闪动
+			if (time > 3) {
+				time -= 3;
+			} else {
+				time = 0;
+			}
+			//状态栏闪动
+			this.removeClass(dom, "twinkling");
+			t = window.setTimeout(function() {
+				ap.ui.addClass(dom, "twinkling");
+			}, time * 1000);
+			timer.push(t);
+			dom.setAttribute("timer", timer.join(","));
 
+		},
 	};
 });

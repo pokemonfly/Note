@@ -69,7 +69,7 @@ ap.module("field").requires("feature").defines(function() {
 			for (i = 0; i < this.bossAmount; i++) {
 				m = new ap.Monster(ap.config.monsters[0]);
 				m.pos = ap.collision.getRandomPos(40);
-				this.monsters.push(m);
+				this.bosses.push(m);
 			}
 			// 执行特性 强化场景
 			for (i = 0; i < this.features.length; i++) {
