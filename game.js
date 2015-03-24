@@ -52,15 +52,25 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 		isUnLock: false,
 
 		// 初始化game对象本身
-		init: function(config) {
+		init: function(difficulty) {
 			// 初始化 与canvas建立关联
 			this.context = ap.ui.canvas.getContext('2d');
 			this.width = ap.ui.canvas.width;
 			this.height = ap.ui.canvas.height;
 			this.entities = [];
 			this.deferredKill = [];
-			// 取得当前难道的设定
-			this.config = ap.config.difficulty["EASY"];
+			// 取得选择的难度取得对应的设定
+			switch (difficulty) {
+				case 0:
+					this.config = ap.config.difficulty["EASY"];
+					break;
+				case 1:
+					this.config = ap.config.difficulty["NORMAL"];
+					break;
+				case 2:
+					this.config = ap.config.difficulty["HARD"];
+					break;
+			}
 		},
 		// 初始化游戏内容
 		start: function() {
@@ -104,10 +114,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 				entity.update();
 				// 剔除死亡的实体
 				if (entity.isKilled) {
-					// 死亡后判断是否需要掉落物品
-					this.dropItem(entity);
 					this.entities.splice(i, 1);
 					if (entity instanceof ap.Monster) {
+						// 死亡后判断是否需要掉落物品
+						this.dropItem(entity.rank);
 						// 更新场上怪物数
 						this.monsterCount -= 1;
 						this.leaveKillCount -= 1;
@@ -115,6 +125,12 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 						ap.ui.setLeaveKill(this.leaveKillCount);
 					}
 					i--;
+					// 如果是玩家死亡则结束游戏
+					if (entity instanceof ap.Player) {
+						// 触发死亡剧情
+						ap.mediator.fire("gameover");
+						break;
+					}
 				}
 			}
 			// 移动后碰撞检查
@@ -316,29 +332,27 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			this.entities.push(area);
 		},
 		// 物品掉落
-		dropItem: function(entity) {
-			if (entity instanceof ap.Monster) {
-				var item = null,
-					isRare = false;
-				switch (entity.rank) {
-					case 0:
-						item = ap.mediator.getItem("NORMAL", 0.1 * this.dropRate);
-						break;
-					case 1:
-						item = ap.mediator.getItem("NORMAL", 0.5 * this.dropRate);
-						break;
-					case 2:
-						isRare = true;
-						item = ap.mediator.getItem("RARE", 0.2 * this.dropRate);
-						break;
-				}
-				// 获得物品
-				if (item) {
-					// 使用物品
-					item.effect();
-					// 显示消息
-					ap.ui.addMessage("获得了物品<span class='" + (isRare ? "rare" : "") + "' title='" + item.description + "'>[" + item.name + "]</span>");
-				}
+		dropItem: function(rank) {
+			var item = null,
+				isRare = false;
+			switch (rank) {
+				case 0:
+					item = ap.mediator.getItem("NORMAL", 0.1 * this.dropRate);
+					break;
+				case 1:
+					item = ap.mediator.getItem("NORMAL", 0.5 * this.dropRate);
+					break;
+				case 2:
+					isRare = true;
+					item = ap.mediator.getItem("RARE", 0.2 * this.dropRate);
+					break;
+			}
+			// 获得物品
+			if (item) {
+				// 使用物品
+				item.effect();
+				// 显示消息
+				ap.ui.addMessage("获得了物品<span class='pointer " + (isRare ? "rare" : "") + "' title='" + item.description + "'>[" + item.name + "]</span>");
 			}
 		},
 		// 绘制技能预览 圆心位置 半径 扇形的2个角度

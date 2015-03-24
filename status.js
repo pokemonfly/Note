@@ -62,11 +62,12 @@ ap.module("status").defines(function() {
 			description: "增加攻击伤害",
 			type: "buff",
 			icon: 1,
+			intensity: 10,
 			effect: function() {
-				this.target.criticalBonus = 0.2;
+				this.target.powerBonus = this.intensity;
 			},
 			vanish: function() {
-				this.target.criticalBonus = 0;
+				this.target.powerBonus = 0;
 			}
 		},
 		regeneration : {

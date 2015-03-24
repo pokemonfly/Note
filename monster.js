@@ -82,6 +82,10 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				this.power = ~~(this.power * this.strength);
 				this.hateRadius = this.hateRadius * this.strength;
 			}
+			// 匹配玩家等级
+			this.lifeLimit += ap.game.player.level * this.lifeUp;
+			this.life = this.lifeLimit;
+			this.power += ap.game.player.level  * this.powerUp;
 		},
 		// 警觉 如果警惕范围内有玩家目标，则加入仇恨列表
 		vigilance: function() {

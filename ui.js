@@ -133,9 +133,9 @@ ap.module("ui").requires("utils").defines(function() {
 			this.shield = ap.$("#shieldInner");
 			this.shieldNum = ap.$("#shieldNum");
 			this.shieldBar = ap.$("#shieldInner");
-			this.exp = ap.$("#expInner"),
-				// 游戏界面 - 区域特性栏
-				this.areaCount = ap.$("#areaCount");
+			this.exp = ap.$("#expInner");
+			// 游戏界面 - 区域特性栏
+			this.areaCount = ap.$("#areaCount");
 			this.rare = ap.$("#rare");
 			this.featureList = ap.$("#featureList");
 			this.leaveKill = ap.$("#leaveKill");
@@ -165,6 +165,15 @@ ap.module("ui").requires("utils").defines(function() {
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
 
+			// 开始按钮
+			this.startGame.addEventListener("click", (function() {
+				// this.addClass(this.main, "hidden");
+				// this.removeClass(this.gameUI, "hidden");
+				// this.showUI("gameUI");
+				this.newGame();
+				event.stopPropagation();
+				event.preventDefault();
+			}).bind(this));
 			// 剧情界面的跳过按钮
 			ap.$("#close").addEventListener("click", this.skipScenario.bind(this), false);
 
@@ -187,14 +196,17 @@ ap.module("ui").requires("utils").defines(function() {
 					ul.style.top = newTop + "px";
 				}
 			}, false);
+		},
+		// 重置UI内容
+		resetUI: function() {
 			// 清空信息战斗信息列表的内容
 			if (this.messageList.children.length > 0) {
 				this.messageList.innerHTML = "";
+				this.messageCount = 0;
 			}
 
 			this.addMessage("欢迎开始冒险~");
 		},
-
 		// CSS 操作
 		hasClass: function(obj, cls) {
 			return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
@@ -336,38 +348,29 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 		// 画面点击新游戏
 		newGame: function() {
+			this.resetUI()
 			// 触发新开游戏事件
-			ap.mediator.fire("NEWGAME");
+			ap.mediator.fire("newgame");
 		},
-
-		// 显示主界面
-		showMain: function() {
-			this.addClass(this.loading, "hidden");
-			this.removeClass(this.main, "hidden");
-			this.startGame.addEventListener("click", (function() {
-				this.addClass(this.main, "hidden");
-				this.removeClass(this.gameUI, "hidden");
-				this.newGame();
-				event.stopPropagation();
-				event.preventDefault();
-			}).bind(this));
+		// 显示指定界面
+		showUI: function(name) {
+			var list = ["loading", "main", "scenario", "gameUI"];
+			for (var i = 0; i < list.length; i++) {
+				if (name == list[i]) {
+					this.removeClass(this[list[i]], "hidden");
+				} else {
+					this.addClass(this[list[i]], "hidden");
+				}
+			}
 		},
-		// 显示游戏界面
-		showGame: function() {
-			this.addClass(this.loading, "hidden");
-			this.addClass(this.main, "hidden");
-			this.addClass(this.scenario, "hidden");
-			this.removeClass(this.gameUI, "hidden");
-		},
-
-		// ==============游戏UI相关==============
+		// ============================游戏UI相关============================
 		// 设置等级
 		setLevel: function(lv) {
 			this.level.innerHTML = lv;
 		},
 		// 刷新血量条
 		setLife: function(num, max) {
-			this.lifeNum.innerHTML = num + "/" + max;
+			this.lifeNum.innerHTML = ~~num + "/" + ~~max;
 			this.lifeBar.style.width = (num / max * 100) + "%";
 			// 刷新角色面板
 			this.refreshRoleJoho();
@@ -383,7 +386,7 @@ ap.module("ui").requires("utils").defines(function() {
 				// 初次添加
 				this._showShield(true);
 			}
-			this.shieldNum.innerHTML = num + "/" + max;
+			this.shieldNum.innerHTML = ~~num + "/" + ~~max;
 			this.shieldBar.style.width = (num / max * 100) + "%";
 		},
 		// 更新经验条
@@ -409,7 +412,7 @@ ap.module("ui").requires("utils").defines(function() {
 		addMessage: function(message) {
 			this.messageCount++;
 			// 超出消除
-			if (this.messageCount > 30) {
+			if (this.messageCount > 50) {
 				this.messageList.removeChild(this.messageList.children[0]);
 				this.messageCount--;
 			}
@@ -437,6 +440,7 @@ ap.module("ui").requires("utils").defines(function() {
 				var span = ap.$new("span");
 				span.innerHTML = feature[i].name;
 				span.title = feature[i].description;
+				span.className = "pointer";
 				df.appendChild(span);
 			}
 			this.featureList.appendChild(df);
@@ -497,6 +501,7 @@ ap.module("ui").requires("utils").defines(function() {
 					sk = skills[i];
 				dom.style.background = "url('" + sk.icon + "')";
 				dom.title = sk.description;
+				ap.ui.removeClass(dom.children[0], "playCd");
 				// 建立DOM关联
 				sk.dom = dom;
 			}
@@ -516,6 +521,7 @@ ap.module("ui").requires("utils").defines(function() {
 		// 初始化玩家状态栏图标
 		initStatusUI: function() {
 			var fr = document.createDocumentFragment();
+			this.statusList.innerHTML = "";
 			for (var s in ap.status) {
 				var status = ap.status[s];
 				if (status.hasOwnProperty("icon")) {
@@ -551,7 +557,6 @@ ap.module("ui").requires("utils").defines(function() {
 			// 时间到了 自动消失
 			var t = window.setTimeout(function() {
 				ap.ui.addClass(dom, "hidden");
-				ap.log("clear");
 			}, time * 1000);
 			timer.push(t);
 			// 少于3秒的时候状态栏闪动
@@ -567,7 +572,10 @@ ap.module("ui").requires("utils").defines(function() {
 			}, time * 1000);
 			timer.push(t);
 			dom.setAttribute("timer", timer.join(","));
-
 		},
+		// 暂停菜单
+		showPause : function() {
+			ap.system.pause();
+		}
 	};
 });

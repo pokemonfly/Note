@@ -116,9 +116,9 @@ ap.module("input").defines(function() {
 	// 按键设定
 	ap.input.config = {
 		// 左键普通攻击 
-		'MOUSE1': 'Attack1',
+		'MOUSE1': 'attack1',
 		// 右键点击移动
-		'MOUSE2': 'Go',
+		'MOUSE2': 'go',
 		// 技能：碎裂之火
 		'Q': 'disintegrate',
 		// 技能：焚烧
@@ -126,20 +126,21 @@ ap.module("input").defines(function() {
 		// 技能：熔岩护盾
 		'E': 'moltenShield',
 		// 技能：提伯斯之怒
-		'R': 'Tibbers',
+		'R': 'tibbers',
 		// 功能：精神爆发，解锁当前区域的出口
 		'B': 'Break',
 		// 面板：成就
-		'Y': 'Achievement',
+		'Y': 'achievement',
 		// 面板：角色
 		'C': 'character',
 		// 面板：中断退出
-		'ESC': 'Escape',
+		'ESC': 'escape',
 		// 不使用鼠标的操作
-		'SPACE': 'Attack2',
-		'LEFT': 'Left',
-		'UP': 'Up',
-		'RIGHT': 'Right',
-		'DOWN': 'Down'
+		'SPACE': 'attack2',
+		// 角色移动
+		'LEFT': 'left',
+		'UP': 'up',
+		'RIGHT': 'right',
+		'DOWN': 'down'
 	};
 });

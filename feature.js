@@ -53,12 +53,12 @@ ap.module("feature").defines(function() {
 		description: "所有怪兽的生命提高",
 		effect: function(field) {
 				field.monsters.forEach(function(monsters) {
-					monsters.life *= 2;
-					monsters.lifeLimit *= 2;
+					monsters.life *= 1.5;
+					monsters.lifeLimit *= 1.5;
 				});
 				field.bosses.forEach(function(boss) {
-					boss.life *= 2;
-					boss.lifeLimit *= 2;
+					boss.life *= 1.5;
+					boss.lifeLimit *= 1.5;
 				});
 			}
 			// }, {

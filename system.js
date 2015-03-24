@@ -14,26 +14,27 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			ap.mediator.init();
 			// 输入组件 初始化
 			ap.input.init();
-			// this.context = ap.ui.canvas.getContext('2d');
 			// 初始化完毕后 显示主界面
-			ap.ui.showMain();
+			ap.ui.showUI("main");
 		},
 		resize: function() {},
 		// 新开游戏
-		newGame: function(val) {
-			// console.log(val);
-			ap.ui.showGame();
-			ap.game = new ap.Game();
+		newGame: function(difficulty) {
+			// 显示游戏界面
+			ap.ui.showUI("gameUI");
+			ap.game = new ap.Game(difficulty);
 			ap.game.start();
 			this.startLoop();
 		},
 		// 循环播放
-		startLoop : function () {
+		startLoop: function() {
+			// FIX 防止进入游戏前的输入
+			ap.input.clearReleased();
 			this.running = true;
 			this.loopId = ap.ui.setAnimation(this.run.bind(this));
 		},
 		// 暂停
-		pause : function () {
+		pause: function() {
 			if (this.running) {
 				ap.ui.clearAnimation(this.loopId);
 				this.running = false;
@@ -56,25 +57,25 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			ap.game = new ap.Game({});
 		},
 		// 保存游戏 保存当前角色的属性 场景数，选择难度，以获得的道具，本次游戏的成就
-		saveGame : function() {
+		saveGame: function() {
 
 		},
 		// 保存游戏 保存总的成就，可继承物品信息
-		gameOver : function() {
-
+		gameOver: function() {
+			ap.ui.showUI("main");
 		}
-		// 测试代码 显示帧数
-		// _fps: 0,
-		// _fpsCount : 0,
-		// _fpsTimer: new ap.Timer(),
-		// fps : function() {
-		// 	if (this._fpsTimer.delta() > 1) {
-		// 		this._fps = this._fpsCount;
-		// 		this._fpsCount = 0;
-		// 		this._fpsTimer.reset();
-		// 	} else {
-		// 		this._fpsCount ++;
-		// 	}
-		// }
+			// 测试代码 显示帧数
+			// _fps: 0,
+			// _fpsCount : 0,
+			// _fpsTimer: new ap.Timer(),
+			// fps : function() {
+			// 	if (this._fpsTimer.delta() > 1) {
+			// 		this._fps = this._fpsCount;
+			// 		this._fpsCount = 0;
+			// 		this._fpsTimer.reset();
+			// 	} else {
+			// 		this._fpsCount ++;
+			// 	}
+			// }
 	};
 });

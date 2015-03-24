@@ -1,18 +1,18 @@
 // 剧情
 ap.module("scenario").requires("ui").defines(function() {
 	ap.scenario = [{
-		name: "NEWGAME",
+		name: "newgame",
 		description: "开始新游戏",
 		// 判断是否需要进行剧情演出 trigger 为空就需要手动触发(通过name)
 		trigger: null,
 		// 是否需要中断游戏来播放剧情
 		needPause: true,
 		run: function() {
-			return ap.ui.playScenario(this);
+			ap.ui.playScenario(this);
 		},
 		// 剧情播放完毕的回调
-		callback: function() {
-			ap.system.newGame();
+		callback: function(difficulty) {
+			ap.system.newGame(difficulty);
 		},
 		// 剧情演出 台词
 		script: [{
@@ -107,7 +107,7 @@ ap.module("scenario").requires("ui").defines(function() {
 			words: "安妮带着血纹咒印出门了..."
 		}]
 	}, {
-		name: "LV6",
+		name: "lv6",
 		description: "角色提升到6级时，遇到熊，击败后获得技能",
 
 		trigger: function() {
@@ -136,5 +136,38 @@ ap.module("scenario").requires("ui").defines(function() {
 			words: "那边就是我要找的小熊吧。"
 		}]
 
+	}, {
+		name: "gameover",
+		description: "玩家死亡，游戏结束",
+		// 判断是否需要进行剧情演出 trigger 为空就需要手动触发(通过name)
+		trigger: null,
+		// 是否需要中断游戏来播放剧情
+		needPause: true,
+		run: function() {
+			ap.ui.playScenario(this);
+		},
+		// 剧情播放完毕的回调
+		callback: function() {
+			ap.system.gameOver();
+		},
+		// 剧情演出 台词
+		script: [{
+			words: "树林里的怪物不断的涌出，强烈的敌意化作凶猛的攻击袭向安妮。"
+		}, {
+			icon: "Annie",
+			words: "好疼，好累，好冷..."
+		}, {
+			icon: "Annie",
+			words: "不和你们玩了！"
+		}, {
+			words: "安妮从口袋摸出了一块宝石，用魔力点燃了它。一阵闪烁中，安妮消失在原地。"
+		}, {
+			words: "神秘术士当然不会对自己的女儿吝啬，那是逃跑用的宝石。"
+		}, {
+			icon: "Annie",
+			words: "下次，下次一定要打扁这些坏家伙。哼！"
+		}, {
+			words: "(迷之音：本次游戏虽然残念的结束了，但安妮的冒险并没有结束。本次获得的稀有道具都已经保留。祝愿下次能走的更远...）"
+		}]
 	}];
 });

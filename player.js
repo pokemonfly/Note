@@ -33,10 +33,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 角色移动方向 弧度
 		moveAim: 0,
 		// 移动的目标地点
-		moveTo: {
-			x: 100,
-			y: 100
-		},
+		moveTo: null,
 
 		// 等级
 		level: 1,
@@ -69,7 +66,10 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 护盾持续时间
 		shieldDuration: 0,
 		// 护盾效果
-		shieldImage: new ap.Image("media/ui/shield.png", {x:93,y:90}),
+		shieldImage: new ap.Image("media/ui/shield.png", {
+			x: 93,
+			y: 90
+		}),
 
 		// 闪避 玩家自带10%闪避
 		dodge: 0.1,
@@ -86,22 +86,16 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 瞄准区域的半径
 		aimmingRadius: 0,
 		// 状态 buff & debuff
-		status: [],
+		status: null,
 		// 持有技能
-		skills: {},
+		skills: null,
 
 		// 位置
-		pos: {
-			x: 100,
-			y: 100
-		},
+		pos: null,
 		// // 上次移动的距离用于再计算方向
 		// lastMove: 0,
 		// 本次移动的位置偏移量
-		moveOffset: {
-			x: 0,
-			y: 0
-		},
+		moveOffset: null,
 		// 碰撞体积 半径
 		radius: 30,
 		// 当前动画效果
@@ -113,6 +107,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 		init: function(property) {
 			this.parent(property);
 			// 初始化UI
+			// 等级
+			ap.ui.setLevel(this.level);
 			// 血条
 			ap.ui.setLife(this.life, this.lifeLimit);
 			// 经验条
@@ -125,6 +121,19 @@ ap.module("player").requires("entity", "image").defines(function() {
 			this.moveTimer = new ap.Timer();
 			// 初始化动作
 			this.action = "stand";
+			this.status = [];
+			this.moveTo = {
+				x: 100,
+				y: 100
+			};
+			this.pos = {
+				x: 100,
+				y: 100
+			};
+			this.moveOffset = {
+				x: 0,
+				y: 0
+			};
 		},
 		// 受到治疗 吸血和恢复buff
 		onHeal: function(heal) {
@@ -189,24 +198,24 @@ ap.module("player").requires("entity", "image").defines(function() {
 				y: this.pos.y
 			};
 			// 鼠标点击 移动位置
-			if (ap.input.pressed("Go")) {
+			if (ap.input.pressed("go")) {
 				// 设定目标地点
 				this.moveTo.x = ap.input.mouse.x;
 				this.moveTo.y = ap.input.mouse.y;
 			}
-			if (ap.input.pressed("Up")) {
+			if (ap.input.pressed("up")) {
 				useKey = true;
 				keyAim.y--;
 			}
-			if (ap.input.pressed("Left")) {
+			if (ap.input.pressed("left")) {
 				useKey = true;
 				keyAim.x--;
 			}
-			if (ap.input.pressed("Down")) {
+			if (ap.input.pressed("down")) {
 				useKey = true;
 				keyAim.y++;
 			}
-			if (ap.input.pressed("Right")) {
+			if (ap.input.pressed("right")) {
 				useKey = true;
 				keyAim.x++;
 			}
@@ -227,7 +236,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 				// 当前时间段可以移动的距离 像素
 				if (useKey) {
 					// 当前可以移动的长度
-					this.lastMove = this.moveTimer.delta() * this.moveSpeed;
+					this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
 					this.moveOffset.x = this.lastMove * Math.cos(this.moveAim);
 					this.moveOffset.y = this.lastMove * Math.sin(this.moveAim);
 					this.moveTo.x = this.pos.x;
@@ -235,7 +244,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 				} else {
 					if (this.moveTo.x !== this.pos.x || this.moveTo.y !== this.pos.y) {
 						// 当前可以移动的长度
-						this.lastMove = this.moveTimer.delta() * this.moveSpeed;
+						this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
 						// 距离目标的长度
 						var current = ap.utils.getDistance(this.moveTo, this.pos);
 						if (this.lastMove < current) {
@@ -268,12 +277,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 				this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
 			}
 			// 普通攻击
-			if (ap.input.pressed("Attack1")) {
+			if (ap.input.pressed("attack1")) {
 				// 鼠标攻击
 				// this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
 				this.useSkill("pyromania");
 			}
-			if (ap.input.pressed("Attack2")) {
+			if (ap.input.pressed("attack2")) {
 				// 键盘攻击
 				// this.aim = this.moveAim;
 				this.useSkill("pyromania");
@@ -293,6 +302,10 @@ ap.module("player").requires("entity", "image").defines(function() {
 			if (ap.input.released("character")) {
 				// 角色面板
 				ap.ui.showRolePanel();
+			}
+			if (ap.input.released("escape")) {
+				// 暂停
+				ap.ui.showPause();
 			}
 
 		},

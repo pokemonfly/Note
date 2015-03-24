@@ -194,6 +194,48 @@ ap.module("skill").requires("utils").defines(function() {
 				});
 			}
 		},
+		fight: {
+			id: "fight",
+			name: "普通近战攻击",
+			description: null,
+			coolDown: 0,
+			cost: 0,
+			caster: null,
+			// 技能施法角度
+			rad: 30 * Math.PI / 180,
+			cast: function() {
+				ap.game.createArea({
+					power: (this.caster.power + this.caster.powerBonus),
+					duration: 0.2,
+					owner: this.caster,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 15),
+					radius: 60,
+					status: null,
+					aimS: this.caster.aim - this.rad / 2,
+					aimE: this.caster.aim + this.rad / 2,
+					coolDown: 0.15,
+					anims: new ap.Animation([new ap.Image("media/ui/fight.png", {
+						x: 0,
+						y: 10
+					})])
+				});
+			}
+		},
+		portal : {
+			id: "portal",
+			name: "时空奇点专属攻击",
+			description: null,
+			coolDown: 0,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				// 持续性的召唤生物
+				var append = ap.field.portalMonster(this.caster.pos.x, this.caster.pos.y, 800, 4, 1);
+				ap.game.entities = ap.game.entities.concat(append);
+				ap.game.monsterCount += append.length;
+				ap.ui.addMessage("时空奇点闪烁着诡异的光芒，不远处的怪物被刺激的发狂了。更多怪物冲过来了！");
+			}
+		},
 		charge: {
 			id: "charge",
 			name: "冲锋",

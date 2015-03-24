@@ -38,8 +38,62 @@ ap.module("config").requires("image", "animation").defines(function() {
 					rare: 0.1
 				}
 			},
-			"NORMAL": {},
-			"HARD": {}
+			"NORMAL": {
+				field: {
+					// 场上预留怪物数目
+					monstersAmount: 15,
+					// 场上预留boss数目
+					bossAmount: 2,
+					// 场景特性数目
+					featureAmount: 2,
+					// 援军增加数目
+					monstersPlus: 6,
+					// 离开前必须击杀数目
+					leaveKill: 18,
+					// 每次强化需要击杀数目增加
+					leaveKillUpd: 4,
+					// 每次强化boss数目增加幅度
+					bossUpd: 0.15,
+					// 每次强化特性数目增加幅度
+					featureUpd: 0.2,
+					// 每次强化援军数目增加幅度
+					monstersPlusUpd: 0.8,
+					// 怪物强度
+					strength: 1.2,
+					// 区域强化间隔数
+					updateNum: 6,
+					// 稀有区域概率
+					rare: 0.2
+				}
+			},
+			"HARD": {
+				field: {
+					// 场上预留怪物数目
+					monstersAmount: 20,
+					// 场上预留boss数目
+					bossAmount: 3,
+					// 场景特性数目
+					featureAmount: 2,
+					// 援军增加数目
+					monstersPlus: 8,
+					// 离开前必须击杀数目
+					leaveKill: 20,
+					// 每次强化需要击杀数目增加
+					leaveKillUpd: 5,
+					// 每次强化boss数目增加幅度
+					bossUpd: 0.2,
+					// 每次强化特性数目增加幅度
+					featureUpd: 0.2,
+					// 每次强化援军数目增加幅度
+					monstersPlusUpd: 1,
+					// 怪物强度
+					strength: 1.5,
+					// 区域强化间隔数
+					updateNum: 7,
+					// 稀有区域概率
+					rare: 0.4
+				}
+			}
 		},
 		// 玩家初始属性
 		player: {
@@ -84,71 +138,180 @@ ap.module("config").requires("image", "animation").defines(function() {
 			breed: "plant",
 			life: 80,
 			exp: 30,
-			attackRadius:400,
+			power: 10,
+			attackRadius: 400,
 			hateRadius: 800,
 			attackSpeed: 0.5,
 			radius: 30,
-			animSheet: new ap.Image("media/ui/1.png")
+			animSheet: new ap.Image("media/ui/plant1.png")
+		}, {
+			name: "投掷型杂草·II",
+			skill: ["throwing"],
+			breed: "plant",
+			life: 85,
+			exp: 35,
+			power: 10,
+			attackRadius: 400,
+			hateRadius: 800,
+			attackSpeed: 0.25,
+			radius: 25,
+			animSheet: new ap.Image("media/ui/plant2.png")
+		}, {
+			name: "格斗型杂草·I",
+			skill: ["fight"],
+			breed: "plant",
+			life: 110,
+			exp: 35,
+			power: 15,
+			attackRadius: 15,
+			hateRadius: 800,
+			attackSpeed: 0.5,
+			radius: 30,
+			animSheet: new ap.Image("media/ui/plant3.png")
+		}, {
+			name: "格斗型杂草·II",
+			skill: ["fight"],
+			breed: "plant",
+			life: 130,
+			exp: 35,
+			power: 15,
+			attackRadius: 15,
+			hateRadius: 800,
+			attackSpeed: 0.75,
+			radius: 30,
+			animSheet: new ap.Image("media/ui/plant4.png")
+		}],
+		bosses: [{
+			name: "[精锐]投掷型杂草·I",
+			skill: ["throwing"],
+			breed: "plant",
+			life: 400,
+			exp: 120,
+			power: 20,
+			attackRadius: 400,
+			hateRadius: 800,
+			attackSpeed: 0.5,
+			radius: 30,
+			animSheet: new ap.Image("media/ui/plant1G.png")
+		}, {
+			name: "[精锐]投掷型杂草·II",
+			skill: ["throwing"],
+			breed: "plant",
+			life: 420,
+			exp: 130,
+			power: 20,
+			attackRadius: 400,
+			hateRadius: 800,
+			attackSpeed: 0.25,
+			radius: 25,
+			animSheet: new ap.Image("media/ui/plant2G.png")
+		}, {
+			name: "[精锐]格斗型杂草·I",
+			skill: ["fight"],
+			breed: "plant",
+			life: 450,
+			exp: 150,
+			power: 30,
+			attackRadius: 15,
+			hateRadius: 800,
+			attackSpeed: 0.5,
+			radius: 30,
+			animSheet: new ap.Image("media/ui/plant3G.png")
+		}, {
+			name: "[精锐]格斗型杂草·II",
+			skill: ["fight"],
+			breed: "plant",
+			life: 500,
+			exp: 200,
+			power: 40,
+			attackRadius: 15,
+			hateRadius: 800,
+			attackSpeed: 0.75,
+			radius: 30,
+			animSheet: new ap.Image("media/ui/plant4G.png")
+		}],
+		// 稀有区域的专属怪物
+		rareMonster: [{
+			name: "[特殊]时空奇点",
+			skill: ["portal"],
+			breed: "portal",
+			life: 2500,
+			exp: 1000,
+			power: 0,
+			// 不需要移动
+			attackRadius: 9999,
+			hateRadius: 400,
+			attackSpeed: 0.08,
+			radius: 80,
+			animSheet: new ap.Image("media/ui/portal.png", {
+				x: 84,
+				y: 187
+			})
 		}],
 		// 游戏中掉落的道具
 		items: {
 			// 普通道具，不限制次数获得
 			"NORMAL": [{
 				name: "活力夹心饼干",
-				description: "获得额外的经验",
+				description: "获得额外的100经验",
 				effect: function() {
 					ap.game.player.getExp(100);
 				}
 			}, {
 				name: "多兰碎片",
-				description: "攻击力永久提高",
+				description: "攻击力永久提高1点",
 				effect: function() {
 					ap.game.player.power += 1;
 				}
 			}, {
 				name: "生命宝珠",
-				description: "生命上限永久提高",
+				description: "生命上限永久提高5点",
 				effect: function() {
-					ap.game.player.lifeLimit += 5;
-				}
-			}, {
-				name: "法力药水",
-				description: "恢复一些精神能量",
-				effect: function() {
-					ap.game.player.spirit += 50;
-					if (ap.game.player.spirit > ap.game.player.spiritLimit) {
-						ap.game.player.spirit = ap.game.player.spiritLimit;
+						ap.game.player.lifeLimit += 5;
 					}
-				}
+					// }, {
+					// 	name: "法力药水",
+					// 	description: "恢复一些精神能量",
+					// 	effect: function() {
+					// 		ap.game.player.spirit += 50;
+					// 		if (ap.game.player.spirit > ap.game.player.spiritLimit) {
+					// 			ap.game.player.spirit = ap.game.player.spiritLimit;
+					// 		}
+					// 	}
 			}, {
 				name: "狂野合剂",
 				description: "获得激怒",
 				effect: function() {
-
+					var s = ap.status.createStatus("fury", "", "", 0, 30);
+					ap.game.player.getStatus(s);
 				}
 			}, {
 				name: "怒火合剂",
 				description: "获得威能",
 				effect: function() {
-
+					var s = ap.status.createStatus("might", "", "", ap.game.player.power * 0.2, 30);
+					ap.game.player.getStatus(s);
 				}
 			}, {
 				name: "生命药水",
-				description: "获得治疗",
+				description: "获得治疗，5秒内30%生命回复",
 				effect: function() {
-
+					var s = ap.status.createStatus("regeneration", "", "", ap.game.player.lifeLimit * 0.03, 5, 0.5);
+					ap.game.player.getStatus(s);
 				}
 			}, {
 				name: "坚韧合剂",
 				description: "获得反弹",
 				effect: function() {
-
+					var s = ap.status.createStatus("retaliation", "", "", 0, 30);
+					ap.game.player.getStatus(s);
 				}
 			}, {
 				name: "迅捷药水",
 				description: "获得迅捷",
 				effect: function() {
-
+					var s = ap.status.createStatus("swiftness", "", "", 0, 30);
+					ap.game.player.getStatus(s);
 				}
 			}],
 			// 稀有道具 只能获得一次，计入成就，可以继承
@@ -205,13 +368,13 @@ ap.module("config").requires("image", "animation").defines(function() {
 				description: "技能冷却缩减",
 				effect: function() {
 
-				}
-			}, {
-				name: "冰霜之心",
-				description: "精神恢复速度加快",
-				effect: function() {
-					ap.game.player.spiritSpeed += 3;
-				}
+					}
+					// }, {
+					// 	name: "冰霜之心",
+					// 	description: "精神恢复速度加快",
+					// 	effect: function() {
+					// 		ap.game.player.spiritSpeed += 3;
+					// 	}
 			}, {
 				name: "禁忌雕像",
 				description: "提伯斯的持续时间延长",
@@ -234,7 +397,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 				name: "女神之泪",
 				description: "经验获得速度加快",
 				effect: function() {
-					ap.game.player.expRate *= 1.2;
+					ap.game.player.expRate += 0.5;
 				}
 			}, {
 				name: "启示灵药",

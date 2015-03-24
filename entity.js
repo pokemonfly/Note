@@ -35,6 +35,9 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 			for (var i in property) {
 				this[i] = property[i];
 			}
+			if (!this.skills) {
+				this.skills = {};
+			}
 			// 如果当前配置指定了技能 创建技能实例
 			if (property && property["skill"]) {
 				for (var i = 0; i < property["skill"].length; i++) {
@@ -105,7 +108,7 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 			// 检查反射Buff 就算是玩家闪避了攻击也需要反射伤害
 			if (this.isReflection && !canReflection) {
 				// 反射的伤害不会再次触发反射
-				ap.Mediator.attack(this, attacker, damage * 0.5, "reflection", null, null, true);
+				ap.mediator.attack(this, attacker, damage * 0.5, "reflection", null, null, true);
 			}
 
 			if (this.life <= 0) {

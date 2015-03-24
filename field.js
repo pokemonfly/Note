@@ -61,14 +61,17 @@ ap.module("field").requires("feature").defines(function() {
 			var i, m;
 			// 生成怪兽
 			for (i = 0; i < this.monstersAmount; i++) {
-				m = new ap.Monster(ap.config.monsters[0]);
-				m.pos = ap.collision.getRandomPos(30);
+				// 获得一个随机的怪物
+				m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
+				m.pos = ap.collision.getRandomPos(m.radius);
+				m.rank = 0;
 				this.monsters.push(m);
 			}
 			// 生成boss
 			for (i = 0; i < this.bossAmount; i++) {
-				m = new ap.Monster(ap.config.monsters[0]);
-				m.pos = ap.collision.getRandomPos(40);
+				m = new ap.Monster(ap.config.bosses[~~(Math.random() * ap.config.bosses.length)]);
+				m.pos = ap.collision.getRandomPos(m.radius);
+				m.rank = 1;
 				this.bosses.push(m);
 			}
 			// 执行特性 强化场景
@@ -76,7 +79,11 @@ ap.module("field").requires("feature").defines(function() {
 				this.features[i].effect(this);
 			}
 			if (this.isRare) {
-				// 添加特殊怪兽 TODO
+				// 添加特殊怪兽
+				m = new ap.Monster(ap.config.rareMonster[0]);
+				m.pos = ap.collision.getRandomPos(m.radius);
+				m.rank = 2;
+				this.monsters.push(m);
 			}
 			// 刷新UI显示内容
 			ap.ui.setFeature(this.num, this.isRare, this.features, this.leaveKill);
@@ -88,8 +95,9 @@ ap.module("field").requires("feature").defines(function() {
 			this.monsters = [];
 			var i, m;
 			for (i = 0; i <= this.monstersPlus; i++) {
-				m = new ap.Monster(ap.config.monsters[0]);
-				m.pos = ap.collision.getRandomPos(30);
+				m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
+				m.pos = ap.collision.getRandomPos(m.radius);
+				m.rank = 0;
 				this.monsters.push(m);
 			}
 			// 执行特性 强化场景
@@ -97,6 +105,34 @@ ap.module("field").requires("feature").defines(function() {
 				this.features[i].effect(this);
 			}
 			return this.monsters;
+		},
+		// 特殊召唤援军  召唤范围 数量
+		portalMonster: function(posX, posY, posRadius, monstersCount, bossesCount) {
+			this.monsters = [];
+			this.bosses = [];
+			var i, m;
+			try {
+				for (i = 1; i <= monstersCount; i++) {
+					m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
+					m.pos = ap.collision.getRandomPos(m.radius, posX, posY, posRadius);
+					m.rank = 0;
+					this.monsters.push(m);
+				}
+				for (i = 1; i <= bossesCount; i++) {
+					m = new ap.Monster(ap.config.bosses[~~(Math.random() * ap.config.bosses.length)]);
+					m.pos = ap.collision.getRandomPos(m.radius, posX, posY, posRadius);
+					m.rank = 1;
+					this.bosses.push(m);
+				}
+			} catch (e) {
+				// 可能目标区域空间不够
+				ap.log(e);
+			}
+			// 执行特性 强化场景
+			for (i = 0; i < this.features.length; i++) {
+				this.features[i].effect(this);
+			}
+			return [].concat(this.monsters).concat(this.bosses);
 		},
 		// UI显示用的信息抽出
 		getUIInfo: function() {

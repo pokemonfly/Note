@@ -25,6 +25,11 @@ div, ui, li {
 .ui {
     position: fixed;
 }
+/*有提示的 title属性的*/
+.pointer {
+    cursor: pointer;
+    color: pink;
+}
 /*居中用*/
 .middle {
     position: relative;
@@ -304,7 +309,6 @@ canvas {
     top: 25px;
 }
 #featureList > span {
-    border-bottom: 1px #0099CC dotted;
     margin-right: 10px;
 }
 #featureList > span:last-child {
@@ -314,7 +318,7 @@ canvas {
     margin-top: 5px !important;
 }
 /*稀有字样*/
-#rare {
+.rare {
     color: yellow;
 }
 /*角色属性*/

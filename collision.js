@@ -7,15 +7,29 @@ ap.module("collision").defines(function() {
 		init: function() {
 			this.border = ap.game.fieldSize;
 		},
-		// 找出一个随机坐标，可以放置新对象 参数 碰撞体积半径
-		getRandomPos: function(radius) {
-			var pos = {
-				x: ~~(Math.random() * this.border.x),
-				y: ~~(Math.random() * this.border.y)
-			};
+		// 找出一个随机坐标，可以放置新对象 参数 碰撞体积半径 posX posY  posRadius:指定位置的范围内
+		getRandomPos: function(radius, posX, posY, posRadius) {
+			var pos = null, 
+				counter = 0;
+			if (posX === undefined) {
+				// 未指定范围的话是全屏
+				pos = {
+					x: ~~(Math.random() * this.border.x),
+					y: ~~(Math.random() * this.border.y)
+				};
+			} else {
+				pos = {
+					x: ~~(Math.random() * posRadius * 2 + posX - posRadius),
+					y: ~~(Math.random() * posRadius * 2 + posY - posRadius),
+				};
+			}
 			while (this._checkCollision(pos, radius).length > 0 || !this._checkBorder(pos, radius)) {
 				pos.x = ~~(Math.random() * this.border.x);
 				pos.y = ~~(Math.random() * this.border.y);
+				counter ++;
+				if (counter > 1000) {
+					throw new Error("目标范围无空间");
+				}
 			}
 			return pos;
 		},
@@ -97,7 +111,7 @@ ap.module("collision").defines(function() {
 					y: current.pos.y + current.moveOffset.y
 				},
 				collisionList = this._checkCollision(pos, current.radius, current);
-				count = count || 0;
+			count = count || 0;
 			if (collisionList.length === 0 && this._checkBorder(pos, current.radius)) {
 				return current.moveOffset;
 			} else {
