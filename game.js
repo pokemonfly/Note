@@ -59,6 +59,7 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			this.height = ap.ui.canvas.height;
 			this.entities = [];
 			this.deferredKill = [];
+			this.difficulty = difficulty;
 			// 取得选择的难度取得对应的设定
 			switch (difficulty) {
 				case 0:
@@ -104,6 +105,8 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 		run: function() {
 			this.update();
 			this.draw();
+			// 检查是否有自定义事件发生
+			ap.mediator.checkTrigger();
 		},
 		update: function() {
 			// 伤害区域检测
@@ -128,7 +131,7 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 					// 如果是玩家死亡则结束游戏
 					if (entity instanceof ap.Player) {
 						// 触发死亡剧情
-						ap.mediator.fire("gameover");
+						ap.mediator.fire("gameOver");
 						break;
 					}
 				}

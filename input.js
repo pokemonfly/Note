@@ -43,7 +43,7 @@ ap.module("input").defines(function() {
 			window.addEventListener('mouseup', this.keyup.bind(this), false);
 			window.addEventListener('mousemove', this.mousemove.bind(this), false);
 
-			this.bindKey();
+			// this.bindAll();
 		},
 		keydown: function() {
 			var code = event.type == 'keydown' ? event.keyCode : (event.button == 2 ? ap.KEY.MOUSE2 : ap.KEY.MOUSE1);
@@ -66,8 +66,10 @@ ap.module("input").defines(function() {
 			var code = event.type == 'keyup' ? event.keyCode : (event.button == 2 ? ap.KEY.MOUSE2 : ap.KEY.MOUSE1);
 			var action = this.bindings[code];
 			if (action) {
-				this.presses[action] = false;
-				this.release[action] = true;
+				if (this.presses[action]) {
+					this.presses[action] = false;
+					this.release[action] = true;
+				}
 				event.stopPropagation();
 				event.preventDefault();
 			}
@@ -84,12 +86,10 @@ ap.module("input").defines(function() {
 		clearReleased: function() {
 			this.release = {};
 		},
+		// 禁用右键菜单
 		contextmenu: function() {
-			// 绑定过鼠标右键的话，就不需要弹菜单了
-			if (this.bindings[ap.KEY.MOUSE2]) {
-				event.stopPropagation();
-				event.preventDefault();
-			}
+			event.stopPropagation();
+			event.preventDefault();
 		},
 		mousemove: function(event) {
 			var pos = {
@@ -104,13 +104,19 @@ ap.module("input").defines(function() {
 			this.useMouse = true;
 		},
 		// 读取按键设定并加载
-		bindKey: function() {
+		bindAll: function() {
 			if (!this.config) {
 				throw new Exception("按键设定未加载");
 			}
 			for (var i in this.config) {
 				this.bindings[ap.KEY[i]] = this.config[i];
 			}
+		},
+		// 解除所有的绑定
+		unBindAll: function() {
+			this.bindings = {};
+			this.presses = {};
+			this.release = {};
 		}
 	};
 	// 按键设定

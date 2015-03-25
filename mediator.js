@@ -7,6 +7,7 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 		// 剧本对象的引用
 		scenario: ap.scenario,
 		achieve: ap.achievement,
+
 		// 初始化
 		init: function() {
 			for (var i = 0, l = this.scenario.length; i < l; i++) {
@@ -19,9 +20,20 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 				}
 			}
 		},
-		// 攻击  参数：攻击者，目标，伤害值，技能id，附加异常, 附加概率, 是否是反射伤害
-		attack: function(attacker, target, damage, skillId, status, probability, isReflection) {
+		// 检查是否有自定义事件发生
+		checkTrigger: function() {
+			var s;
+			for (var i = 0, l = this.scenario.length; i < l; i++) {
+				s = this.scenario[i];
+				if (s.trigger) {
+					s.trigger();
+				}
+			}
+		},
+		// 攻击  参数：攻击者，目标，伤害值，技能id，附加异常, 是否是反射伤害
+		attack: function(attacker, target, damage, skillId, status, isReflection) {
 			var isDead = false;
+			damage = ~~damage;
 			if (!isReflection) {
 				// 通知攻击者伤害成功 如果同时发生吸血和反射，优先吸血
 				attacker.onDamage(damage);

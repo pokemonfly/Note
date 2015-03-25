@@ -1,7 +1,7 @@
 // 剧情
 ap.module("scenario").requires("ui").defines(function() {
 	ap.scenario = [{
-		name: "newgame",
+		name: "newGame",
 		description: "开始新游戏",
 		// 判断是否需要进行剧情演出 trigger 为空就需要手动触发(通过name)
 		trigger: null,
@@ -109,35 +109,45 @@ ap.module("scenario").requires("ui").defines(function() {
 	}, {
 		name: "lv6",
 		description: "角色提升到6级时，遇到熊，击败后获得技能",
-
 		trigger: function() {
-			if (game.field.player.level == 6 && game.field.isNewField) {
-				return true;
-			} else {
-				return false;
+			if (ap.game.player.level == 6 && !this.disabled) {
+				this.run();
+				this.disabled = true;
 			}
 		},
-
+		background: 'canvas',
 		needPause: true,
 		run: function() {
-			ap.utils.playScenario(this);
-			game.field.addMonster("XXX");
+			ap.ui.playScenario(this);
 		},
-
+		callback: function() {
+			ap.ui.addMessage("安妮命运的邂逅，史诗级暗影熊出现了！", "yellow");
+		},
 		script: [{
-
-			icon: null,
-
-			words: "森林里传来野兽的吼声"
+			icon: "Bear ",
+			words: "吼~~~~~~~~~~~~~~~~~~"
 		}, {
-			// 头像
+			icon: "Bear ",
+			words: "吼~~~~~~~~~~~~"
+		}, {
+			icon: "Bear ",
+			words: "吼~~~~~~"
+		} {
+			words: "森林里传来野兽的吼声。"
+		}, {
 			icon: "Annie",
-			// 台词
-			words: "那边就是我要找的小熊吧。"
+			words: "就在前面了！"
+		}, {
+			icon: "Annie",
+			words: "那就是我要找的小熊吧。（兴奋）"
+		}, {
+			words: "被瘴气浸入的暗影熊目露凶光，冲了过来！"
+		}, {
+			icon: "Annie",
+			words: "不听话的孩子是要被教训的。嘿！"
 		}]
-
 	}, {
-		name: "gameover",
+		name: "gameOver",
 		description: "玩家死亡，游戏结束",
 		// 判断是否需要进行剧情演出 trigger 为空就需要手动触发(通过name)
 		trigger: null,
@@ -148,7 +158,7 @@ ap.module("scenario").requires("ui").defines(function() {
 		},
 		// 剧情播放完毕的回调
 		callback: function() {
-			ap.system.gameOver();
+			ap.system.saveGame();
 		},
 		// 剧情演出 台词
 		script: [{
@@ -168,6 +178,25 @@ ap.module("scenario").requires("ui").defines(function() {
 			words: "下次，下次一定要打扁这些坏家伙。哼！"
 		}, {
 			words: "(迷之音：本次游戏虽然残念的结束了，但安妮的冒险并没有结束。本次获得的稀有道具都已经保留。祝愿下次能走的更远...）"
+		}]
+	}, {
+		name: "loadGame",
+		description: "继续游戏",
+		trigger: null,
+		needPause: true,
+		run: function() {
+			ap.ui.playScenario(this);
+		},
+		// 剧情播放完毕的回调
+		callback: function() {
+			ap.system.loadGame();
+		},
+		// 剧情演出 台词
+		script: [{
+			words: "我们的主角休息好又回来了。"
+		}, {
+			icon: "Annie",
+			words: "我上次走到到哪儿来着？唔唔唔~~就从这里开始吧。"
 		}]
 	}];
 });

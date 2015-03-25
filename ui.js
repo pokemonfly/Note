@@ -23,7 +23,8 @@ ap.module("ui").requires("utils").defines(function() {
 		returnValue: 0,
 		// 剧情播放完的回调
 		callback: null,
-
+		// 游戏是否暂停
+		isPause: false,
 		// =============DOM关联==================
 		// Loading界面
 		loading: null,
@@ -31,9 +32,11 @@ ap.module("ui").requires("utils").defines(function() {
 		main: null,
 		// 主界面 - 选项
 		startGame: null,
-		loadGame: null,
+		continueGame: null,
 		// 剧情界面
 		scenario: null,
+		// 剧情界面 - 背景
+		scenarioBg: null,
 		// 剧情界面 - 头像		
 		head: null,
 		// 剧情界面 - 文本
@@ -108,18 +111,25 @@ ap.module("ui").requires("utils").defines(function() {
 		skill4: null,
 		// 游戏界面 - 状态栏
 		statusList: null,
-
-		init: function() {
+		// 游戏界面 - 系统菜单
+		systemMenu: null,
+		// 游戏界面 - 系统菜单 - 中断
+		save: null,
+		// 游戏界面 - 系统菜单 - 返回
+		returnGame: null,
+		// DOM 关联  是否有上次的存档
+		init: function(hasLastGame) {
 			// loading 界面
 			this.loading = ap.$("#loading");
 			// 主界面
 			this.main = ap.$("#main");
 			this.startGame = ap.$("#newGame");
-			this.loadGame = ap.$("#loadGame");
+			this.continueGame = ap.$("#loadGame");
 			// 剧情界面
 			this.scenario = ap.$("#scenario");
 			this.selecter = ap.$("#selecter");
 			this.selectList = ap.$("#selectList");
+			this.scenarioBg = ap.$("#scenarioBg");
 			this.head = ap.$("#head");
 			this.messageList = ap.$("#messageInfo");
 			this.lines = ap.$("#lines");
@@ -161,19 +171,47 @@ ap.module("ui").requires("utils").defines(function() {
 			this.skill4 = ap.$("#skill4");
 			// 游戏界面 - 状态栏
 			this.statusList = ap.$("#statusList");
+			// 游戏界面 - 系统菜单
+			this.systemMenu = ap.$("#system");
+			this.save = ap.$("#save");
+			this.returnGame = ap.$("#returnGame");
 
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
 
+			// DOM 事件绑定
 			// 开始按钮
-			this.startGame.addEventListener("click", (function() {
-				// this.addClass(this.main, "hidden");
-				// this.removeClass(this.gameUI, "hidden");
-				// this.showUI("gameUI");
-				this.newGame();
+			this.startGame.addEventListener("click", function() {
+				ap.ui.newGame();
 				event.stopPropagation();
 				event.preventDefault();
-			}).bind(this));
+			});
+			// 继续按钮
+			this.continueGame.addEventListener("click", function() {
+				if (!ap.ui.hasClass(this, "disable")) {
+					ap.ui.loadGame();
+				}
+				event.stopPropagation();
+				event.preventDefault();
+			});
+			// 游戏系统菜单界面按钮
+			this.save.addEventListener("click", function() {
+				ap.system.saveGame();
+				event.stopPropagation();
+				event.preventDefault();
+			});
+			this.returnGame.addEventListener("click", function() {
+				ap.ui.showPause();
+				event.stopPropagation();
+				event.preventDefault();
+			});
+			// 游戏系统菜单界面隐藏 ESC键
+			window.addEventListener('keyup', function(event) {
+				if (event.keyCode == ap.KEY.ESC && !ap.ui.hasClass(ap.ui.systemMenu, "hidden")) {
+					// 取消暂停
+					ap.ui.showPause();
+				}
+			}, false);
 			// 剧情界面的跳过按钮
 			ap.$("#close").addEventListener("click", this.skipScenario.bind(this), false);
 
@@ -195,7 +233,11 @@ ap.module("ui").requires("utils").defines(function() {
 					}
 					ul.style.top = newTop + "px";
 				}
-			}, false);
+			});
+			// 防止选中内容
+			document.body.onselectstart = function() {
+				return false;
+			};
 		},
 		// 重置UI内容
 		resetUI: function() {
@@ -204,7 +246,9 @@ ap.module("ui").requires("utils").defines(function() {
 				this.messageList.innerHTML = "";
 				this.messageCount = 0;
 			}
-
+			// 隐藏弹出的界面
+			this.addClass(this.playerInfo, "hidden");
+			this.addClass(this.systemMenu, "hidden");
 			this.addMessage("欢迎开始冒险~");
 		},
 		// CSS 操作
@@ -247,25 +291,37 @@ ap.module("ui").requires("utils").defines(function() {
 		playScenario: function(scenario) {
 			this.script = scenario.script;
 			if (scenario.needPause) {
-				ap.system.pause();
+				this.pause();
 			}
 			// 显示剧情界面
-			this.removeClass(this.scenario, "hidden");
-			this.addClass(this.main, "hidden");
-			this.addClass(this.gameUI, "hidden");
-
+			this.showUI("scenario");
 			this.callback = scenario.callback || {};
 			this.cur = 0;
+			// 设置背景 
+			if (scenario.background) {
+				if (scenario.background != "canvas") {
+					this.removeClass(this.scenarioBg, "hidden");
+					this.scenarioBg.style.backgroundImage = scenario.background;
+				} else {
+					this.addClass(this.scenarioBg, "hidden");
+				}
+			} else {
+				this.scenarioBg.style.backgroundImage = "";
+				this.removeClass(this.scenarioBg, "hidden");
+			}
 			this.playNext();
 		},
 		// 播放下一句
 		playNext: function() {
 			if (this.cur == this.script.length) {
+				this.scenarioRemoveListener();
+				// 如果之前暂停了的话，恢复游戏
+				this.start();
+				this.showUI("gameUI");
 				// 剧情播放完毕执行回调
 				if (this.callback) {
 					this.callback(this.returnValue);
 				}
-				this.scenarioRemoveListener();
 				return;
 			}
 			var section = this.script[this.cur];
@@ -287,10 +343,6 @@ ap.module("ui").requires("utils").defines(function() {
 			} else {
 				this.lines.innerHTML = "";
 			}
-			// 设置背景  设计保留 暂无合适背景Orz
-			// if (section.background) {
-			// } else {
-			// }
 			// 创建一个选择菜单 并关联监听器
 			if (section.select) {
 				this.removeClass(this.selecter, "hidden");
@@ -348,9 +400,15 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 		// 画面点击新游戏
 		newGame: function() {
-			this.resetUI()
+			this.resetUI();
 			// 触发新开游戏事件
-			ap.mediator.fire("newgame");
+			ap.mediator.fire("newGame");
+		},
+		// 画面点击继续
+		loadGame: function() {
+			this.resetUI();
+			// 触发新开游戏事件
+			ap.mediator.fire("loadGame");
 		},
 		// 显示指定界面
 		showUI: function(name) {
@@ -360,6 +418,13 @@ ap.module("ui").requires("utils").defines(function() {
 					this.removeClass(this[list[i]], "hidden");
 				} else {
 					this.addClass(this[list[i]], "hidden");
+				}
+			}
+			if (name == "main") {
+				if (ap.system.hasLastGame()) {
+					this.removeClass(this.continueGame, "disable");
+				} else {
+					this.addClass(this.continueGame, "disable");
 				}
 			}
 		},
@@ -409,12 +474,15 @@ ap.module("ui").requires("utils").defines(function() {
 			}
 		},
 		// 添加战斗信息
-		addMessage: function(message) {
+		addMessage: function(message, color) {
 			this.messageCount++;
 			// 超出消除
 			if (this.messageCount > 50) {
 				this.messageList.removeChild(this.messageList.children[0]);
 				this.messageCount--;
+			}
+			if (color) {
+				message = "<span style='color:" + color + ";'>" + message + "</span>";
 			}
 			var m = ap.$new("li");
 			m.innerHTML = (new Date()).toTimeString().substr(0, 8) + " " + message;
@@ -424,6 +492,8 @@ ap.module("ui").requires("utils").defines(function() {
 				pHeight = this.messageList.parentNode.offsetHeight;
 			if (height > pHeight) {
 				this.messageList.style.top = pHeight - height + "px";
+			} else {
+				this.messageList.style.top = "0px";
 			}
 		},
 		// 设置特性栏
@@ -512,6 +582,7 @@ ap.module("ui").requires("utils").defines(function() {
 			var node = dom.children[0];
 			// 设置冷却时间
 			node.style.webkitAnimationDuration = cd + "s";
+			node.style.webkitAnimationPlayState = "running";
 			ap.ui.removeClass(node, "playCd");
 			// 使用异步来实现dom的绘制
 			window.setTimeout(function() {
@@ -573,9 +644,41 @@ ap.module("ui").requires("utils").defines(function() {
 			timer.push(t);
 			dom.setAttribute("timer", timer.join(","));
 		},
-		// 暂停菜单
-		showPause : function() {
+		// 游戏暂停
+		pause: function() {
 			ap.system.pause();
+			this.isPause = true;
+			// 技能CD的动画的停止
+			for (var i = 0; i < 5; i++) {
+				var dom = this["skill" + i].children[0];
+				if (dom && this.hasClass(dom, "playCd")) {
+					dom.style.webkitAnimationPlayState = "paused";
+				}
+			}
+		},
+		// 游戏恢复
+		start: function() {
+			if (this.isPause) {
+				ap.system.startLoop();
+				for (var i = 0; i < 5; i++) {
+					var dom = this["skill" + i].children[0];
+					if (dom && this.hasClass(dom, "playCd")) {
+						dom.style.webkitAnimationPlayState = "running";
+					}
+				}
+			}
+		},
+		// 暂停菜单的显示与隐藏
+		showPause: function() {
+			if (this.hasClass(this.systemMenu, "hidden")) {
+				// 暂停游戏 显示菜单
+				this.pause();
+				this.removeClass(this.systemMenu, "hidden");
+			} else {
+				this.addClass(this.systemMenu, "hidden");
+				// 隐藏菜单 继续游戏
+				this.start();
+			}
 		}
 	};
 });

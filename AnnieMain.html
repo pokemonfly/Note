@@ -10,9 +10,9 @@
 
 <body>
     <!-- UI -->
+    <canvas id="canvas" class="ui"></canvas>
     <div id="ui" class="fullscreen hidden">
         <!--主画面-->
-        <canvas id="canvas" class="ui"></canvas>
         <!-- 血条 经验条 护盾-->
         <div id="player" class="ui noborder">
             <div class="middle playerPanel">
@@ -128,10 +128,19 @@
         <!-- 统计 成就 -->
         <div id="achievement" class="ui panel"></div>
         <!-- 系统菜单 -->
-        <div id="system" class="ui panel"></div>
+        <div id="system" class="ui hidden">
+            <div class="mask"></div>
+            <div class="middle pause">
+                <!-- 中断游戏 -->
+                <div id="save"></div>
+                <!-- 返回 -->
+                <div id="returnGame"></div>
+            </div>
+        </div>
     </div>
     <!-- 剧情用 -->
     <div id="scenario" class="fullscreen hidden">
+        <div id="scenarioBg"></div> 
         <img id="close" src="media/ui/close.png" title="跳过剧情"></img>
         <div class="dialog">
             <div class="middle">
@@ -157,8 +166,8 @@
         <div id="title"></div>
         <div id="mainMenu">
             <div class="middle">
-                <a href="#" id="newGame"></a>
-                <a href="#" id="loadGame" class="disable" title="你必须要有一个可用的存档"></a>
+                <div id="newGame"></div>
+                <div id="loadGame" class="disable" title="你必须要有一个可用的存档"></div>
             </div>
         </div>
     </div>
