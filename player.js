@@ -23,6 +23,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 		attackRange: 1,
 		// 技能范围加成
 		skillRange: 1,
+		// 冷却缩短比例
+		cdDown: 0,
 		// 技能方向
 		aim: 0,
 		// 攻击计数
@@ -59,8 +61,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 		shield: 0,
 		// 护盾上限
 		shieldLimit: 0,
-		// 护盾上限加成
-		shieldBonus: 0,
+		// 护盾上限加成比例
+		shieldBonusRate: 1,
 		// 护盾创建时间
 		shieldCreateTimer: null,
 		// 护盾持续时间
@@ -149,7 +151,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 			}
 			// 检查闪避
 			if (Math.random() < this.dodge) {
-				ap.ui.addMessage("闪避" + damage + "伤害。");
+				ap.ui.addMessage(this.name + "闪避" + damage + "伤害。", "#fa4204");
 				return;
 			}
 			// 检查护盾
@@ -171,7 +173,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 				this.life -= damage;
 				ap.ui.setLife(this.life, this.lifeLimit);
 			}
-			ap.ui.addMessage("受到" + damage + "伤害。" + (guardDamage > 0 ? "（" + guardDamage + "吸收)" : ""));
+			ap.ui.addMessage(this.name + "受到" + damage + "伤害。" + (guardDamage > 0 ? "（" + guardDamage + "吸收)" : ""), "#fa4204");
 		},
 
 		// 检查角色护盾的状态
@@ -261,8 +263,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 						this.moveOffset.y = 0;
 					}
 				}
-				this.moveTimer.reset();
+			} else {
+				this.lastMove = 0;
+				this.moveOffset.x = 0;
+				this.moveOffset.y = 0;
 			}
+			this.moveTimer.reset();
 			// 判断玩家动作
 			if (this.moveAim === 0) {
 				this.action = "stand";
@@ -300,12 +306,18 @@ ap.module("player").requires("entity", "image").defines(function() {
 			}
 			// 面板相关
 			if (ap.input.released("character")) {
+				// 刷新角色面板
+				ap.ui.refreshRoleJoho();
 				// 角色面板
 				ap.ui.showRolePanel();
 			}
 			if (ap.input.released("escape")) {
 				// 暂停
 				ap.ui.showPause();
+			}
+			if (ap.input.released("help")) {
+				// 暂停
+				ap.ui.showHelp();
 			}
 
 		},
@@ -317,7 +329,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 				if (s.timer.delta() >= s.coolDown && s.hasPreview) {
 					this.isAimming = true;
 					this.aimmingRad = s.rad;
-					this.aimmingRadius = s.radius;
+					this.aimmingRadius = s.radius * this.attackRange;
 				}
 			} else {
 				throw new Error("_checkSkillAvailable参数不正:" + skillId);
@@ -327,7 +339,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 		getExp: function(num) {
 			num = ~~(num * this.expRate);
 			this.exp += num;
-			ap.ui.addMessage("获得" + num + "经验。");
+			ap.ui.addMessage("获得" + num + "经验。", "#f0ff00");
 			while (this.exp > this.nextLvExp) {
 				this.exp -= this.nextLvExp;
 				// 升级
@@ -352,81 +364,99 @@ ap.module("player").requires("entity", "image").defines(function() {
 		// 升级 获得属性加成
 		levelUp: function() {
 			this.level += 1;
-			ap.ui.addMessage("升级！ " + this.level);
-			ap.ui.addMessage("属性提升：");
+			ap.ui.addMessage("升级！ " + this.level, "#f0ff00");
+			ap.ui.addMessage("属性提升：", "#f0ff00");
 			this.lifeLimit += 50;
-			ap.ui.addMessage("生命上限提高： 50");
+			ap.ui.addMessage("生命上限提高： 50", "#6db7f6");
 			this.power += 10;
-			ap.ui.addMessage("攻击力提高： 10");
+			ap.ui.addMessage("攻击力提高： 10", "#6db7f6");
 			// 获得额外的升级奖励
 			var i = this.levelUpBonusCount;
-			ap.ui.addMessage("额外属性提升：");
+			ap.ui.addMessage("额外属性提升：", "#f0ff00");
 			while (i--) {
 				var select = ~~(Math.random() * 12);
 				switch (select) {
 					case 0:
 						// 攻速奖励
-						this.attackSpeed *= 1.1;
-						ap.ui.addMessage("攻速提升10%");
+						this.attackSpeed += 0.05;
+						ap.ui.addMessage("攻速提升5%", "#6db7f6");
+						this.setCD();
 						break;
 					case 1:
 						// 技能CD减少
-						ap.ui.addMessage("技能冷却时间减少10%");
+						ap.ui.addMessage("技能冷却时间减少5%", "#6db7f6");
+						this.cdDown += 0.05;
+						this.setCD();
 						break;
 					case 2:
 						// 攻击力提高
 						this.power += 10;
-						ap.ui.addMessage("攻击力提高：10");
+						ap.ui.addMessage("攻击力提高：10", "#6db7f6");
 						break;
 					case 3:
 						// 生命上限提高
 						this.lifeLimit += 50;
-						ap.ui.addMessage("生命上限提高：50");
+						ap.ui.addMessage("生命上限提高：50", "#6db7f6");
 						break;
 					case 4:
 						// 暴击
 						this.critical += 0.03;
-						ap.ui.addMessage("暴击几率提升：3%");
+						ap.ui.addMessage("暴击几率提升：3%", "#6db7f6");
 						break;
 					case 5:
 						// 生命吸取
 						this.drainLife += 0.01;
-						ap.ui.addMessage("生命吸取提升：1%");
+						ap.ui.addMessage("生命吸取提升：1%", "#6db7f6");
 						break;
 					case 6:
 						// 攻击射程加成
-						this.attackRange *= 1.1;
-						ap.ui.addMessage("攻击射程增加10%");
+						this.attackRange += 0.05;
+						ap.ui.addMessage("攻击射程增加5%", "#6db7f6");
 						break;
 					case 7:
 						// 技能范围加成
-						this.skillRange *= 1.1;
-						ap.ui.addMessage("技能范围扩大10%");
+						this.skillRange += 0.05;
+						ap.ui.addMessage("技能范围扩大5%", "#6db7f6");
 						break;
 					case 8:
 						// 移动速度
 						this.moveSpeed *= 1.05;
-						ap.ui.addMessage("移动速度提升5%");
+						ap.ui.addMessage("移动速度提升5%", "#6db7f6");
 						break;
 					case 9:
 						// 经验获得速度
 						this.expRate += 0.05;
-						ap.ui.addMessage("经验获得速度提高5%");
+						ap.ui.addMessage("经验获得速度提高5%", "#6db7f6");
 						break;
 					case 10:
 						// 闪避
 						this.dodge += 0.03;
-						ap.ui.addMessage("闪避几率提高3%");
+						ap.ui.addMessage("闪避几率提高3%", "#6db7f6");
 						break;
 					case 11:
 						// 护盾上限加成
-						this.shieldBonus += 50;
-						ap.ui.addMessage("护盾上限加成：50");
+						this.shieldBonus += 0.05;
+						ap.ui.addMessage("护盾加成5%", "#6db7f6");
 						break;
 				}
 			}
 			// 提高下一次升级需要的经验
 			this.nextLvExp += 50;
+		},
+		// 更新技能冷却时间
+		setCD: function() {
+			if (this.cdDown > 0.5) {
+				// 冷却时间减少上限
+				this.cdDown = 0.5;
+			}
+			for (var skillId in this.skills) {
+				var s = this.skills[skillId];
+				if (s._cd) {
+					s.coolDown = s._cd * (1 - this.cdDown);
+				} else {
+					s.coolDown = 1 / this.attackSpeed;
+				}
+			}
 		},
 		// 根据当前动作更新动画
 		_setAnimes: function() {

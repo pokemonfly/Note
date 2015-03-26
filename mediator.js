@@ -32,13 +32,23 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 		},
 		// 攻击  参数：攻击者，目标，伤害值，技能id，附加异常, 是否是反射伤害
 		attack: function(attacker, target, damage, skillId, status, isReflection) {
-			var isDead = false;
+			var isDead = false,
+				isCritical = false;
 			damage = ~~damage;
+			// 检查暴击
+			if (Math.random() < attacker.critical + attacker.criticalBonus) {
+				isCritical = true;
+				damage = ~~(damage * 1.5);
+			}
 			if (!isReflection) {
 				// 通知攻击者伤害成功 如果同时发生吸血和反射，优先吸血
 				attacker.onDamage(damage);
 				// 通知目标受伤
 				isDead = target.onHurt(damage, attacker);
+				if (attacker.type == "player") {
+					ap.ui.addMessage(attacker.name + "的" + skillId + "对" + target.name + "造成" +
+						damage + "伤害。" + (isCritical ? "(暴击）" : ""), "#fa4204");
+				}
 			} else {
 				// 反射攻击没有吸血 并且不会再次反射
 				isDead = target.onHurt(damage, attacker, false);
@@ -103,9 +113,10 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 				while (type == "RARE" && item.own) {
 					r = ~~(Math.random() * ap.config.items[type].length);
 					item = ap.config.items[type][r];
-					this.achieve.rareItemCollect.push(item.name);
+				}
+				if (type == "RARE") {
+					this.achieve.rareItemCollect.push(r);
 					item.own = true;
-					break;
 				}
 			}
 			return item;

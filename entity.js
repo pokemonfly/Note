@@ -102,7 +102,6 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 				this.hurt(damage);
 			} else {
 				this.life -= damage;
-				ap.ui.addMessage("对" + this.name + "造成" + damage + "伤害。");
 			}
 
 			// 检查反射Buff 就算是玩家闪避了攻击也需要反射伤害

@@ -24,6 +24,8 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			ap.ui.showUI("gameUI");
 			ap.game = new ap.Game(difficulty);
 			ap.game.start();
+			// 加载继承要素
+			this.loadUserData(true);
 			this.startLoop();
 		},
 		// 循环播放
@@ -80,11 +82,13 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 					skillRange: p.skillRange,
 					attackCount: p.attackCount,
 					moveSpeed: p.moveSpeed,
+					shieldBonusRate: p.shieldBonusRate,
 					level: p.level,
 					exp: p.exp,
 					nextLvExp: p.nextLvExp,
 					expRate: p.expRate,
-					dodge: p.dodge
+					dodge: p.dodge,
+					cdDown: p.cdDown
 				};
 				saveData.field = {
 					num: f.num
@@ -98,15 +102,35 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 				// 玩家死亡，保存物品 成就信息
 				window.localStorage.setItem("continue", "false");
 			}
+			userData.achievement = {
+				rareItemCollect : ap.achievement.rareItemCollect
+			};
 			window.localStorage.setItem("userData", JSON.stringify(userData));
 			// 游戏结束，暂停
 			this.pause();
 			ap.ui.showUI("main");
 		},
+		// 加载可继承要素的存档  isNew 是否是新开游戏
+		loadUserData: function(isNew) {
+			var userData = JSON.parse(window.localStorage.getItem("userData"));
+			if (userData) {
+				var achieve = ap.achievement;
+				achieve.rareItemCollect = userData.achievement.rareItemCollect;
+				// 稀有物品加载
+				for (var i = 0; i < achieve.rareItemCollect.length; i ++) {
+					var id = achieve.rareItemCollect[i],
+					item = ap.config.items["RARE"][id];
+					// 标记拥有
+					item.own = true;
+					if (isNew || !item.once) {
+						item.effect();
+					}
+				}
+			}
+		},
 		// 加载上次保存的游戏
 		loadGame: function() {
-			var saveData = JSON.parse(window.localStorage.getItem("saveData")),
-				userData = JSON.parse(window.localStorage.getItem("userData"));
+			var saveData = JSON.parse(window.localStorage.getItem("saveData"));
 			// 显示游戏界面
 			ap.ui.showUI("gameUI");
 			ap.game = new ap.Game(saveData.game.difficulty);
@@ -131,7 +155,9 @@ ap.module("system").requires("ui", "mediator", "config", "input", "timer").defin
 			ap.ui.setExpUI(p.exp, p.nextLvExp);
 			// 区域特性显示内容
 			ap.ui.setFeature(ap.field.num, ap.field.isRare, ap.field.features, ap.field.leaveKill);
-			// TODO
+			// 加载继承要素
+			this.loadUserData(false);
+			// 开始游戏
 			this.startLoop();
 		}
 	};

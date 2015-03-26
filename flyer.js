@@ -5,7 +5,8 @@ ap.module("flyer").requires("entity").defines(function() {
 		type: null,
 		// 威力
 		power: 0,
-
+		// 技能名
+		name : null,
 		// 自动瞄准
 		autoFocus: false,
 		// 目标 - 自动瞄准用
@@ -21,7 +22,7 @@ ap.module("flyer").requires("entity").defines(function() {
 		// 位置
 		pos: null,
 		// 移动速度 
-		moveSpeed: 500,
+		moveSpeed: 300,
 		// 角色移动方向 弧度
 		moveAim: 0,
 		// 本次移动的位置偏移量
@@ -29,15 +30,11 @@ ap.module("flyer").requires("entity").defines(function() {
 		// 碰撞体积 半径
 		radius: 30,
 		// 附加异常状态
-		status: [],
-		// 异常附加概率
-		probability: 0,
+		status: null,
 		// 爆炸威力
 		explosionPower: 0,
 		// 爆炸范围
-		explosionRange: 100,
-		// 爆炸附加异常状态
-		explosionStatus: [],
+		explosionRange: 50,
 		// 图像角度
 		angle: 0,
 
@@ -74,7 +71,27 @@ ap.module("flyer").requires("entity").defines(function() {
 		// 消灭时
 		onKill: function() {
 			this.parent();
-
+			// 自带爆炸效果
+			if (this.explosionPower > 0) {
+				// 产生一次爆炸 
+				ap.game.createArea({
+					name: this.name + "爆炸",
+					duration: 0.3,
+					owner: this.owner,
+					power: this.explosionPower,
+					pos: {
+						x: this.pos.x,
+						y: this.pos.y
+					},
+					radius: this.explosionRange,
+					status: this.status,
+					coolDown: 0.2,
+					animSheet: new ap.Image("media/ui/explosion.png", {
+						x: 80,
+						y: 67
+					})
+				});
+			}
 		},
 
 		update: function() {

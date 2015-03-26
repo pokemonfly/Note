@@ -12,6 +12,7 @@ ap.module("input").defines(function() {
 		'B': 66,
 		'Y': 89,
 		'C': 67,
+		'H': 72,
 		'SPACE': 32,
 		'LEFT': 37,
 		'UP': 38,
@@ -141,6 +142,8 @@ ap.module("input").defines(function() {
 		'C': 'character',
 		// 面板：中断退出
 		'ESC': 'escape',
+		// 帮助
+		'H': 'help',
 		// 不使用鼠标的操作
 		'SPACE': 'attack2',
 		// 角色移动

@@ -59,7 +59,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 					// 每次强化援军数目增加幅度
 					monstersPlusUpd: 0.8,
 					// 怪物强度
-					strength: 1.2,
+					strength: 1.5,
 					// 区域强化间隔数
 					updateNum: 6,
 					// 稀有区域概率
@@ -87,7 +87,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 					// 每次强化援军数目增加幅度
 					monstersPlusUpd: 1,
 					// 怪物强度
-					strength: 1.5,
+					strength: 2,
 					// 区域强化间隔数
 					updateNum: 7,
 					// 稀有区域概率
@@ -103,27 +103,35 @@ ap.module("config").requires("image", "animation").defines(function() {
 				skill: ["pyromania", "disintegrate", "incinerate", "moltenShield"],
 				animsSet: {
 					"stand": new ap.Animation(
-						new ap.Image("media/sprites/annie.png", {
-							x: 75,
+						new ap.Image("media/sprites/annieStand.png", {
+							x: 77,
 							y: 195
 						})
 					),
 					"move": new ap.Animation(
-						[new ap.Image("media/sprites/annie.png", {
-								x: 75,
+						[new ap.Image("media/sprites/annieStand.png", {
+								x: 77,
 								y: 195
 							}),
-							new ap.Image("media/sprites/annie1.png", {
+							new ap.Image("media/sprites/annieMove1.png", {
+								x: 92,
+								y: 195
+							}),
+							new ap.Image("media/sprites/annieStand.png", {
+								x: 77,
+								y: 195
+							}),
+							new ap.Image("media/sprites/annieMove2.png", {
 								x: 75,
 								y: 195
 							})
-						], 0.5),
+						], 0.2),
 					"attack": new ap.Animation(
-						[new ap.Image("media/sprites/annie1.png", {
-								x: 75,
+						[new ap.Image("media/sprites/annieStand.png", {
+								x: 77,
 								y: 195
 							}),
-							new ap.Image("media/sprites/annie2.png", {
+							new ap.Image("media/sprites/annieAttack.png", {
 								x: 75,
 								y: 195
 							})
@@ -143,6 +151,8 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.5,
 			radius: 30,
+			lifeUp: 40,
+			powerUp: 5,
 			animSheet: new ap.Image("media/ui/plant1.png")
 		}, {
 			name: "投掷型杂草·II",
@@ -155,6 +165,8 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.25,
 			radius: 25,
+			lifeUp: 40,
+			powerUp: 4,
 			animSheet: new ap.Image("media/ui/plant2.png")
 		}, {
 			name: "格斗型杂草·I",
@@ -167,6 +179,8 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.5,
 			radius: 30,
+			lifeUp: 50,
+			powerUp: 8,
 			animSheet: new ap.Image("media/ui/plant3.png")
 		}, {
 			name: "格斗型杂草·II",
@@ -179,10 +193,12 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.75,
 			radius: 30,
+			lifeUp: 45,
+			powerUp: 7,
 			animSheet: new ap.Image("media/ui/plant4.png")
 		}],
 		bosses: [{
-			name: "[精锐]投掷型杂草·I",
+			name: "精锐投掷型杂草·I",
 			skill: ["throwing"],
 			breed: "plant",
 			life: 400,
@@ -192,9 +208,11 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.5,
 			radius: 30,
+			lifeUp: 50,
+			powerUp: 7,
 			animSheet: new ap.Image("media/ui/plant1G.png")
 		}, {
-			name: "[精锐]投掷型杂草·II",
+			name: "精锐投掷型杂草·II",
 			skill: ["throwing"],
 			breed: "plant",
 			life: 420,
@@ -204,9 +222,11 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.25,
 			radius: 25,
+			lifeUp: 40,
+			powerUp: 7,
 			animSheet: new ap.Image("media/ui/plant2G.png")
 		}, {
-			name: "[精锐]格斗型杂草·I",
+			name: "精锐格斗型杂草·I",
 			skill: ["fight"],
 			breed: "plant",
 			life: 450,
@@ -216,9 +236,11 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.5,
 			radius: 30,
+			lifeUp: 80,
+			powerUp: 10,
 			animSheet: new ap.Image("media/ui/plant3G.png")
 		}, {
-			name: "[精锐]格斗型杂草·II",
+			name: "精锐格斗型杂草·II",
 			skill: ["fight"],
 			breed: "plant",
 			life: 500,
@@ -228,21 +250,24 @@ ap.module("config").requires("image", "animation").defines(function() {
 			hateRadius: 800,
 			attackSpeed: 0.75,
 			radius: 30,
+			lifeUp: 60,
+			powerUp: 7,
 			animSheet: new ap.Image("media/ui/plant4G.png")
 		}],
 		// 稀有区域的专属怪物
 		rareMonster: [{
-			name: "[特殊]时空奇点",
+			name: "时空奇点",
 			skill: ["portal"],
 			breed: "portal",
 			life: 2500,
-			exp: 1000,
+			exp: 1,
 			power: 0,
 			// 不需要移动
 			attackRadius: 9999,
 			hateRadius: 400,
 			attackSpeed: 0.08,
 			radius: 80,
+			lifeUp: 300,
 			animSheet: new ap.Image("media/ui/portal.png", {
 				x: 84,
 				y: 187
@@ -317,57 +342,71 @@ ap.module("config").requires("image", "animation").defines(function() {
 			// 稀有道具 只能获得一次，计入成就，可以继承
 			"RARE": [{
 				name: "蜂刺",
-				description: "攻击速度增加",
+				description: "攻击速度增加50%",
+				// 恢复游戏时属性已经被修改过，不需要重复设置
+				once: true,
 				effect: function() {
-					ap.game.player.attackSpeed = 1.6;
+					ap.game.player.attackSpeed += 0.5;
+					ap.game.player.setCD();
 				}
 			}, {
 				name: "魔宗",
-				description: "所有攻击射程增加",
+				description: "所有攻击射程增加30%",
+				once: true,
 				effect: function() {
-					ap.game.player.attackRange = 1.2;
+					ap.game.player.attackRange += 0.3;
 				}
 			}, {
 				name: "智慧末刃",
-				description: "技能范围加大",
+				description: "技能范围加大50%",
+				once: true,
 				effect: function() {
-					ap.game.player.skillRange = 1.2;
+					ap.game.player.skillRange += 0.5;
 				}
 			}, {
 				name: "黯炎火炬",
-				description: "普通攻击附带爆炸",
+				description: "火球攻击附带爆炸效果",
 				effect: function() {
-
+					var s = ap.game.player.skills["pyromania"];
+					s.status = ["explosion"];
+					s = ap.game.player.skills["disintegrate"];
+					s.status = ["explosion"];
 				}
 			}, {
 				name: "轻灵之靴",
-				description: "移动速度加快",
+				description: "移动速度提高50",
+				once: true,
 				effect: function() {
 					ap.game.player.moveSpeed += 50;
 				}
 			}, {
 				name: "日炎斗篷",
-				description: "护盾吸收效果加强",
+				description: "护盾吸收效果提高50%",
+				once: true,
 				effect: function() {
-
+					ap.game.player.shieldBonusRate += 0.5;
 				}
 			}, {
 				name: "幽梦之灵",
-				description: "物品掉落提高",
+				description: "物品掉落提高一倍",
+				once: true,
 				effect: function() {
 					ap.game.dropRate *= 2;
 				}
 			}, {
 				name: "时光之杖",
-				description: "击杀后恢复效果提高",
+				description: "攻击的生命吸取效果提高20%",
+				once: true,
 				effect: function() {
-
+					ap.game.player.drainLife += 0.2;
 				}
 			}, {
 				name: "燃烧宝石",
-				description: "技能冷却缩减",
+				description: "技能冷却缩减20%",
+				once: true,
 				effect: function() {
-
+						ap.game.player.cdDown += 0.2;
+						ap.game.player.setCD();
 					}
 					// }, {
 					// 	name: "冰霜之心",
@@ -389,13 +428,15 @@ ap.module("config").requires("image", "animation").defines(function() {
 				}
 			}, {
 				name: "双生暗影",
-				description: "普通攻击小几率附加毒伤",
+				description: "普通攻击小几率附加毒焰伤害",
 				effect: function() {
-
+					var s = ap.game.player.skills["pyromania"];
+					s.status = ["poison"];
 				}
 			}, {
 				name: "女神之泪",
-				description: "经验获得速度加快",
+				description: "经验获得速度提高50%",
+				once: true,
 				effect: function() {
 					ap.game.player.expRate += 0.5;
 				}

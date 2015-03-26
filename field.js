@@ -63,14 +63,14 @@ ap.module("field").requires("feature").defines(function() {
 			for (i = 0; i < this.monstersAmount; i++) {
 				// 获得一个随机的怪物
 				m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
-				m.pos = ap.collision.getRandomPos(m.radius);
+				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 0;
 				this.monsters.push(m);
 			}
 			// 生成boss
 			for (i = 0; i < this.bossAmount; i++) {
 				m = new ap.Monster(ap.config.bosses[~~(Math.random() * ap.config.bosses.length)]);
-				m.pos = ap.collision.getRandomPos(m.radius);
+				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 1;
 				this.bosses.push(m);
 			}
@@ -81,7 +81,7 @@ ap.module("field").requires("feature").defines(function() {
 			if (this.isRare) {
 				// 添加特殊怪兽
 				m = new ap.Monster(ap.config.rareMonster[0]);
-				m.pos = ap.collision.getRandomPos(m.radius);
+				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 2;
 				this.monsters.push(m);
 			}
@@ -96,7 +96,7 @@ ap.module("field").requires("feature").defines(function() {
 			var i, m;
 			for (i = 0; i <= this.monstersPlus; i++) {
 				m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
-				m.pos = ap.collision.getRandomPos(m.radius);
+				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 0;
 				this.monsters.push(m);
 			}
@@ -114,13 +114,13 @@ ap.module("field").requires("feature").defines(function() {
 			try {
 				for (i = 1; i <= monstersCount; i++) {
 					m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
-					m.pos = ap.collision.getRandomPos(m.radius, posX, posY, posRadius);
+					m.pos = ap.collision.getRandomPosInArea(m.radius, posX, posY, posRadius);
 					m.rank = 0;
 					this.monsters.push(m);
 				}
 				for (i = 1; i <= bossesCount; i++) {
 					m = new ap.Monster(ap.config.bosses[~~(Math.random() * ap.config.bosses.length)]);
-					m.pos = ap.collision.getRandomPos(m.radius, posX, posY, posRadius);
+					m.pos = ap.collision.getRandomPosInArea(m.radius, posX, posY, posRadius);
 					m.rank = 1;
 					this.bosses.push(m);
 				}

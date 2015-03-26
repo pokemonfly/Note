@@ -13,7 +13,7 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		// 生命上限
 		lifeLimit: 100,
 		// 生命成长
-		lifeUp: 20,
+		lifeUp: 40,
 		// 攻击力
 		power: 10,
 		// 攻击成长
@@ -75,6 +75,10 @@ ap.module("monster").requires("entity", "image").defines(function() {
 		},
 		// 用强度强化怪兽
 		buff: function() {
+			// 匹配玩家等级
+			this.lifeLimit += ap.game.player.level * this.lifeUp;
+			this.life = this.lifeLimit;
+			this.power += ap.game.player.level * this.powerUp;
 			// 强度大于1才需要强化
 			if (this.strength > 1) {
 				this.lifeLimit = ~~(this.lifeLimit * this.strength);
@@ -82,10 +86,6 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				this.power = ~~(this.power * this.strength);
 				this.hateRadius = this.hateRadius * this.strength;
 			}
-			// 匹配玩家等级
-			this.lifeLimit += ap.game.player.level * this.lifeUp;
-			this.life = this.lifeLimit;
-			this.power += ap.game.player.level  * this.powerUp;
 		},
 		// 警觉 如果警惕范围内有玩家目标，则加入仇恨列表
 		vigilance: function() {
@@ -133,8 +133,8 @@ ap.module("monster").requires("entity", "image").defines(function() {
 				this.moveTimer = new ap.Timer();
 			}
 			this.aim = ap.utils.getRad(this.pos, this.target.pos);
-			// 当前可以移动的长度
-			if (this.needMove) {
+			// 当前可以移动的长度   未定身的话
+			if (this.needMove && !this.isImmobilize) {
 				this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
 			} else {
 				this.lastMove = 0;

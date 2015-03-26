@@ -7,10 +7,19 @@ ap.module("collision").defines(function() {
 		init: function() {
 			this.border = ap.game.fieldSize;
 		},
-		// 找出一个随机坐标，可以放置新对象 参数 碰撞体积半径 posX posY  posRadius:指定位置的范围内
-		getRandomPos: function(radius, posX, posY, posRadius) {
-			var pos = null, 
+		// 找出一个随机坐标 全屏范围 extraList 额外检查对象 生成中的对象，未加入游戏区域
+		getRandomPos: function(radius, extraList) {
+			return this._getRandomPos(radius, null, null, null, extraList);
+		},
+		// 找出一个随机坐标 在一个局域内
+		getRandomPosInArea: function(radius, posX, posY, posRadius) {
+			return this._getRandomPos(radius, posX, posY, posRadius);
+		},
+		// 找出一个随机坐标，可以放置新对象 参数 碰撞体积半径 posX posY  posRadius:指定位置的范围内 extraList 额外检查对象
+		_getRandomPos: function(radius, posX, posY, posRadius, extraList) {
+			var pos = null,
 				counter = 0;
+			extraList = extraList || [];
 			if (posX === undefined) {
 				// 未指定范围的话是全屏
 				pos = {
@@ -23,10 +32,10 @@ ap.module("collision").defines(function() {
 					y: ~~(Math.random() * posRadius * 2 + posY - posRadius),
 				};
 			}
-			while (this._checkCollision(pos, radius).length > 0 || !this._checkBorder(pos, radius)) {
+			while (this._checkCollision(pos, radius, null, null, null, extraList).length > 0 || !this._checkBorder(pos, radius)) {
 				pos.x = ~~(Math.random() * this.border.x);
 				pos.y = ~~(Math.random() * this.border.y);
-				counter ++;
+				counter++;
 				if (counter > 1000) {
 					throw new Error("目标范围无空间");
 				}
@@ -65,7 +74,7 @@ ap.module("collision").defines(function() {
 						if (target.type !== current.type) {
 							ap.mediator.attack(current.owner, target, current.power, current.name, current.status);
 							// 碰撞后消灭
-							current.isKilled = true;
+							current.onKill();
 						}
 					});
 				}
@@ -121,13 +130,15 @@ ap.module("collision").defines(function() {
 				return this._tryToMove(current, count);
 			}
 		},
-		// 判断指定点和半径 是否与其他实体有交集 并返回有交集的实体列表 cursor:当前正在检查的目标 aimS aimE 扇形的话，2个角度
-		_checkCollision: function(pos, radius, cursor, aimS, aimE) {
+		// 判断指定点和半径 是否与其他实体有交集 并返回有交集的实体列表 cursor:当前正在检查的目标 aimS aimE 扇形的话，2个角度 extraList 额外需要检查的对象
+		_checkCollision: function(pos, radius, cursor, aimS, aimE, extraList) {
 			var current = null,
 				distance = 0,
-				result = [];
-			for (var i = 0, l = ap.game.entities.length; i < l; i++) {
-				current = ap.game.entities[i];
+				result = [],
+				checkList = ap.game.entities.concat(extraList || []);
+
+			for (var i = 0, l = checkList.length; i < l; i++) {
+				current = checkList[i];
 				if (current === cursor) {
 					continue;
 				}

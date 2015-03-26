@@ -7,7 +7,7 @@ ap.module("skill").requires("utils").defines(function() {
 			id: "pyromania",
 			name: "嗜火",
 			icon: "media/ui/Pyromania.png",
-			description: "普通攻击。\n被动效果：每进行4个攻击后，安妮的下一次伤害就会对目标造成短暂的定身效果。",
+			description: "普通攻击。\n被动效果：每4次攻击后，安妮的下一次伤害就会对目标造成短暂的定身效果。",
 			coolDown: 0,
 			caster: null,
 			// 技能范围
@@ -16,15 +16,32 @@ ap.module("skill").requires("utils").defines(function() {
 			hasPreview: false,
 			// 施法 参数：方向
 			cast: function() {
-				var status = [];
+				var status = [],
+					power = this.caster.power + this.caster.powerBonus,
+					explosionPower = 0;
+
+				if (this.status) {
+					for (var i = 0; i < this.status.length; i++) {
+						if (this.status[i] == "poison") {
+							status.push(ap.status.createStatus("poison", "毒焰", this.caster, (this.caster.power + this.caster.powerBonus) * 0.1,
+								4, 1, 0.2));
+						}
+						if (this.status[i] == "explosion") {
+							explosionPower = power * 0.3;
+						}
+					}
+				}
 				this.caster.attackCount += 1;
 				if (this.caster.attackCount >= 5) {
 					this.caster.attackCount = 0;
+					status.push(ap.status.createStatus("immobilize", "被动效果", this.caster, 0,
+						2, 0.1));
 				}
 				// 创造火球投射物
 				ap.game.createFlyer({
+					name: "嗜火",
 					// 技能伤害
-					power: this.caster.power + this.caster.powerBonus,
+					power: power,
 					// 火球持续时间 s
 					duration: 3,
 					owner: this.caster,
@@ -33,6 +50,10 @@ ap.module("skill").requires("utils").defines(function() {
 					status: status,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
 					moveAim: this.caster.aim,
+					// 爆炸效果
+					explosionPower: explosionPower,
+					explosionRange: 80 * this.caster.skillRange,
+					moveSpeed: 500,
 					anims: new ap.Animation([
 						new ap.Image("media/sprites/fireball.png", {
 							x: 65,
@@ -63,27 +84,44 @@ ap.module("skill").requires("utils").defines(function() {
 			caster: null,
 			// 技能范围
 			radius: 900,
+			scale: 1.5,
 			// 需要技能指向预览
 			hasPreview: true,
 			// 施法 参数：方向
 			cast: function() {
-				var status = [];
+				var status = [],
+					power = (this.caster.power + this.caster.powerBonus) * this.scale,
+					explosionPower = 0;
 				this.caster.attackCount += 1;
 				if (this.caster.attackCount >= 5) {
 					this.caster.attackCount = 0;
+					status.push(ap.status.createStatus("immobilize", "被动效果", this.caster, 0,
+						2, 0.1));
+				}
+				if (this.status) {
+					for (var i = 0; i < this.status.length; i++) {
+						if (this.status[i] == "explosion") {
+							explosionPower = power * 0.3;
+						}
+					}
 				}
 				// 创造火球投射物
 				ap.game.createFlyer({
+					name: "碎裂之火",
 					// 技能伤害
-					power: (this.caster.power + this.caster.powerBonus) * 1.5,
+					power: power,
 					// 火球持续时间 s
 					duration: 3,
 					owner: this.caster,
 					// 火球大小
-					radius: 30,
+					radius: 45,
 					status: status,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
 					moveAim: this.caster.aim,
+					// 爆炸效果
+					explosionPower: explosionPower,
+					explosionRange: 100 * this.caster.skillRange,
+					moveSpeed: 500,
 					anims: new ap.Animation([
 						new ap.Image("media/sprites/fireballBig.png", {
 							x: 130,
@@ -115,18 +153,21 @@ ap.module("skill").requires("utils").defines(function() {
 			// 技能施法角度
 			rad: 75 * Math.PI / 180,
 			// 技能伤害倍率
-			scale: 3,
+			scale: 2,
 			// 技能范围
 			radius: 450,
 			hasPreview: true,
 			// 抬起按键时释放
 			cast: function() {
 				var status = [];
-				// 创造一个在0.1s内只有一跳伤害的dot
-				// status.push(ap.status.createStatus("burn", "incinerate", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
-				// 	0.1, 0.1));
-				// 区域也是只存在0.1s 在0.06s后，区域的目标将被附加dot
+				this.caster.attackCount += 1;
+				if (this.caster.attackCount >= 5) {
+					this.caster.attackCount = 0;
+					status.push(ap.status.createStatus("immobilize", "被动效果", this.caster, 0,
+						2, 0.1));
+				}
 				ap.game.createArea({
+					name: "焚烧",
 					power: (this.caster.power + this.caster.powerBonus) * this.scale,
 					duration: 0.3,
 					owner: this.caster,
@@ -134,7 +175,7 @@ ap.module("skill").requires("utils").defines(function() {
 						x: this.caster.pos.x,
 						y: this.caster.pos.y
 					},
-					radius: this.radius,
+					radius: this.radius * this.caster.attackRange,
 					status: status,
 					aimS: this.caster.aim - this.caster.aimmingRad / 2,
 					aimE: this.caster.aim + this.caster.aimmingRad / 2,
@@ -157,9 +198,10 @@ ap.module("skill").requires("utils").defines(function() {
 			scale: 0.3,
 			// 抬起按键时释放
 			cast: function() {
+				this.caster.attackCount += 1;
 				// 为施法者添加护盾
 				this.caster.hasShield = true;
-				this.caster.shield = ~~(this.caster.lifeLimit * this.scale);
+				this.caster.shield = ~~(this.caster.lifeLimit * this.scale * this.caster.shieldBonusRate);
 				this.caster.shieldLimit = this.caster.shield;
 				this.caster.shieldDuration = 15;
 				this.caster.shieldCreateTimer = new ap.Timer();
@@ -221,7 +263,7 @@ ap.module("skill").requires("utils").defines(function() {
 				});
 			}
 		},
-		portal : {
+		portal: {
 			id: "portal",
 			name: "时空奇点专属攻击",
 			description: null,
@@ -323,6 +365,10 @@ ap.module("skill").requires("utils").defines(function() {
 		// 如果冷却未设定，则用未角色的攻击速度来设定
 		if (newSkill.coolDown === 0) {
 			newSkill.coolDown = 1 / caster.attackSpeed;
+			newSkill._cd = 0;
+		} else {
+			// _cd 记录技能本来的冷却时间
+			newSkill._cd = newSkill.coolDown;
 		}
 		// 初始化时，追加属性 冷却用的计时器
 		newSkill.timer = new ap.Timer(newSkill.coolDown);

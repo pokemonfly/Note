@@ -249,6 +249,7 @@ ap.module("ui").requires("utils").defines(function() {
 			// 隐藏弹出的界面
 			this.addClass(this.playerInfo, "hidden");
 			this.addClass(this.systemMenu, "hidden");
+			this.setShield(0);
 			this.addMessage("欢迎开始冒险~");
 		},
 		// CSS 操作
@@ -679,6 +680,9 @@ ap.module("ui").requires("utils").defines(function() {
 				// 隐藏菜单 继续游戏
 				this.start();
 			}
+		},
+		showHelp: function() {
+			ap.mediator.fire("help");
 		}
 	};
 });

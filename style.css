@@ -1,6 +1,8 @@
-html, body, .fullscreen, #canvas {
+html, body, .fullscreen, #canvas, dl, dd {
     margin: 0;
     padding: 0;
+}
+html, body, .fullscreen, #canvas {
     width: 100%;
     height: 100%;
 }
@@ -344,19 +346,25 @@ canvas {
 #roleInfo {
     float: left;
     color: white;
-}
-#roleInfo > p {
-    margin: 0;
+    width: 160px;
 }
 .annieImage {
     background: url("media/ui/annieImage.jpg");
     background-size: 100% 100%;
 }
-table {
-    width: 160px;
+dt {
+    text-align: center;
+    margin: 1px auto;
+    font-weight: bold;
 }
-td:last-child {
-    text-align: right;
+dl {
+    padding: 2px;
+}
+dd {
+    display: inline;
+}
+dd:last-child {
+    float: right;
 }
 /*统计*/
 #achievement {
