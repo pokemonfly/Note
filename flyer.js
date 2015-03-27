@@ -53,6 +53,7 @@ ap.module("flyer").requires("entity").defines(function() {
 			if (this.autoFocus) {
 				// 追踪型
 				this.moveAim = ap.utils.getRad(this.pos, this.target.pos);
+				this.angle = this.moveAim;
 			}
 			// 计算出此次可以移动的距离
 			this.lastMove = this.moveTimer.delta() * this.moveSpeed;

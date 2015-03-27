@@ -102,6 +102,23 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			this.isUnLock = false;
 			this.leaveKillCount = ap.field.leaveKill;
 		},
+		// 添加怪物
+		addMonster: function(m) {
+			this.entities = this.entities.concat(m);
+			this.monsterCount += (m instanceof Array ? m.length : 1);
+		},
+		// 获得当前场景中的怪兽 怪物类型： 0 普通 1精英
+		getCurrentMonster: function(rank) {
+			var monster = [],
+				entity = null;
+			for (var i = 0; i < this.entities.length; i++) {
+				entity = this.entities[i];
+				if (entity instanceof ap.Monster ||entity.rank == rank)  {
+					monster.push(entity);
+				}
+			}
+			return monster;
+		},
 		run: function() {
 			this.update();
 			this.draw();
@@ -224,8 +241,9 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			// 场上怪物数不够的话
 			if (!this.isUnLock && this.monsterCount < ap.field.monstersPlus) {
 				var append = ap.field.appendMonster();
-				this.entities = this.entities.concat(append);
-				this.monsterCount += append.length;
+				// this.entities = this.entities.concat(append);
+				// this.monsterCount += append.length;
+				this.addMonster(append);
 				ap.ui.addMessage("怪物倒下的悲鸣吸引了更多怪物出现。");
 			}
 		},

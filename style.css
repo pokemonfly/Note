@@ -166,6 +166,10 @@ canvas {
     margin: 0 5px;
     outline: 2px solid gray;
 }
+.skillLock {
+    background-position-x: 0px !important;
+    background-position-y: 0px !important;
+}
 /* 技能冷却用*/
 .cooldown {
     background: url("media/ui/cooldown.png") no-repeat;

@@ -326,7 +326,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 			var s = this.skills[skillId];
 			if (s) {
 				// 检查技能是否可用 
-				if (s.timer.delta() >= s.coolDown && s.hasPreview) {
+				if (s.timer.delta() >= s.coolDown && s.hasPreview && s.isReady) {
 					this.isAimming = true;
 					this.aimmingRad = s.rad;
 					this.aimmingRadius = s.radius * this.attackRange;
@@ -443,21 +443,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 			// 提高下一次升级需要的经验
 			this.nextLvExp += 50;
 		},
-		// 更新技能冷却时间
-		setCD: function() {
-			if (this.cdDown > 0.5) {
-				// 冷却时间减少上限
-				this.cdDown = 0.5;
-			}
-			for (var skillId in this.skills) {
-				var s = this.skills[skillId];
-				if (s._cd) {
-					s.coolDown = s._cd * (1 - this.cdDown);
-				} else {
-					s.coolDown = 1 / this.attackSpeed;
-				}
-			}
-		},
+
 		// 根据当前动作更新动画
 		_setAnimes: function() {
 			if (!this.anims || (this.action != this.anims.name && this.anims.end())) {

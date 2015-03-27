@@ -86,6 +86,10 @@ ap.module("collision").defines(function() {
 						collisionList.forEach(function(target) {
 							if (target.type !== current.type) {
 								ap.mediator.attack(current.owner, target, current.power, current.name, current.status);
+								// 如果是一次性的陷阱
+								if (current.once) {
+									current.onKill();
+								}
 							}
 						});
 					} else {

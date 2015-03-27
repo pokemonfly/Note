@@ -58,20 +58,25 @@ ap.module("field").requires("feature").defines(function() {
 			this._setFeature();
 			// 设置当前区域是否为稀有
 			this.isRare = (Math.random() < this.rare);
-			var i, m;
+			var i, m, id;
 			// 生成怪兽
 			for (i = 0; i < this.monstersAmount; i++) {
 				// 获得一个随机的怪物
-				m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
+				id = ~~(Math.random() * ap.config.monsters.length);
+				m = new ap.Monster(ap.config.monsters[id]);
 				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 0;
+				// 保留id，复制怪物用
+				m._id = id;
 				this.monsters.push(m);
 			}
 			// 生成boss
 			for (i = 0; i < this.bossAmount; i++) {
-				m = new ap.Monster(ap.config.bosses[~~(Math.random() * ap.config.bosses.length)]);
+				id = ~~(Math.random() * ap.config.bosses.length);
+				m = new ap.Monster(ap.config.bosses[id]);
 				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 1;
+				m._id = id;
 				this.bosses.push(m);
 			}
 			// 执行特性 强化场景
@@ -93,11 +98,14 @@ ap.module("field").requires("feature").defines(function() {
 		// 添加援军
 		appendMonster: function() {
 			this.monsters = [];
-			var i, m;
+			this.bosses = [];
+			var i, m, id;
 			for (i = 0; i <= this.monstersPlus; i++) {
-				m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
+				id = ~~(Math.random() * ap.config.monsters.length)
+				m = new ap.Monster(ap.config.monsters[id]);
 				m.pos = ap.collision.getRandomPos(m.radius, this.monsters.concat(this.bosses));
 				m.rank = 0;
+				m._id = id;
 				this.monsters.push(m);
 			}
 			// 执行特性 强化场景
@@ -110,18 +118,22 @@ ap.module("field").requires("feature").defines(function() {
 		portalMonster: function(posX, posY, posRadius, monstersCount, bossesCount) {
 			this.monsters = [];
 			this.bosses = [];
-			var i, m;
+			var i, m, id;
 			try {
 				for (i = 1; i <= monstersCount; i++) {
-					m = new ap.Monster(ap.config.monsters[~~(Math.random() * ap.config.monsters.length)]);
+					id = ~~(Math.random() * ap.config.monsters.length)
+					m = new ap.Monster(ap.config.monsters[id]);
 					m.pos = ap.collision.getRandomPosInArea(m.radius, posX, posY, posRadius);
 					m.rank = 0;
+					m._id = id;
 					this.monsters.push(m);
 				}
 				for (i = 1; i <= bossesCount; i++) {
-					m = new ap.Monster(ap.config.bosses[~~(Math.random() * ap.config.bosses.length)]);
+					id = ~~(Math.random() * ap.config.bosses.length);
+					m = new ap.Monster(ap.config.bosses[id]);
 					m.pos = ap.collision.getRandomPosInArea(m.radius, posX, posY, posRadius);
 					m.rank = 1;
+					m._id = id;
 					this.bosses.push(m);
 				}
 			} catch (e) {

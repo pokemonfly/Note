@@ -21,6 +21,8 @@ ap.module("area").requires("entity", "image").defines(function() {
 		// 如果是扇形的话，需要2个角度
 		aimS: null,
 		aimE: null,
+		// 是否是一次性
+		once: false,
 		// 附加异常状态
 		status: [],
 		// 异常附加概率
@@ -48,6 +50,9 @@ ap.module("area").requires("entity", "image").defines(function() {
 			this.angle = this.aimS ? (this.aimS + this.aimE) / 2 : 0;
 		},
 		update: function() {
+			if (this.anims) {
+				this.anims.update();
+			}
 			// 超时后消失
 			if (this.duration < this.durationTimer.delta()) {
 				this.onKill();

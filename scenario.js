@@ -112,7 +112,7 @@ ap.module("scenario").requires("ui").defines(function() {
 		name: "lv6",
 		description: "角色提升到6级时，遇到熊，击败后获得技能",
 		trigger: function() {
-			if (ap.game.player.level == 6 && !this.disabled) {
+			if (ap.game.player.level == 6 && ap.field.num > 3 && !this.disabled) {
 				this.run();
 				this.disabled = true;
 			}

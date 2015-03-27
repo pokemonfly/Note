@@ -683,6 +683,13 @@ ap.module("ui").requires("utils").defines(function() {
 		},
 		showHelp: function() {
 			ap.mediator.fire("help");
+		},
+		setSkillStatus: function(dom, isReady) {
+			if (isReady) {
+				this.removeClass(dom.children[0], "skillLock");
+			} else {
+				this.addClass(dom.children[0], "skillLock");
+			}
 		}
 	};
 });

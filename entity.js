@@ -10,7 +10,8 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 		powerBonus: 0,
 		// 暴击加成
 		criticalBonus: 0,
-
+		// 冷却缩短比例
+		cdDown: 0,
 		// 移动速度 每秒移动像素
 		moveSpeed: 100,
 		// 移动速度奖励
@@ -26,8 +27,6 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 		isReflection: false,
 		// 是否死亡
 		isKilled: false,
-		// 是否在被干扰
-		isJam: false,
 
 		// 初始化
 		init: function(property) {
@@ -50,7 +49,7 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 		useSkill: function(skill) {
 			var s = this.skills[skill];
 			// 检查Cooldown
-			if (s.timer.delta() >= s.coolDown) {
+			if (s.isReady && s.timer.delta() >= s.coolDown) {
 				s.cast();
 				// 重置冷却计时
 				s.timer.reset();
@@ -76,6 +75,21 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 				rad = Math.round(num / 2) * 15 * Math.PI / 180,
 				moveAim = this.moveAim || this.aim;
 			this.moveByRad(moveAim + rad * f);
+		},
+		// 更新技能冷却时间
+		setCD: function() {
+			if (this.cdDown > 0.5) {
+				// 冷却时间减少上限
+				this.cdDown = 0.5;
+			}
+			for (var skillId in this.skills) {
+				var s = this.skills[skillId];
+				if (s._cd) {
+					s.coolDown = s._cd * (1 - this.cdDown);
+				} else {
+					s.coolDown = 1 / this.attackSpeed;
+				}
+			}
 		},
 		// 受到治疗 吸血和恢复buff
 		onHeal: function(heal) {
@@ -106,8 +120,13 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 
 			// 检查反射Buff 就算是玩家闪避了攻击也需要反射伤害
 			if (this.isReflection && !canReflection) {
+				var reflectDamage = damage - (this.life < 0 ? this.life : 0);
+				if (attacker.type == "player") {
+					// 如果是玩家攻击的话，反弹减少。
+					reflectDamage = reflectDamage * 0.1;
+				}
 				// 反射的伤害不会再次触发反射
-				ap.mediator.attack(this, attacker, damage * 0.5, "reflection", null, true);
+				ap.mediator.attack(this, attacker, reflectDamage, "reflection", null, true);
 			}
 
 			if (this.life <= 0) {

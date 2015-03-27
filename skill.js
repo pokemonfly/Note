@@ -14,6 +14,8 @@ ap.module("skill").requires("utils").defines(function() {
 			radius: 900,
 			// 需要技能指向预览
 			hasPreview: false,
+			// 无法沉默标识 基础技能
+			cannotSilence: true,
 			// 施法 参数：方向
 			cast: function() {
 				var status = [],
@@ -216,6 +218,15 @@ ap.module("skill").requires("utils").defines(function() {
 			cost: 0,
 			caster: null,
 			cast: function() {
+				var status = [];
+				if (this.status) {
+					for (var i = 0; i < this.status.length; i++) {
+						if (this.status[i] == "poison") {
+							status.push(ap.status.createStatus("poison", "", this.caster, (this.caster.power + this.caster.powerBonus) * 0.1,
+								4, 1, 0.5));
+						}
+					}
+				}
 				ap.game.createFlyer({
 					// 技能伤害
 					power: (this.caster.power + this.caster.powerBonus),
@@ -224,7 +235,7 @@ ap.module("skill").requires("utils").defines(function() {
 					moveSpeed: 350,
 					owner: this.caster,
 					radius: 10,
-					status: null,
+					status: status,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
 					moveAim: this.caster.aim,
 					anims: new ap.Animation([
@@ -246,13 +257,22 @@ ap.module("skill").requires("utils").defines(function() {
 			// 技能施法角度
 			rad: 30 * Math.PI / 180,
 			cast: function() {
+				var status = [];
+				if (this.status) {
+					for (var i = 0; i < this.status.length; i++) {
+						if (this.status[i] == "poison") {
+							status.push(ap.status.createStatus("poison", "", this.caster, (this.caster.power + this.caster.powerBonus) * 0.1,
+								4, 1, 0.5));
+						}
+					}
+				}
 				ap.game.createArea({
 					power: (this.caster.power + this.caster.powerBonus),
 					duration: 0.2,
 					owner: this.caster,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 15),
 					radius: 60,
-					status: null,
+					status: status,
 					aimS: this.caster.aim - this.rad / 2,
 					aimE: this.caster.aim + this.rad / 2,
 					coolDown: 0.15,
@@ -321,6 +341,37 @@ ap.module("skill").requires("utils").defines(function() {
 				}
 			}
 		},
+		track: {
+			id: "track",
+			name: "追踪火球",
+			description: null,
+			coolDown: 15,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				ap.game.createFlyer({
+					// 技能伤害
+					power: (this.caster.power + this.caster.powerBonus),
+					// 持续时间 s
+					duration: 5,
+					moveSpeed: 250,
+					owner: this.caster,
+					radius: 15,
+					status: null,
+					// 自动瞄准
+					autoFocus: true,
+					target: ap.game.player,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
+					moveAim: this.caster.aim,
+					anims: new ap.Animation([
+						new ap.Image("media/ui/fire.png", {
+							x: 84,
+							y: 16
+						})
+					])
+				});
+			}
+		},
 		miasma: {
 			id: "miasma",
 			name: "毒沼",
@@ -351,9 +402,198 @@ ap.module("skill").requires("utils").defines(function() {
 					})
 				});
 			}
+		},
+		prison: {
+			id: "prison",
+			name: "监禁",
+			description: null,
+			coolDown: 20,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				var status = [];
+				// 定身debuff 过于强力，不可多放
+				status.push(ap.status.createStatus("immobilize", "", this.caster, null,
+					2, 0.1));
+				ap.game.createArea({
+					duration: 0.2,
+					owner: this.caster,
+					pos: {
+						x: ap.game.player.pos.x,
+						y: ap.game.player.pos.y
+					},
+					radius: 20,
+					status: status,
+					coolDown: 0.1,
+					once: true,
+					animSheet: new ap.Image("media/ui/prison.png", {
+						x: 25,
+						y: 20
+					})
+				});
+				// 额外放置一个陷阱
+				var pos = ap.collision.getRandomPosInArea(20, this.caster.pos.x, this.caster.pos.y, 600);
+				ap.game.createArea({
+					duration: this.coolDown,
+					owner: this.caster,
+					pos: {
+						x: pos.x,
+						y: pos.y
+					},
+					radius: 20,
+					status: status,
+					coolDown: 0.1,
+					once: true,
+					animSheet: new ap.Image("media/ui/prison.png", {
+						x: 25,
+						y: 20
+					})
+				});
+			}
+		},
+		cold: {
+			id: "cold",
+			name: "寒气",
+			description: null,
+			coolDown: 15,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				var status = [];
+				// 减速debuff
+				status.push(ap.status.createStatus("slow", "", this.caster, null,
+					3, 0.1));
+				ap.game.createArea({
+					duration: 0.2,
+					owner: this.caster,
+					pos: {
+						x: ap.game.player.pos.x,
+						y: ap.game.player.pos.y
+					},
+					radius: 20,
+					status: status,
+					coolDown: 0.1,
+					once: true,
+					animSheet: new ap.Image("media/ui/cold.png", {
+						x: 25,
+						y: 20
+					})
+				});
+				// 额外放置一个陷阱
+				var pos = ap.collision.getRandomPosInArea(20, this.caster.pos.x, this.caster.pos.y, 600);
+				ap.game.createArea({
+					duration: this.coolDown,
+					owner: this.caster,
+					pos: {
+						x: pos.x,
+						y: pos.y
+					},
+					radius: 20,
+					status: status,
+					coolDown: 0.1,
+					once: true,
+					animSheet: new ap.Image("media/ui/cold.png", {
+						x: 25,
+						y: 20
+					})
+				});
+			}
+		},
+		silence: {
+			id: "silence",
+			name: "沉默",
+			description: null,
+			coolDown: 15,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				var status = [];
+				// 沉默debuff
+				status.push(ap.status.createStatus("silence", "", this.caster, null,
+					5, 0.1));
+				ap.game.createArea({
+					duration: 0.2,
+					owner: this.caster,
+					pos: {
+						x: ap.game.player.pos.x,
+						y: ap.game.player.pos.y
+					},
+					radius: 20,
+					status: status,
+					coolDown: 0.1,
+					once: true
+				});
+			}
+		},
+		growth: {
+			id: "growth",
+			name: "生长",
+			description: null,
+			coolDown: 20,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				ap.ui.addMessage("精英怪物治疗了全体怪物！");
+				var bosses = ap.game.getCurrentMonster(1);
+				bosses.forEach(function(boss) {
+					// 回复buff
+					var s = ap.status.createStatus("regeneration", "", "", boss.lifeLimit * 0.01, 3, 0.5);
+					boss.status.push(s);
+				});
+				var monsters = ap.game.getCurrentMonster(0);
+				monsters.forEach(function(monster) {
+					// 回复buff
+					var s = ap.status.createStatus("regeneration", "", "", monster.lifeLimit * 0.05, 3, 0.5);
+					monster.status.push(s);
+				});
+			}
+		},
+		summon: {
+			id: "summon",
+			name: "召唤",
+			description: null,
+			coolDown: 20,
+			cost: 0,
+			caster: null,
+			cast: function() {
+				ap.ui.addMessage("精英怪物召唤了一批手下！");
+				var append = ap.field.appendMonster();
+				ap.game.addMonster(append);
+			}
+		},
+		annihilation: {
+			id: "annihilation",
+			name: "歼灭",
+			description: null,
+			coolDown: 20,
+			cost: 0,
+			caster: null,
+			// 技能施法角度
+			rad: 60 * Math.PI / 180,
+			cast: function() {
+				// 怪物需要停下来释放技能
+				var s = ap.status.createStatus("immobilize", "", "", "", 1, 0.1);
+				this.caster.status.push(s);
+				ap.game.createArea({
+					power: (this.caster.power + this.caster.powerBonus) * 3,
+					duration: 1.5,
+					owner: this.caster,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 15),
+					radius: 600,
+					status: status,
+					aimS: this.caster.aim - this.rad / 2,
+					aimE: this.caster.aim + this.rad / 2,
+					coolDown: 1.4,
+					anims: new ap.Animation([new ap.Image("media/ui/Annihilation.png", {
+						x: 0,
+						y: 300
+					}), new ap.Image("media/ui/Annihilation1.png", {
+						x: 0,
+						y: 300
+					})], 1.4)
+				});
+			}
 		}
-
-
 	};
 	// 生成新的技能对象
 	ap.skill.createSkill = function(name, caster) {
@@ -372,6 +612,8 @@ ap.module("skill").requires("utils").defines(function() {
 		}
 		// 初始化时，追加属性 冷却用的计时器
 		newSkill.timer = new ap.Timer(newSkill.coolDown);
+		// 技能冷却准备完成
+		newSkill.isReady = true;
 		return newSkill;
 	};
 });

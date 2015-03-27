@@ -165,16 +165,33 @@ ap.module("status").defines(function() {
 				this.target.isImmobilize = false;
 			}
 		},
-		jam: {
-			name: "干扰",
-			description: "技能冷却时间加长",
+		silence: {
+			name: "沉默",
+			description: "无法使用技能",
 			type: "debuff",
 			icon: 9,
 			effect: function() {
-				this.target.isJam = true;
+				for (var skillId in this.target.skills) {
+					var s = this.target.skills[skillId];
+					if (s.cannotSilence) {
+						continue;
+					}
+					s.isReady = false;
+					if (s.dom && !s.isLock) {
+						// 修改技能图标样式
+						ap.ui.setSkillStatus(s.dom, false);
+					}
+				}
 			},
 			vanish: function() {
-				this.target.isJam = false;
+				for (var skillId in this.target.skills) {
+					var s = this.target.skills[skillId];
+					s.isReady = true;
+					if (s.dom && !s.isLock) {
+						// 修改技能图标样式
+						ap.ui.setSkillStatus(s.dom, true);
+					}
+				}
 			}
 		}
 	};
@@ -193,9 +210,9 @@ ap.module("status").defines(function() {
 		// 持续时间最短1秒
 		newStatus.duration = duration || 1;
 		// 每一跳的时间
-		newStatus.cycle = cycle || 1;
+		newStatus.cycle = cycle || 0;
 		// 部分buff没有强度概念
-		newStatus.intensity = intensity || 0;
+		newStatus.intensity = intensity || 1;
 		// 默认100%附加
 		newStatus.probability = probability || 1;
 		return newStatus;
