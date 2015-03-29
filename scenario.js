@@ -105,14 +105,14 @@ ap.module("scenario").requires("ui").defines(function() {
 				return diff === 2;
 			},
 			words: "安妮带着血纹咒印出门了..."
-		},{
-			words:"（谜之音：游戏内可以点击右下角的帮助 或者 按下H键获得游戏帮助。)"
+		}, {
+			words: "（谜之音：游戏内可以点击右下角的帮助 或者 按下H键获得游戏帮助。)"
 		}]
 	}, {
 		name: "lv6",
-		description: "角色提升到6级时，遇到熊，击败后获得技能",
+		description: "角色提升到6级时，遇到熊",
 		trigger: function() {
-			if (ap.game.player.level == 6 && ap.field.num > 3 && !this.disabled) {
+			if (ap.game.player.level == 6 && ap.field.num > 3 && !this.disabled && ap.game.leaveKillCount > 0) {
 				this.run();
 				this.disabled = true;
 			}
@@ -123,7 +123,18 @@ ap.module("scenario").requires("ui").defines(function() {
 			ap.ui.playScenario(this);
 		},
 		callback: function() {
+			var m = new ap.Monster(ap.config.rareMonster[1]);
+			m.pos = ap.collision.getRandomPos(m.radius);
+			m.rank = 2;
+			m.onKill = function() {
+				m.isKilled = true;
+				ap.game.lockCurrentField = false;
+				ap.mediator.fire("killBear");
+			};
+			ap.game.addMonster(m);
 			ap.ui.addMessage("安妮命运的邂逅，史诗级暗影熊出现了！", "yellow");
+			// 锁定当前区域
+			ap.game.lockCurrentField = true;
 		},
 		script: [{
 			icon: "Bear ",
@@ -147,6 +158,78 @@ ap.module("scenario").requires("ui").defines(function() {
 		}, {
 			icon: "Annie",
 			words: "不听话的孩子是要被教训的。嘿！"
+		}]
+	}, {
+		name: "killBear",
+		description: "击败熊后获得技能",
+		trigger: null,
+		background: 'canvas',
+		needPause: true,
+		run: function() {
+			ap.ui.playScenario(this);
+		},
+		// 剧情播放完毕的回调
+		callback: function() {
+			var s = ap.game.player.skills["tibbers"];
+			s.isLock = false;
+			ap.ui.setSkillStatus(s.dom, true);
+		},
+		// 剧情演出 台词
+		script: [{
+			words: "暗影熊被打倒了。"
+		}, {
+			icon: "Bear",
+			words: "吼...（颤抖）"
+		}, {
+			icon: "Annie",
+			words: "你现在愿意和我做朋友了吧？"
+		}, {
+			icon: "Bear",
+			words: "吼...（点头）"
+		}, {
+			icon: "Annie",
+			words: "那你以后就是我的小熊了❤~你的名字就叫提伯斯好了~"
+		}, {
+			icon: "Annie",
+			words: "来和我签下契约，成为魔法小熊吧~"
+		}, {
+			icon: "Bear",
+			words: "吼...（颤抖）"
+		}, {
+			words: "安妮咏唱了一段咒文，暗影熊最后化作布偶上的闪动的符号。那是个封印魔物的符号。"
+		}, {
+			icon: "Annie",
+			words: "嘻嘻~交到朋友真好啊，再继续玩会吧~"
+		}, {
+			words: "(迷之音：安妮解锁了一个新技能：提伯斯之怒。）"
+		}, {
+			words: "(提伯斯会攻击周围的敌人，并周期性的对附近的敌人造成伤害。敌人会优先攻击提伯斯。）"
+		}]
+	}, {
+		name: "patDead",
+		description: "宠物熊第一次死亡事件",
+		trigger: null,
+		background: 'canvas',
+		needPause: true,
+		disabled: false,
+		run: function() {
+			if (!this.disabled) {
+				ap.ui.playScenario(this);
+				this.disabled = true;
+			}
+		},
+		callback: function() {},
+		// 剧情演出 台词
+		script: [{
+			words: "提伯斯被打的破破烂烂，终于倒下了..."
+		}, {
+			icon: "Bear",
+			words: "吼...（痛苦）"
+		}, {
+			icon: "Annie",
+			words: "小熊！！你们，你们竟然伤到了我的小熊！我要把你们都烧掉！"
+		}, {
+			words: "安妮的愤怒使她暂时获得了强大的力量。"
 		}]
 	}, {
 		name: "gameOver",

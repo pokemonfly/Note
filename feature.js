@@ -162,20 +162,24 @@ ap.module("feature").defines(function() {
 			field.bosses.forEach(function(boss) {
 				// 重写boss的一些方法
 				boss.hurt = (function(damage) {
-					if (Math.random() < 1) {
+					if (Math.random() < 0.1) {
 						// 被击中后创建幻影 幻影伤害低，无特殊技能 
-						var phantom = new ap.Monster(ap.config.bosses[this._id]);
-						phantom.pos = ap.collision.getRandomPos(phantom.radius, this.pos.x, this.pos.y, 500);
-						phantom.life = this.life / 3;
-						phantom.exp = 1;
-						phantom.name = this.name + "幻影";
-						phantom.power = this.poswer / 2;
-						// 幻影击杀不能加数目
-						phantom.onKill = function() {
-							this.isKilled = true;
-							ap.game.leaveKillCount += 1;
-						};
-						ap.game.addMonster(phantom);
+						try {
+							var phantom = new ap.Monster(ap.config.bosses[this._id]);
+							phantom.pos = ap.collision.getRandomPosInArea(phantom.radius, this.pos.x, this.pos.y, 500);
+							phantom.life = this.life / 3;
+							phantom.exp = 1;
+							phantom.name = this.name + "幻影";
+							phantom.power = this.poswer / 2;
+							// 幻影击杀不能加数目
+							phantom.onKill = function() {
+								this.isKilled = true;
+								ap.game.leaveKillCount += 1;
+							};
+							ap.game.addMonster(phantom);
+						} catch (e) {
+							ap.log(e);
+						}
 					}
 					this.life -= damage;
 				}).bind(boss);
@@ -183,5 +187,3 @@ ap.module("feature").defines(function() {
 		}
 	}];
 });
-
-// Bomb	爆弹	召唤爆弹蘑菇

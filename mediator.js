@@ -45,7 +45,7 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 				attacker.onDamage(damage);
 				// 通知目标受伤
 				isDead = target.onHurt(damage, attacker);
-				if (attacker.type == "player") {
+				if (attacker instanceof ap.Player) {
 					ap.ui.addMessage(attacker.name + "的" + skillId + "对" + target.name + "造成" +
 						damage + "伤害。" + (isCritical ? "(暴击）" : ""), "#fa4204");
 				}
@@ -65,14 +65,14 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 								uidCheck = false;
 								target.status[i].duration = s.duration;
 								// 如果是玩家的状态，还需要刷新时间
-								if (target.type == "player" && s.dom) {
+								if (target instanceof ap.Player && s.dom) {
 									// 更新状态栏
 									ap.ui.showStatus(s.dom, s.duration);
 								}
 							}
 						}
 						if (uidCheck) {
-							if (target.type == "player") {
+							if (target.type instanceof ap.Player) {
 								// 玩家受到异常的话
 								target.getStatus(s);
 							} else {

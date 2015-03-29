@@ -45,23 +45,6 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 				}
 			}
 		},
-		// 攻击 使用技能
-		useSkill: function(skill) {
-			var s = this.skills[skill];
-			// 检查Cooldown
-			if (s.isReady && s.timer.delta() >= s.coolDown) {
-				s.cast();
-				// 重置冷却计时
-				s.timer.reset();
-				// 只有玩家的技能会关联DOM
-				if (s.dom) {
-					// 如果是玩家的技能话，设置冷却时间动画
-					ap.ui.setCoolDown(s.dom, s.coolDown);
-				}
-				// 设置角色动作
-				this.action = "attack";
-			}
-		},
 		// 计算指定的角度移动的偏移量 具体移动在collision中实现
 		moveByRad: function(rad) {
 			this.moveOffset.x = this.lastMove * Math.cos(rad);
@@ -141,6 +124,22 @@ ap.module("entity").requires("timer", "class", "skill", "status", "animation").d
 		// 死亡事件
 		onKill: function() {
 			this.isKilled = true;
+		},
+		// 向目标移动 并指向目标 
+		move: function() {
+			// 因为怪物是发现目标后才移动，所以移动时再初始化
+			if (!this.moveTimer) {
+				this.moveTimer = new ap.Timer();
+			}
+			this.aim = ap.utils.getRad(this.pos, this.target.pos);
+			// 当前可以移动的长度   未定身的话
+			if (this.needMove && !this.isImmobilize) {
+				this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
+			} else {
+				this.lastMove = 0;
+			}
+			this.moveByRad(this.aim);
+			this.moveTimer.reset();
 		},
 		update: function() {
 			// 检查自带的状态 （如果自带debuff效果，优先处理）

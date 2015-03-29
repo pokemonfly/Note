@@ -48,8 +48,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 		dropRate: 1,
 		// 离开前需要击杀数 如果为0则解锁当前区域
 		leaveKillCount: 0,
-		// 当前区域是否解锁
+		// 当前区域是否解锁 防止重复解锁
 		isUnLock: false,
+		// 强制锁定当前区域  特殊事件用
+		lockCurrentField: false,
 
 		// 初始化game对象本身
 		init: function(difficulty) {
@@ -94,6 +96,9 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			this.entities = [];
 			// 加入玩家实体 优先加入是为了防止怪物的坐标与玩家重复
 			this.entities.push(this.player);
+			if (this.player.redirect) {
+				this.entities.push(this.player.redirect);
+			}
 			// 获得怪物信息
 			var monsters = ap.field.nextWave();
 			this.entities = this.entities.concat(monsters);
@@ -113,7 +118,7 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 				entity = null;
 			for (var i = 0; i < this.entities.length; i++) {
 				entity = this.entities[i];
-				if (entity instanceof ap.Monster ||entity.rank == rank)  {
+				if (entity instanceof ap.Monster || entity.rank == rank) {
 					monster.push(entity);
 				}
 			}
@@ -155,6 +160,10 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			}
 			// 移动后碰撞检查
 			ap.collision.checkMoveAll();
+			// 如果有特殊事件封锁了当前场景，击杀数不会低于1
+			if (this.lockCurrentField && this.leaveKillCount <= 0) {
+				this.leaveKillCount = 1;
+			}
 			// 如果击杀数够了就解锁当前区域
 			if (!this.isUnLock && this.leaveKillCount <= 0) {
 				this.isUnLock = true;

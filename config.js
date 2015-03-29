@@ -100,7 +100,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 			// 安妮的初始属性大多已经在player中预设
 			"Annie": {
 				name: "安妮",
-				skill: ["pyromania", "disintegrate", "incinerate", "moltenShield"],
+				skill: ["pyromania", "disintegrate", "incinerate", "moltenShield", "tibbers"],
 				animsSet: {
 					"stand": new ap.Animation(
 						new ap.Image("media/sprites/annieStand.png", {
@@ -137,6 +137,15 @@ ap.module("config").requires("image", "animation").defines(function() {
 							})
 						], 0.2, false)
 				}
+			}
+		},
+		// 宠物
+		pat:{
+			"Tibbers" : {
+				name: "提伯斯",
+				skill: ["bearAttack","bearBurn"],
+				radius: 80,
+				animSheet : new ap.Image("media/ui/petBear.png")
 			}
 		},
 		// 怪物列表
@@ -254,7 +263,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 			powerUp: 7,
 			animSheet: new ap.Image("media/ui/plant4G.png")
 		}],
-		// 稀有区域的专属怪物
+		// 专属怪物
 		rareMonster: [{
 			name: "时空奇点",
 			skill: ["portal"],
@@ -271,6 +280,23 @@ ap.module("config").requires("image", "animation").defines(function() {
 			animSheet: new ap.Image("media/ui/portal.png", {
 				x: 84,
 				y: 187
+			})
+		},{
+			name: "狂暴的暗影熊",
+			skill: ["bearAttack"],
+			breed: "bearAttack",
+			life: 3500,
+			exp: 100,
+			power: 60,
+			attackRadius: 250,
+			hateRadius: 9999,
+			attackSpeed: 1,
+			radius: 70,
+			powerUp: 10,
+			lifeUp: 10,
+			animSheet: new ap.Image("media/ui/crazyBear.png", {
+				x: 130,
+				y: 250
 			})
 		}],
 		// 游戏中掉落的道具
@@ -314,7 +340,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 				name: "怒火合剂",
 				description: "获得威能",
 				effect: function() {
-					var s = ap.status.createStatus("might", "", "", ap.game.player.power * 0.2, 30);
+					var s = ap.status.createStatus("might", "", "", ap.game.player.power * 0.2, 20);
 					ap.game.player.getStatus(s);
 				}
 			}, {
@@ -335,7 +361,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 				name: "迅捷药水",
 				description: "获得迅捷",
 				effect: function() {
-					var s = ap.status.createStatus("swiftness", "", "", 0, 30);
+					var s = ap.status.createStatus("swiftness", "", "", 0, 15);
 					ap.game.player.getStatus(s);
 				}
 			}],

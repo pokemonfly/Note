@@ -116,6 +116,10 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			for (var i in this.skills) {
 				var s = this.skills[i];
 				if (s.timer.delta() >= s.coolDown) {
+					if (s.radius && s.radius <= ap.utils.getDistance(this.pos, this.target.pos)) {
+						// 攻击范围不够
+						return;
+					}
 					// 瞄准当前目标
 					s.aim = Math.atan2(this.target.pos.y - this.pos.y, this.target.pos.x - this.pos.x);
 					// 检查技能是否准备好
@@ -125,22 +129,6 @@ ap.module("monster").requires("entity", "image").defines(function() {
 					break;
 				}
 			}
-		},
-		// 向目标移动 并指向目标
-		move: function() {
-			// 因为怪物是发现目标后才移动，所以移动时再初始化
-			if (!this.moveTimer) {
-				this.moveTimer = new ap.Timer();
-			}
-			this.aim = ap.utils.getRad(this.pos, this.target.pos);
-			// 当前可以移动的长度   未定身的话
-			if (this.needMove && !this.isImmobilize) {
-				this.lastMove = this.moveTimer.delta() * (this.moveSpeed + this.moveSpeedBonus);
-			} else {
-				this.lastMove = 0;
-			}
-			this.moveByRad(this.aim);
-			this.moveTimer.reset();
 		},
 		update: function() {
 			// 执行超类

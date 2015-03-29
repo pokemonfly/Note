@@ -575,6 +575,9 @@ ap.module("ui").requires("utils").defines(function() {
 				ap.ui.removeClass(dom.children[0], "playCd");
 				// 建立DOM关联
 				sk.dom = dom;
+				if (sk.isLock) {
+					this.setSkillStatus(dom, false);
+				}
 			}
 
 		},

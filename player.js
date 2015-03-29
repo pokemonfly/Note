@@ -286,12 +286,12 @@ ap.module("player").requires("entity", "image").defines(function() {
 			if (ap.input.pressed("attack1")) {
 				// 鼠标攻击
 				// this.aim = Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x);
-				this.useSkill("pyromania");
+				this._useSkill("pyromania");
 			}
 			if (ap.input.pressed("attack2")) {
 				// 键盘攻击
 				// this.aim = this.moveAim;
-				this.useSkill("pyromania");
+				this._useSkill("pyromania");
 			}
 			// this.aim = ap.input.useMouse ? Math.atan2(ap.input.mouse.y - this.pos.y, ap.input.mouse.x - this.pos.x) : this.moveAim;
 			// 技能攻击 
@@ -301,7 +301,7 @@ ap.module("player").requires("entity", "image").defines(function() {
 					this._showSkillPreview(skillId);
 				}
 				if (ap.input.released(skillId)) {
-					this.useSkill(skillId);
+					this._useSkill(skillId);
 				}
 			}
 			// 面板相关
@@ -320,6 +320,23 @@ ap.module("player").requires("entity", "image").defines(function() {
 				ap.ui.showHelp();
 			}
 
+		},
+		// 攻击 使用技能
+		_useSkill: function(skill) {
+			var s = this.skills[skill];
+			// 检查Cooldown
+			if (s.isReady && !s.isLock && s.timer.delta() >= s.coolDown) {
+				s.cast();
+				// 重置冷却计时
+				s.timer.reset();
+				// 只有玩家的技能会关联DOM
+				if (s.dom) {
+					// 如果是玩家的技能话，设置冷却时间动画
+					ap.ui.setCoolDown(s.dom, s.coolDown);
+				}
+				// 设置角色动作
+				this.action = "attack";
+			}
 		},
 		// 准备描绘技能方向
 		_showSkillPreview: function(skillId) {

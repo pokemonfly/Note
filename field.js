@@ -146,14 +146,6 @@ ap.module("field").requires("feature").defines(function() {
 			}
 			return [].concat(this.monsters).concat(this.bosses);
 		},
-		// UI显示用的信息抽出
-		// getUIInfo: function() {
-		// 	return {
-		// 		num: this.num,
-		// 		isRare: this.isRare,
-		// 		features: this.features
-		// 	};
-		// },
 		// 设置当前的区域数 用于读档
 		setNum: function(val) {
 			for (; this.num < val; this.num++) {

@@ -209,6 +209,27 @@ ap.module("skill").requires("utils").defines(function() {
 				this.caster.shieldCreateTimer = new ap.Timer();
 			}
 		},
+		tibbers: {
+			id: "tibbers",
+			name: "提伯斯之怒",
+			icon: "media/ui/InfernalGuardian.png",
+			description: "安妮召唤伙伴提伯斯为其作战。提伯斯将会追赶并攻击敌人，同时会对身边的敌人造成伤害，在它倒下前，敌人会优先瞄准提伯斯。",
+			coolDown: 60,
+			duration: 20,
+			scale: 1.5,
+			caster: null,
+			// 初期不可用
+			isLock :true,
+			// 抬起按键时释放
+			cast: function() {
+				ap.ui.addMessage("安妮:出来吧，我的小熊~");
+				ap.ui.addMessage("提伯斯:吼~~~~");
+				var m = new ap.Pat(ap.config.pat["Tibbers"], this.caster, this.scale);
+				m.pos = ap.collision.getRandomPosInArea(m.radius, this.caster.pos.x, this.caster.pos.y, 300);
+				// 加入到画面
+				ap.game.entities = ap.game.entities.concat(m);
+			}
+		},
 		// 怪物技能列表
 		throwing: {
 			id: "throwing",
@@ -568,6 +589,7 @@ ap.module("skill").requires("utils").defines(function() {
 			coolDown: 20,
 			cost: 0,
 			caster: null,
+			radius: 600,
 			// 技能施法角度
 			rad: 60 * Math.PI / 180,
 			cast: function() {
@@ -579,7 +601,7 @@ ap.module("skill").requires("utils").defines(function() {
 					duration: 1.5,
 					owner: this.caster,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 15),
-					radius: 600,
+					radius: this.radius,
 					status: status,
 					aimS: this.caster.aim - this.rad / 2,
 					aimE: this.caster.aim + this.rad / 2,
@@ -593,7 +615,57 @@ ap.module("skill").requires("utils").defines(function() {
 					})], 1.4)
 				});
 			}
+		},
+		bearAttack: {
+			id: "bearAttack",
+			name: "爪击",
+			description: null,
+			coolDown: 4,
+			cost: 0,
+			caster: null,
+			// 技能施法角度
+			rad: 45 * Math.PI / 180,
+			radius: 300,
+			cast: function() {
+				ap.game.createArea({
+					power: (this.caster.power + this.caster.powerBonus),
+					duration: 0.3,
+					owner: this.caster,
+					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 15),
+					radius: this.radius,
+					status: null,
+					aimS: this.caster.aim - this.rad / 2,
+					aimE: this.caster.aim + this.rad / 2,
+					coolDown: 0.2,
+					anims: new ap.Animation([new ap.Image("media/ui/bearAttack.png", {
+						x: 0,
+						y: 100
+					})])
+				});
+			}
+		},
+		bearBurn: {
+			id: "bearBurn",
+			name: "灼热",
+			description: null,
+			coolDown: 1,
+			cost: 0,
+			caster: null,
+			// 技能施法角度
+			rad: 45 * Math.PI / 180,
+			radius: 250,
+			cast: function() {
+				ap.game.createArea({
+					power: (this.caster.power + this.caster.powerBonus) * 0.5,
+					duration: 0.2,
+					owner: this.caster,
+					pos: this.caster.pos,
+					radius: this.radius,
+					coolDown: 0.15
+				});
+			}
 		}
+
 	};
 	// 生成新的技能对象
 	ap.skill.createSkill = function(name, caster) {
