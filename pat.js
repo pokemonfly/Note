@@ -26,6 +26,11 @@ ap.module("pat").requires("monster").defines(function() {
 		owner: null,
 		// 碰撞体积 半径
 		radius: 30,
+		// 持续时间
+		duration: 0,
+		// 持续时间 计时器
+		durationTimer: null,
+
 		// 状态 buff & debuff
 		status: null,
 		// 持有技能
@@ -38,7 +43,7 @@ ap.module("pat").requires("monster").defines(function() {
 		anims: null,
 		animSheet: null,
 		// 初始化 owner : 主人 scale：pat属性倍率
-		init: function(property, owner, scale) {
+		init: function(property, owner, scale, duration) {
 			this.parent(property);
 			// 初始化引用类型属性
 			this.status = [];
@@ -57,6 +62,9 @@ ap.module("pat").requires("monster").defines(function() {
 			this.power = ~~((this.owner.power + this.owner.powerBonus) * scale / 2);
 			this.moveSpeed = ~~((this.owner.moveSpeed + this.owner.moveSpeedBonus) * scale / 2);
 			this.owner.redirect = this;
+			// 宠物的持续时间
+			this.duration = duration;
+			this.durationTimer = new ap.Timer();
 		},
 		// 警觉 
 		vigilance: function() {
@@ -95,9 +103,9 @@ ap.module("pat").requires("monster").defines(function() {
 			for (var i in this.skills) {
 				var s = this.skills[i];
 				if (s.timer.delta() >= s.coolDown) {
-					if ((s.radius && s.radius <= ap.utils.getDistance(this.pos, this.target.pos)) || this.target.type == this.type) {
+					if ((s.radius && s.radius <= ap.utils.getDistance(this.pos, this.target.pos) - this.radius) || this.target.type == this.type) {
 						// 攻击范围不够
-						return;
+						continue;
 					}
 					// 瞄准当前目标
 					s.aim = Math.atan2(this.target.pos.y - this.pos.y, this.target.pos.x - this.pos.x);
@@ -129,13 +137,20 @@ ap.module("pat").requires("monster").defines(function() {
 		update: function() {
 			// 执行超类
 			this.parent();
-			// 检索附近的目标
-			this.vigilance();
-			// 执行移动
-			this.move();
-			if (this.target) {
-				// 开始攻击
-				this.cast();
+			if (this.duration > this.durationTimer.delta()) {
+				// 检索附近的目标
+				this.vigilance();
+				// 执行移动
+				this.move();
+				if (this.target) {
+					// 开始攻击
+					this.cast();
+				}
+			} else {
+				// 超过存在时间则消灭
+				this.isKilled = true;
+				this.owner.redirect = null;
+				ap.ui.addMessage(this.name + "消失了。");
 			}
 		},
 		draw: function() {

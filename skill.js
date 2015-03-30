@@ -41,7 +41,7 @@ ap.module("skill").requires("utils").defines(function() {
 				}
 				// 创造火球投射物
 				ap.game.createFlyer({
-					name: "嗜火",
+					name: this.name,
 					// 技能伤害
 					power: power,
 					// 火球持续时间 s
@@ -109,7 +109,7 @@ ap.module("skill").requires("utils").defines(function() {
 				}
 				// 创造火球投射物
 				ap.game.createFlyer({
-					name: "碎裂之火",
+					name: this.name,
 					// 技能伤害
 					power: power,
 					// 火球持续时间 s
@@ -169,7 +169,7 @@ ap.module("skill").requires("utils").defines(function() {
 						2, 0.1));
 				}
 				ap.game.createArea({
-					name: "焚烧",
+					name: this.name,
 					power: (this.caster.power + this.caster.powerBonus) * this.scale,
 					duration: 0.3,
 					owner: this.caster,
@@ -215,16 +215,17 @@ ap.module("skill").requires("utils").defines(function() {
 			icon: "media/ui/InfernalGuardian.png",
 			description: "安妮召唤伙伴提伯斯为其作战。提伯斯将会追赶并攻击敌人，同时会对身边的敌人造成伤害，在它倒下前，敌人会优先瞄准提伯斯。",
 			coolDown: 60,
+			// 持续时间
 			duration: 20,
 			scale: 1.5,
 			caster: null,
 			// 初期不可用
-			isLock :true,
+			isLock: true,
 			// 抬起按键时释放
 			cast: function() {
 				ap.ui.addMessage("安妮:出来吧，我的小熊~");
 				ap.ui.addMessage("提伯斯:吼~~~~");
-				var m = new ap.Pat(ap.config.pat["Tibbers"], this.caster, this.scale);
+				var m = new ap.Pat(ap.config.pat["Tibbers"], this.caster, this.scale, this.duration);
 				m.pos = ap.collision.getRandomPosInArea(m.radius, this.caster.pos.x, this.caster.pos.y, 300);
 				// 加入到画面
 				ap.game.entities = ap.game.entities.concat(m);
@@ -274,6 +275,7 @@ ap.module("skill").requires("utils").defines(function() {
 			description: null,
 			coolDown: 0,
 			cost: 0,
+			radius: 60,
 			caster: null,
 			// 技能施法角度
 			rad: 30 * Math.PI / 180,
@@ -292,7 +294,7 @@ ap.module("skill").requires("utils").defines(function() {
 					duration: 0.2,
 					owner: this.caster,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 15),
-					radius: 60,
+					radius: this.radius,
 					status: status,
 					aimS: this.caster.aim - this.rad / 2,
 					aimE: this.caster.aim + this.rad / 2,
@@ -369,7 +371,11 @@ ap.module("skill").requires("utils").defines(function() {
 			coolDown: 15,
 			cost: 0,
 			caster: null,
+			scale: 0.3,
 			cast: function() {
+				var status = [];
+				status.push(ap.status.createStatus("burn", "", this.caster, (this.caster.power + this.caster.powerBonus) * this.scale,
+					4, 0.5));
 				ap.game.createFlyer({
 					// 技能伤害
 					power: (this.caster.power + this.caster.powerBonus),
@@ -378,10 +384,10 @@ ap.module("skill").requires("utils").defines(function() {
 					moveSpeed: 250,
 					owner: this.caster,
 					radius: 15,
-					status: null,
+					status: status,
 					// 自动瞄准
 					autoFocus: true,
-					target: ap.game.player,
+					target: this.caster.target,
 					pos: ap.utils.getSkillPos(this.caster.pos, this.caster.radius, this.caster.aim, 30),
 					moveAim: this.caster.aim,
 					anims: new ap.Animation([
@@ -628,6 +634,7 @@ ap.module("skill").requires("utils").defines(function() {
 			radius: 300,
 			cast: function() {
 				ap.game.createArea({
+					name: "提伯斯-" + this.name,
 					power: (this.caster.power + this.caster.powerBonus),
 					duration: 0.3,
 					owner: this.caster,
@@ -656,6 +663,7 @@ ap.module("skill").requires("utils").defines(function() {
 			radius: 250,
 			cast: function() {
 				ap.game.createArea({
+					name: "提伯斯-" + this.name,
 					power: (this.caster.power + this.caster.powerBonus) * 0.5,
 					duration: 0.2,
 					owner: this.caster,

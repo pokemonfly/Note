@@ -116,9 +116,9 @@ ap.module("monster").requires("entity", "image").defines(function() {
 			for (var i in this.skills) {
 				var s = this.skills[i];
 				if (s.timer.delta() >= s.coolDown) {
-					if (s.radius && s.radius <= ap.utils.getDistance(this.pos, this.target.pos)) {
+					if (s.radius && s.radius <= ap.utils.getDistance(this.pos, this.target.pos) - this.radius) {
 						// 攻击范围不够
-						return;
+						continue;
 					}
 					// 瞄准当前目标
 					s.aim = Math.atan2(this.target.pos.y - this.pos.y, this.target.pos.x - this.pos.x);

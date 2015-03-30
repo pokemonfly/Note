@@ -140,12 +140,12 @@ ap.module("config").requires("image", "animation").defines(function() {
 			}
 		},
 		// 宠物
-		pat:{
-			"Tibbers" : {
+		pat: {
+			"Tibbers": {
 				name: "提伯斯",
-				skill: ["bearAttack","bearBurn"],
+				skill: ["bearAttack", "bearBurn"],
 				radius: 80,
-				animSheet : new ap.Image("media/ui/petBear.png")
+				animSheet: new ap.Image("media/ui/petBear.png")
 			}
 		},
 		// 怪物列表
@@ -281,7 +281,7 @@ ap.module("config").requires("image", "animation").defines(function() {
 				x: 84,
 				y: 187
 			})
-		},{
+		}, {
 			name: "狂暴的暗影熊",
 			skill: ["bearAttack"],
 			breed: "bearAttack",
@@ -444,13 +444,15 @@ ap.module("config").requires("image", "animation").defines(function() {
 				name: "禁忌雕像",
 				description: "提伯斯的持续时间延长",
 				effect: function() {
-
+					var s = ap.game.player.skills["tibbers"];
+					s.duration = 40;
 				}
 			}, {
 				name: "熊灵号角",
 				description: "提伯斯的伤害和血量加强",
 				effect: function() {
-
+					var s = ap.game.player.skills["tibbers"];
+					s.scale = 3;
 				}
 			}, {
 				name: "双生暗影",

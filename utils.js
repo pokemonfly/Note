@@ -43,6 +43,38 @@ ap.module("utils").defines(function() {
 				x: Math.round((casterRadius + radius) * Math.cos(aim) + casterPos.x),
 				y: Math.round((casterRadius + radius) * Math.sin(aim) + casterPos.y)
 			};
+		},
+		// cookie工具
+		cookie: {
+			hasItem: function(key) {
+				var bool = document.cookie.indexOf(key);
+				if (bool < 0) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			setItem: function(key, value) {
+				document.cookie = key + '=' + value;
+			},
+			getItem: function(key) {
+				var i = this.hasItem(key);
+				if (!i) {
+					var array = document.cookie.split(';')
+					for (var j = 0; j < array.length; j++) {
+						var arraySplit = array[j];
+						if (arraySplit.indexOf(key) > -1) {
+							var getValue = array[j].split('=');
+							getValue[0] = getValue[0].replace(/^\s\s*/, '').replace(/\s\s*$/, '')
+							if (getValue[0] == key) {
+								return getValue[1];
+							} else {
+								return '';
+							}
+						}
+					}
+				}
+			}
 		}
 	};
 

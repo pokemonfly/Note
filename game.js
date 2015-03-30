@@ -85,8 +85,6 @@ ap.module("game").requires("class", "player", "monster", "pat", "flyer", "area",
 			ap.field.init(this.config.field);
 			// 初始化玩家角色
 			this.player = new ap.Player(ap.config.player["Annie"]);
-			// 如果有存档则继承属性
-			// TODO
 			// 创建第一个场景
 			this.nextField();
 		},

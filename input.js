@@ -5,6 +5,7 @@ ap.module("input").defines(function() {
 		'MOUSE1': -1,
 		'MOUSE2': -3,
 		'ESC': 27,
+		'A': 65,
 		'Q': 81,
 		'W': 87,
 		'E': 69,
@@ -58,7 +59,7 @@ ap.module("input").defines(function() {
 				event.preventDefault();
 			}
 			// 如果使用了键盘方向的话，就标记为键盘操作
-			if (action === "Left" || action === "Up" || action === "Right" || action === "Down") {
+			if (action === "left" || action === "up" || action === "right" || action === "down") {
 				this.useMouse = false;
 			}
 		},
@@ -122,7 +123,7 @@ ap.module("input").defines(function() {
 	};
 	// 按键设定
 	ap.input.config = {
-		// 左键普通攻击 
+		// 普通攻击 
 		'MOUSE1': 'attack1',
 		// 右键点击移动
 		'MOUSE2': 'go',
@@ -135,7 +136,7 @@ ap.module("input").defines(function() {
 		// 技能：提伯斯之怒
 		'R': 'tibbers',
 		// 功能：精神爆发，解锁当前区域的出口
-		'B': 'Break',
+		// 'B': 'Break',
 		// 面板：成就
 		'Y': 'achievement',
 		// 面板：角色
@@ -146,6 +147,7 @@ ap.module("input").defines(function() {
 		'H': 'help',
 		// 不使用鼠标的操作
 		'SPACE': 'attack2',
+		'A': 'attack2',
 		// 角色移动
 		'LEFT': 'left',
 		'UP': 'up',

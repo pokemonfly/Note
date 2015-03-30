@@ -109,10 +109,10 @@ ap.module("scenario").requires("ui").defines(function() {
 			words: "（谜之音：游戏内可以点击右下角的帮助 或者 按下H键获得游戏帮助。)"
 		}]
 	}, {
-		name: "lv6",
+		name: "meetBear",
 		description: "角色提升到6级时，遇到熊",
 		trigger: function() {
-			if (ap.game.player.level == 6 && ap.field.num > 3 && !this.disabled && ap.game.leaveKillCount > 0) {
+			if (ap.game.player.level >= 6 && ap.field.num > 1 && !this.disabled && ap.game.leaveKillCount > 0) {
 				this.run();
 				this.disabled = true;
 			}
@@ -298,7 +298,7 @@ ap.module("scenario").requires("ui").defines(function() {
 		}, {
 			words: "关于移动：<br/> 使用 鼠标右击地面 或者 方向键 来移动角色。"
 		}, {
-			words: "关于攻击：<br/> 使用 鼠标左键 或者 空格键 来释放普通攻击。<br/>使用 QWER键 来释放角色技能。"
+			words: "关于攻击：<br/> 使用 鼠标左键 或者 空格键 或者 A键 来释放普通攻击。<br/>使用 QWER键 来释放角色技能。"
 		}, {
 			words: "关于瞄准：<br/> 角色的攻击会瞄准当前鼠标的位置，如果使用键盘移动的话，就是攻击最近移动的方向。"
 		}, {
@@ -330,6 +330,73 @@ ap.module("scenario").requires("ui").defines(function() {
 			words: "TIPS 2: <br/> 危机的时候请不要犹豫，中断游戏再继续可以让角色回复部分生命。"
 		}, {
 			words: "TIPS 3: <br/> 游戏内置了金手指，如果真有需要的话，请按下F12来查看控制台。"
+		}]
+	}, {
+		name: "gameFinish",
+		description: "游戏结束",
+		trigger: function() {
+			if ((ap.game.player.level >= 30 && ap.game.difficulty === 0) ||
+				(ap.game.player.level >= 40 && ap.game.difficulty === 1) ||
+				(ap.game.player.level >= 50 && ap.game.difficulty === 2)) {
+				// 3种难度的结束等级不一样
+				this.run();
+			}
+		},
+		needPause: true,
+		run: function() {
+			ap.ui.playScenario(this);
+		},
+		// 剧情播放完毕的回调
+		callback: function() {
+			// 结束游戏
+			ap.game.player.life = 0;
+			ap.system.saveGame();
+		},
+		// 剧情演出 台词
+		script: [{
+			words: "天色渐渐变暗...."
+		}, {
+			icon: "Annie",
+			words: "肚子饿了...回家吧。"
+		}, {
+			icon: "Annie",
+			words: "今天真开心呐，恩，是吧小熊？"
+		}, {
+			icon: "Bear",
+			words: "吼...（温顺）"
+		}, {
+			which: function() {
+				return ap.game.difficulty === 0;
+			},
+			icon: "Annie",
+			words: "下次再带你去远点的地方玩~"
+		}, {
+			which: function() {
+				return ap.game.difficulty === 0;
+			},
+			words: "(迷之音：简单模式通关。Thanks for playing. 欢迎继续挑战更高难度。）"
+		}, {
+			which: function() {
+				return ap.game.difficulty === 1;
+			},
+			icon: "Annie",
+			words: "下次再带你去更远点的地方玩~ 那边虽然有更厉害的怪物，不过有我在，一定没问题的。"
+		}, {
+			which: function() {
+				return ap.game.difficulty === 1;
+			},
+			words: "(迷之音：普通模式通关。Thanks for playing. 欢迎继续挑战更高难度。）"
+		}, {
+			which: function() {
+				return ap.game.difficulty === 2;
+			},
+			icon: "Annie",
+			words: "这片树林已经没有我的对手了，以后有机会去别的地方吧~"
+		}, {
+			which: function() {
+				return ap.game.difficulty === 2;
+			},
+			words: "(迷之音：困难模式通关。Thanks for playing. ）"
 		}]
 	}];
 });

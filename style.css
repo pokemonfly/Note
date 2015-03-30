@@ -180,8 +180,48 @@ canvas {
 }
 /*播放冷却动画*/
 .playCd {
+    animation: cooldown steps(1);
+    animation-duration: 1.2s;
     -webkit-animation: cooldown steps(1);
     -webkit-animation-duration: 1.2s;
+}
+@keyframes cooldown {
+    0% {
+        background-position-x: 0px;
+        background-position-y: 0px;
+    }
+    12.5% {
+        background-position-x: -64px;
+        background-position-y: 0px;
+    }
+    25% {
+        background-position-x: -128px;
+        background-position-y: 0px;
+    }
+    37.5% {
+        background-position-x: -192px;
+        background-position-y: 0px;
+    }
+    50% {
+        background-position-x: -256px;
+        background-position-y: 0px;
+    }
+    65.5% {
+        background-position-x: -320px;
+        background-position-y: 0px;
+    }
+    75% {
+        background-position-x: -384px;
+        background-position-y: 0px;
+    }
+    87.5% {
+        background-position-x: -448px;
+        background-position-y: 0px;
+    }
+    100% {
+        background-position-x: -512px;
+        background-position-y: 0px;
+    }
 }
 @-webkit-keyframes cooldown {
     0% {
@@ -233,6 +273,7 @@ canvas {
     width: 16px;
     height: 16px;
     line-height: 16px;
+    text-align: center;
 }
 /*战斗信息*/
 #message {
@@ -244,6 +285,7 @@ canvas {
     background-size: 100% 100%;
     color: AntiqueWhite;
     overflow: hidden;
+    z-index: 20;
 }
 .messageList {
     overflow: hidden;
@@ -288,13 +330,6 @@ canvas {
 .test1 {
     background-position-x: 0px;
     background-position-y: 0px;
-}
-/*快捷方式*/
-#shortcut {
-    left: 90%;
-    top: 93%;
-    width: 8%;
-    height: 5%;
 }
 /*场地特性表示*/
 #feature {
@@ -372,10 +407,14 @@ dd:last-child {
 }
 /*统计*/
 #achievement {
-    left: 35%;
-    top: 90%;
-    width: 30%;
-    height: 8%;
+    color: white;
+    padding: 60px 30px 40px 30px;
+    right: 3%;
+    top: 15%;
+    width: 250px;
+    height: 550px;
+    background: url("media/ui/role.png");
+    background-size: 100% 100%;
 }
 /*系统菜单*/
 #system {
@@ -599,4 +638,43 @@ dd:last-child {
 }
 .disable#loadGame {
     background-position-x: -400px;
+}
+.version {
+    right: 0%;
+    bottom: 0%;
+    color: white;
+    position: absolute;
+}
+/*菜单图标 快捷方式*/
+#shortcut {
+    right: 5%;
+    bottom: 1%;
+    width: 192px;
+    height: 64px;
+}
+#shortcut > div {
+    width: 64px;
+    height: 100%;
+    float: left;
+    cursor: pointer;
+}
+#playInfoIcon {
+    background: url("media/ui/icon.png");
+    background-position-x: 0px;
+    background-position-y: 0px;
+}
+#achieveIcon {
+    background: url("media/ui/icon.png");
+    background-position-x: -64px;
+    background-position-y: 0px;
+}
+#helpIcon {
+    background: url("media/ui/icon.png");
+    background-position-x: -128px;
+    background-position-y: 0px;
+}
+.icon.skillButton {
+    border: 2px solid #735539;
+    margin-left: 3px;
+    top: 41px;
 }

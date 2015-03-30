@@ -72,7 +72,7 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 							}
 						}
 						if (uidCheck) {
-							if (target.type instanceof ap.Player) {
+							if (target instanceof ap.Player) {
 								// 玩家受到异常的话
 								target.getStatus(s);
 							} else {
@@ -84,7 +84,7 @@ ap.module("mediator").requires("scenario", "game", "achievement").defines(functi
 			}
 			if (attacker.type == "player" && isDead) {
 				// 如果是玩家杀死怪物，则更新成就 
-				this.achieve.killCount += 1;
+				this.achieve.currentKillCount += 1;
 				this.achieve.skillKillCount[skillId] += 1;
 				// 给玩家经验
 				ap.game.player.getExp(target.exp);

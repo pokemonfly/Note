@@ -306,17 +306,19 @@ ap.module("player").requires("entity", "image").defines(function() {
 			}
 			// 面板相关
 			if (ap.input.released("character")) {
-				// 刷新角色面板
-				ap.ui.refreshRoleJoho();
 				// 角色面板
 				ap.ui.showRolePanel();
+			}
+			if (ap.input.released("achievement")) {
+				// 统计面板
+				ap.ui.showAchievement();
 			}
 			if (ap.input.released("escape")) {
 				// 暂停
 				ap.ui.showPause();
 			}
 			if (ap.input.released("help")) {
-				// 暂停
+				// 显示帮助
 				ap.ui.showHelp();
 			}
 
@@ -367,6 +369,8 @@ ap.module("player").requires("entity", "image").defines(function() {
 			}
 			// 刷新角色面板
 			ap.ui.refreshRoleJoho();
+			// 刷新统计面板
+			ap.ui.refreshAchievement();
 			// 更新界面上的经验条
 			ap.ui.setExpUI(this.exp, this.nextLvExp);
 		},

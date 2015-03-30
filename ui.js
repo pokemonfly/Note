@@ -117,6 +117,43 @@ ap.module("ui").requires("utils").defines(function() {
 		save: null,
 		// 游戏界面 - 系统菜单 - 返回
 		returnGame: null,
+		// 游戏界面 - 统计
+		achievement: null,
+		// 游戏界面 - 统计 - 稀有物品收集
+		rareCollect: null,
+		// 游戏界面 - 统计 - 本次游戏击杀怪物数
+		currentKillCount: null,
+		// 游戏界面 - 统计 - 本次游戏游戏时间
+		currentGameTime: null,
+		// 游戏界面 - 统计 - 嗜火
+		skillKillCount0: null,
+		// 游戏界面 - 统计 - 焚烧
+		skillKillCount1: null,
+		// 游戏界面 - 统计 - 碎裂之火
+		skillKillCount2: null,
+		// 游戏界面 - 统计 - 提伯斯-爪击
+		skillKillCount3: null,
+		// 游戏界面 - 统计 - 提伯斯-灼热
+		skillKillCount4: null,
+		// 游戏界面 - 统计 - 嗜火爆炸
+		skillKillCount5: null,
+		// 游戏界面 - 统计 - 碎裂之火爆炸
+		skillKillCount6: null,
+		// 游戏界面 - 统计 - 毒焰
+		skillKillCount7: null,
+		// 游戏界面 - 统计 - 总计击杀怪物数
+		killCount: null,
+		// 游戏界面 - 统计 - 总计游戏时间
+		gameTime: null,
+		// 游戏界面 - 统计 - 角色最高等级
+		maxLevel: null,
+		// 游戏界面 - 统计 - 最远达到的区域数
+		maxFieldNum: null,
+		// 角色面板是否显示中
+		playerInfoIsShow: false,
+		// 统计面板是否显示中
+		achievementIsShow: false,
+
 		// DOM 关联  是否有上次的存档
 		init: function(hasLastGame) {
 			// loading 界面
@@ -175,6 +212,23 @@ ap.module("ui").requires("utils").defines(function() {
 			this.systemMenu = ap.$("#system");
 			this.save = ap.$("#save");
 			this.returnGame = ap.$("#returnGame");
+			// 游戏界面 - 统计
+			this.achievement = ap.$("#achievement");
+			this.rareCollect = ap.$("#rareCollect");
+			this.currentKillCount = ap.$("#currentKillCount");
+			this.currentGameTime = ap.$("#currentGameTime");
+			this.skillKillCount0 = ap.$("#skillKillCount0");
+			this.skillKillCount1 = ap.$("#skillKillCount1");
+			this.skillKillCount2 = ap.$("#skillKillCount2");
+			this.skillKillCount3 = ap.$("#skillKillCount3");
+			this.skillKillCount4 = ap.$("#skillKillCount4");
+			this.skillKillCount5 = ap.$("#skillKillCount5");
+			this.skillKillCount6 = ap.$("#skillKillCount6");
+			this.skillKillCount7 = ap.$("#skillKillCount7");
+			this.killCount = ap.$("#killCount");
+			this.gameTime = ap.$("#gameTime");
+			this.maxLevel = ap.$("#maxLevel");
+			this.maxFieldNum = ap.$("#maxFieldNum");
 
 			this.canvas.height = document.body.clientHeight;
 			this.canvas.width = document.body.clientWidth;
@@ -234,10 +288,24 @@ ap.module("ui").requires("utils").defines(function() {
 					ul.style.top = newTop + "px";
 				}
 			});
+			// 快捷方式 系统图标
+			ap.$("#playInfoIcon").addEventListener("click", this.showRolePanel.bind(this), false);
+			ap.$("#achieveIcon").addEventListener("click", this.showAchievement.bind(this), false);
+			ap.$("#helpIcon").addEventListener("click", this.showHelp.bind(this), false);
 			// 防止选中内容
 			document.body.onselectstart = function() {
 				return false;
 			};
+			window.addEventListener("resize", this.resize.bind(this));
+		},
+		// 窗口变化大小时
+		resize: function() {
+			var width = document.body.clientWidth,
+				height = document.body.clientHeight;
+			this.canvas.height = height;
+			this.canvas.width = width;
+			ap.game.width = width;
+			ap.game.height = height;
 		},
 		// 重置UI内容
 		resetUI: function() {
@@ -249,6 +317,7 @@ ap.module("ui").requires("utils").defines(function() {
 			// 隐藏弹出的界面
 			this.addClass(this.playerInfo, "hidden");
 			this.addClass(this.systemMenu, "hidden");
+			this.addClass(this.achievement, "hidden");
 			this.setShield(0);
 			this.addMessage("欢迎开始冒险~");
 		},
@@ -533,30 +602,35 @@ ap.module("ui").requires("utils").defines(function() {
 			if (this.hasClass(this.playerInfo, "hidden")) {
 				// 显示面板
 				this.removeClass(this.playerInfo, "hidden");
+				this.playerInfoIsShow = true;
+				this.refreshRoleJoho();
 			} else {
 				// 隐藏面板
 				this.addClass(this.playerInfo, "hidden");
+				this.playerInfoIsShow = false;
 			}
 		},
 		// 刷新角色面板内容
 		refreshRoleJoho: function() {
-			var player = ap.game.player;
-			if (player) {
-				this.nameInfo.innerHTML = player.name;
-				this.levelInfo.innerHTML = player.level;
-				this.nextLvExpInfo.innerHTML = player.nextLvExp - player.exp;
-				this.lifeInfo.innerHTML = ~~player.life + "/" + player.lifeLimit;
-				this.powerInfo.innerHTML = ~~player.power;
-				this.attackSpeedInfo.innerHTML = player.attackSpeed.toFixed(2);
-				this.criticalInfo.innerHTML = ~~(player.critical * 100);
-				this.drainLifeInfo.innerHTML = ~~(player.drainLife * 100);
-				this.moveSpeedInfo.innerHTML = ~~player.moveSpeed;
-				this.dodgeInfo.innerHTML = ~~(player.dodge * 100);
-			} else {
-				// 在player初始化的时候是取不到ap.game.player的
-				window.setTimeout(function() {
-					ap.ui.refreshRoleJoho();
-				}, 1);
+			if (this.playerInfoIsShow) {
+				var player = ap.game.player;
+				if (player) {
+					this.nameInfo.innerHTML = player.name;
+					this.levelInfo.innerHTML = player.level;
+					this.nextLvExpInfo.innerHTML = player.nextLvExp - player.exp;
+					this.lifeInfo.innerHTML = ~~player.life + "/" + player.lifeLimit;
+					this.powerInfo.innerHTML = ~~player.power;
+					this.attackSpeedInfo.innerHTML = player.attackSpeed.toFixed(2);
+					this.criticalInfo.innerHTML = ~~(player.critical * 100);
+					this.drainLifeInfo.innerHTML = ~~(player.drainLife * 100);
+					this.moveSpeedInfo.innerHTML = ~~player.moveSpeed;
+					this.dodgeInfo.innerHTML = ~~(player.dodge * 100);
+				} else {
+					// 在player初始化的时候是取不到ap.game.player的
+					window.setTimeout(function() {
+						ap.ui.refreshRoleJoho();
+					}, 1);
+				}
 			}
 		},
 		// 初始化技能栏图标
@@ -585,13 +659,16 @@ ap.module("ui").requires("utils").defines(function() {
 		setCoolDown: function(dom, cd) {
 			var node = dom.children[0];
 			// 设置冷却时间
+			node.style.animationDuration = cd + "s";
+			node.style.animationPlayState = "running";
 			node.style.webkitAnimationDuration = cd + "s";
 			node.style.webkitAnimationPlayState = "running";
 			ap.ui.removeClass(node, "playCd");
 			// 使用异步来实现dom的绘制
 			window.setTimeout(function() {
 				ap.ui.addClass(node, "playCd");
-			}, 0);
+			}, 15);
+			// 这里设为15是因为可悲的IE不响应。
 		},
 		// 初始化玩家状态栏图标
 		initStatusUI: function() {
@@ -656,6 +733,7 @@ ap.module("ui").requires("utils").defines(function() {
 			for (var i = 0; i < 5; i++) {
 				var dom = this["skill" + i].children[0];
 				if (dom && this.hasClass(dom, "playCd")) {
+					dom.style.animationPlayState = "paused";
 					dom.style.webkitAnimationPlayState = "paused";
 				}
 			}
@@ -667,6 +745,7 @@ ap.module("ui").requires("utils").defines(function() {
 				for (var i = 0; i < 5; i++) {
 					var dom = this["skill" + i].children[0];
 					if (dom && this.hasClass(dom, "playCd")) {
+						dom.style.animationPlayState = "running";
 						dom.style.webkitAnimationPlayState = "running";
 					}
 				}
@@ -693,6 +772,59 @@ ap.module("ui").requires("utils").defines(function() {
 			} else {
 				this.addClass(dom.children[0], "skillLock");
 			}
+		},
+		// 显示/ 隐藏 统计界面
+		showAchievement: function() {
+			if (this.hasClass(this.achievement, "hidden")) {
+				// 显示面板
+				this.removeClass(this.achievement, "hidden");
+				this.achievementIsShow = true;
+				this.refreshAchievement()
+			} else {
+				// 隐藏面板
+				this.addClass(this.achievement, "hidden");
+				this.achievementIsShow = false;
+			}
+		},
+		// 刷新统计界面内的数据
+		refreshAchievement: function() {
+			// 不显示的时候不需要刷新
+			if (this.achievementIsShow) {
+				var a = ap.achievement;
+				this.rareCollect.innerHTML = a.rareItemCollect.length + " / " + ap.config.items["RARE"].length;
+				this.currentKillCount.innerHTML = a.currentKillCount;
+				a.currentGameTime = ~~ap.Timer.time;
+				this.currentGameTime.innerHTML = this._formatGameTime(a.currentGameTime);
+				this.skillKillCount0.innerHTML = a.skillKillCount["嗜火"];
+				this.skillKillCount1.innerHTML = a.skillKillCount["焚烧"];
+				this.skillKillCount2.innerHTML = a.skillKillCount["碎裂之火"];
+				this.skillKillCount3.innerHTML = a.skillKillCount["提伯斯-爪击"];
+				this.skillKillCount4.innerHTML = a.skillKillCount["提伯斯-灼热"];
+				this.skillKillCount5.innerHTML = a.skillKillCount["嗜火爆炸"];
+				this.skillKillCount6.innerHTML = a.skillKillCount["碎裂之火爆炸"];
+				this.skillKillCount7.innerHTML = a.skillKillCount["毒焰"];
+				this.killCount.innerHTML = a.killCount + a.currentKillCount;
+				this.gameTime.innerHTML = this._formatGameTime(a.gameTime + a.currentGameTime);
+				this.maxLevel.innerHTML = (ap.game.player.level > a.maxLevel ? ap.game.player.level : a.maxLevel);
+				this.maxFieldNum.innerHTML = (ap.field.num > a.maxFieldNum ? ap.field.num : a.maxFieldNum);
+				// 自动更新时间
+				window.setTimeout(function() {
+					ap.ui.refreshAchievement();
+				}, 1000);
+			}
+		},
+		// 将时间秒转换为文字列
+		_formatGameTime: function(time) {
+			var s = time % 60,
+				m = ~~(time / 60) % 60,
+				h = ~~(time / 3600);
+			if (s < 10) {
+				s = "0" + s;
+			}
+			if (m < 10) {
+				m = "0" + m;
+			}
+			return h + " : " + m + " : " + s;
 		}
 	};
 });
