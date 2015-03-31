@@ -316,7 +316,7 @@ canvas {
 #statusList > li {
     width: 30px;
     height: 30px;
-    background: url("media/sprites/icon.png");
+    background: url("media/ui/statusIcon.png");
     background-size: cover;
     margin: 0;
     padding: 0;
@@ -404,6 +404,17 @@ dd {
 }
 dd:last-child {
     float: right;
+}
+/*关闭按钮*/
+#closePlayerInfo, #closeAchieve{
+    background: url("media/ui/closeIcon.png") no-repeat;
+    height: 30px;
+    width: 30px;
+    position: absolute !important;
+    top: 7% !important;
+    right: 15px;
+    left: initial !important;
+    cursor: pointer;
 }
 /*统计*/
 #achievement {
