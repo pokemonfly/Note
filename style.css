@@ -16,14 +16,7 @@ div, ui, li {
 .border, div {
     /*outline: 1px dotted gray;*/
 }
-.noborder {
-    outline: none;
-}
 /*========================*/
-.panel {
-    /*TODO*/
-    display: none;
-}
 .ui {
     position: fixed;
 }
